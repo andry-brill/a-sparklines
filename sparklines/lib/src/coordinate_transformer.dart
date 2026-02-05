@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'relative_dimension.dart';
 
 /// Transforms data coordinates to screen coordinates
 class CoordinateTransformer {
@@ -9,7 +10,7 @@ class CoordinateTransformer {
   final double width;
   final double height;
   final bool relativeDataPoints;
-  final bool relativeDimensions;
+  final RelativeDimension relativeDimensions;
   final bool crop;
 
   CoordinateTransformer({
@@ -20,7 +21,7 @@ class CoordinateTransformer {
     required this.width,
     required this.height,
     this.relativeDataPoints = true,
-    this.relativeDimensions = true,
+    this.relativeDimensions = RelativeDimension.width,
     this.crop = false,
   }) {
     assert(minX < maxX, 'minX must be less than maxX');
@@ -53,10 +54,23 @@ class CoordinateTransformer {
 
   /// Transform a relative width to absolute pixels
   double transformWidth(double relativeWidth) {
-    if (relativeDimensions) {
-      return relativeWidth * width;
-    } else {
-      return relativeWidth;
+    return transformDimension(relativeWidth);
+  }
+
+  /// Transform a dimensional value based on relativeDimensions setting
+  /// If value is infinity, returns it unchanged
+  double transformDimension(double value) {
+    if (value == double.infinity || value == double.negativeInfinity) {
+      return value;
+    }
+
+    switch (relativeDimensions) {
+      case RelativeDimension.none:
+        return value;
+      case RelativeDimension.width:
+        return value * width;
+      case RelativeDimension.height:
+        return value * height;
     }
   }
 

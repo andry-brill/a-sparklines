@@ -5,6 +5,7 @@ import 'interfaces.dart';
 import 'chart_data.dart';
 import 'data_point.dart';
 import 'sparklines_painter.dart';
+import 'relative_dimension.dart';
 
 /// Main sparklines chart widget
 class SparklinesChart extends StatefulWidget {
@@ -19,7 +20,7 @@ class SparklinesChart extends StatefulWidget {
 
   final bool crop;
   final bool relativeDataPoints;
-  final bool relativeDimensions;
+  final RelativeDimension relativeDimensions;
 
   final Duration animationDuration;
   final Curve animationCurve;
@@ -38,7 +39,7 @@ class SparklinesChart extends StatefulWidget {
     this.maxY = 1.0,
     this.crop = false,
     this.relativeDataPoints = true,
-    this.relativeDimensions = true,
+    this.relativeDimensions = RelativeDimension.width,
     this.animationDuration = const Duration(milliseconds: 300),
     this.animationCurve = Curves.easeInOut,
     this.animate = true,
@@ -257,7 +258,7 @@ class _SparklinesRenderWidget extends StatelessWidget {
   final double maxY;
   final bool crop;
   final bool relativeDataPoints;
-  final bool relativeDimensions;
+  final RelativeDimension relativeDimensions;
   final Animation<double> animation;
   final List<ISparklinesData> Function(double) getCharts;
 

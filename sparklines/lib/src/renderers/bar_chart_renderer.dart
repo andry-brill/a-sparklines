@@ -69,7 +69,11 @@ class BarChartRenderer extends BaseRenderer {
         // Apply border radius if specified
         RRect? roundedRect;
         if (barData.borderRadius != null) {
-          roundedRect = barData.borderRadius!.resolve(TextDirection.ltr)
+          final transformedBorderRadius = _transformBorderRadius(
+            barData.borderRadius!,
+            transformer,
+          );
+          roundedRect = transformedBorderRadius.resolve(TextDirection.ltr)
               .toRRect(rect);
         }
 
@@ -91,7 +95,8 @@ class BarChartRenderer extends BaseRenderer {
         // Draw border if specified
         if (barData.border != null || barData.borderColor != null) {
           paint.style = PaintingStyle.stroke;
-          paint.strokeWidth = barData.border?.width ?? 1.0;
+          final borderWidth = barData.border?.width ?? 1.0;
+          paint.strokeWidth = transformer.transformDimension(borderWidth);
           paint.color = barData.borderColor ?? barData.border?.color ?? Colors.black;
 
           if (roundedRect != null) {
@@ -108,5 +113,30 @@ class BarChartRenderer extends BaseRenderer {
     }
 
     canvas.restore();
+  }
+
+  /// Transform BorderRadius values based on relativeDimensions
+  BorderRadius _transformBorderRadius(
+    BorderRadius borderRadius,
+    CoordinateTransformer transformer,
+  ) {
+    return BorderRadius.only(
+      topLeft: Radius.elliptical(
+        transformer.transformDimension(borderRadius.topLeft.x),
+        transformer.transformDimension(borderRadius.topLeft.y),
+      ),
+      topRight: Radius.elliptical(
+        transformer.transformDimension(borderRadius.topRight.x),
+        transformer.transformDimension(borderRadius.topRight.y),
+      ),
+      bottomLeft: Radius.elliptical(
+        transformer.transformDimension(borderRadius.bottomLeft.x),
+        transformer.transformDimension(borderRadius.bottomLeft.y),
+      ),
+      bottomRight: Radius.elliptical(
+        transformer.transformDimension(borderRadius.bottomRight.x),
+        transformer.transformDimension(borderRadius.bottomRight.y),
+      ),
+    );
   }
 }

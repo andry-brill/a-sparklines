@@ -70,6 +70,7 @@ class PieChartRenderer extends BaseRenderer {
           startAngle,
           endAngle,
           pieData,
+          transformer,
         );
       } else {
         // Arc with stroke
@@ -80,6 +81,7 @@ class PieChartRenderer extends BaseRenderer {
           startAngle,
           endAngle,
           pieData,
+          transformer,
         );
       }
 
@@ -96,19 +98,28 @@ class PieChartRenderer extends BaseRenderer {
     double startAngle,
     double endAngle,
     PieData pieData,
+    CoordinateTransformer transformer,
   ) {
-    final hasRoundedCorners = pieData.borderRadius != null &&
-        (pieData.borderRadius!.topLeft.x > 0 ||
-            pieData.borderRadius!.topLeft.y > 0 ||
-            pieData.borderRadius!.topRight.x > 0 ||
-            pieData.borderRadius!.topRight.y > 0);
+    BorderRadius? transformedBorderRadius;
+    if (pieData.borderRadius != null) {
+      transformedBorderRadius = _transformBorderRadius(
+        pieData.borderRadius!,
+        transformer,
+      );
+    }
+
+    final hasRoundedCorners = transformedBorderRadius != null &&
+        (transformedBorderRadius.topLeft.x > 0 ||
+            transformedBorderRadius.topLeft.y > 0 ||
+            transformedBorderRadius.topRight.x > 0 ||
+            transformedBorderRadius.topRight.y > 0);
 
     final path = hasRoundedCorners
         ? _buildRoundedSectorPath(
             radius,
             startAngle,
             endAngle,
-            pieData.borderRadius!,
+            transformedBorderRadius!,
           )
         : () {
             final p = Path();
@@ -137,7 +148,8 @@ class PieChartRenderer extends BaseRenderer {
     // Border
     if (pieData.border != null || pieData.borderColor != null) {
       paint.style = PaintingStyle.stroke;
-      paint.strokeWidth = pieData.border?.width ?? 1.0;
+      final borderWidth = pieData.border?.width ?? 1.0;
+      paint.strokeWidth = transformer.transformDimension(borderWidth);
       paint.color = pieData.borderColor ?? pieData.border?.color ?? Colors.black;
       canvas.drawPath(path, paint);
     }
@@ -150,8 +162,9 @@ class PieChartRenderer extends BaseRenderer {
     double startAngle,
     double endAngle,
     PieData pieData,
+    CoordinateTransformer transformer,
   ) {
-    final strokeWidth = pieData.stroke;
+    final strokeWidth = transformer.transformDimension(pieData.stroke);
     double innerRadius = radius;
     double outerRadius = radius;
 
@@ -170,11 +183,19 @@ class PieChartRenderer extends BaseRenderer {
         break;
     }
 
-    final hasRoundedCorners = pieData.borderRadius != null &&
-        (pieData.borderRadius!.topLeft.x > 0 ||
-            pieData.borderRadius!.topLeft.y > 0 ||
-            pieData.borderRadius!.topRight.x > 0 ||
-            pieData.borderRadius!.topRight.y > 0);
+    BorderRadius? transformedBorderRadius;
+    if (pieData.borderRadius != null) {
+      transformedBorderRadius = _transformBorderRadius(
+        pieData.borderRadius!,
+        transformer,
+      );
+    }
+
+    final hasRoundedCorners = transformedBorderRadius != null &&
+        (transformedBorderRadius.topLeft.x > 0 ||
+            transformedBorderRadius.topLeft.y > 0 ||
+            transformedBorderRadius.topRight.x > 0 ||
+            transformedBorderRadius.topRight.y > 0);
 
     final path = hasRoundedCorners
         ? _buildRoundedArcPath(
@@ -182,7 +203,7 @@ class PieChartRenderer extends BaseRenderer {
             outerRadius,
             startAngle,
             endAngle,
-            pieData.borderRadius!,
+            transformedBorderRadius!,
           )
         : () {
             final p = Path();
@@ -215,10 +236,36 @@ class PieChartRenderer extends BaseRenderer {
     // Border
     if (pieData.border != null || pieData.borderColor != null) {
       paint.style = PaintingStyle.stroke;
-      paint.strokeWidth = pieData.border?.width ?? 1.0;
+      final borderWidth = pieData.border?.width ?? 1.0;
+      paint.strokeWidth = transformer.transformDimension(borderWidth);
       paint.color = pieData.borderColor ?? pieData.border?.color ?? Colors.black;
       canvas.drawPath(path, paint);
     }
+  }
+
+  /// Transform BorderRadius values based on relativeDimensions
+  BorderRadius _transformBorderRadius(
+    BorderRadius borderRadius,
+    CoordinateTransformer transformer,
+  ) {
+    return BorderRadius.only(
+      topLeft: Radius.elliptical(
+        transformer.transformDimension(borderRadius.topLeft.x),
+        transformer.transformDimension(borderRadius.topLeft.y),
+      ),
+      topRight: Radius.elliptical(
+        transformer.transformDimension(borderRadius.topRight.x),
+        transformer.transformDimension(borderRadius.topRight.y),
+      ),
+      bottomLeft: Radius.elliptical(
+        transformer.transformDimension(borderRadius.bottomLeft.x),
+        transformer.transformDimension(borderRadius.bottomLeft.y),
+      ),
+      bottomRight: Radius.elliptical(
+        transformer.transformDimension(borderRadius.bottomRight.x),
+        transformer.transformDimension(borderRadius.bottomRight.y),
+      ),
+    );
   }
 
   Path _buildRoundedSectorPath(

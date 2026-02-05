@@ -63,7 +63,7 @@ class LineChartRenderer extends BaseRenderer {
 
     // Draw line
     paint.style = PaintingStyle.stroke;
-    paint.strokeWidth = lineData.width;
+    paint.strokeWidth = transformer.transformDimension(lineData.width);
     paint.strokeCap = lineData.isStrokeCapRound
         ? StrokeCap.round
         : StrokeCap.butt;
@@ -211,7 +211,8 @@ class LineChartRenderer extends BaseRenderer {
 
     for (final point in lineData.points) {
       final screenPoint = transformer.transformPoint(point.x, point.y);
-      canvas.drawCircle(screenPoint, style.radius, paint);
+      final radius = transformer.transformDimension(style.radius);
+      canvas.drawCircle(screenPoint, radius, paint);
     }
   }
 }

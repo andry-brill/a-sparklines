@@ -12,3 +12,4 @@ export 'src/interfaces.dart';
 
 // Enums
 export 'src/stroke_align.dart';
+export 'src/relative_dimension.dart';
