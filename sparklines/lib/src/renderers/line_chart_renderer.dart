@@ -1,0 +1,217 @@
+import 'package:flutter/material.dart';
+import '../coordinate_transformer.dart';
+import '../chart_data.dart';
+import '../data_point.dart';
+import '../interfaces.dart';
+import 'base_renderer.dart';
+
+/// Renders line charts
+class LineChartRenderer extends BaseRenderer {
+  @override
+  void render(
+    Canvas canvas,
+    CoordinateTransformer transformer,
+    ISparklinesData data,
+  ) {
+    if (data is! LineData || !data.visible) return;
+    if (data.points.length < 2) return;
+
+    final lineData = data;
+    final paint = Paint();
+
+    // Apply origin offset
+    canvas.save();
+    canvas.translate(lineData.origin.dx, lineData.origin.dy);
+
+    // Apply rotation
+    if (lineData.rotation != 0.0) {
+      final center = Offset(transformer.width / 2, transformer.height / 2);
+      canvas.translate(center.dx, center.dy);
+      canvas.rotate(lineData.rotation);
+      canvas.translate(-center.dx, -center.dy);
+    }
+
+    // Clip if crop is enabled
+    if (transformer.crop) {
+      canvas.clipRect(
+        Rect.fromLTWH(0, 0, transformer.width, transformer.height),
+      );
+    }
+
+    // Build path based on line type
+    final path = buildPath(lineData, transformer);
+
+    // Draw area gradient if specified
+    if (lineData.gradientArea != null) {
+      final areaPath = Path.from(path);
+      areaPath.lineTo(
+        transformer.transformX(transformer.maxX),
+        transformer.transformY(transformer.minY),
+      );
+      areaPath.lineTo(
+        transformer.transformX(transformer.minX),
+        transformer.transformY(transformer.minY),
+      );
+      areaPath.close();
+
+      paint.shader = lineData.gradientArea!.createShader(
+        Rect.fromLTWH(0, 0, transformer.width, transformer.height),
+      );
+      paint.style = PaintingStyle.fill;
+      canvas.drawPath(areaPath, paint);
+    }
+
+    // Draw line
+    paint.style = PaintingStyle.stroke;
+    paint.strokeWidth = lineData.width;
+    paint.strokeCap = lineData.isStrokeCapRound
+        ? StrokeCap.round
+        : StrokeCap.butt;
+    paint.strokeJoin = lineData.isStrokeJoinRound
+        ? StrokeJoin.round
+        : StrokeJoin.miter;
+
+    if (lineData.gradient != null) {
+      paint.shader = lineData.gradient!.createShader(
+        Rect.fromLTWH(0, 0, transformer.width, transformer.height),
+      );
+    } else {
+      paint.color = lineData.color ?? Colors.blue;
+    }
+
+    canvas.drawPath(path, paint);
+
+    // Draw points if style is specified
+    if (lineData.pointStyle != null) {
+      _drawPoints(canvas, lineData, transformer, paint);
+    }
+
+    canvas.restore();
+  }
+
+  Path buildPath(LineData lineData, CoordinateTransformer transformer) {
+    final path = Path();
+    final points = lineData.points;
+
+    if (points.isEmpty) return path;
+
+    // Transform first point
+    final firstPoint = transformer.transformPoint(points[0].x, points[0].y);
+    path.moveTo(firstPoint.dx, firstPoint.dy);
+
+    if (points.length == 1) return path;
+
+    if (lineData.lineType is LineChartStepData) {
+      final stepData = lineData.lineType as LineChartStepData;
+      _buildStepPath(path, points, transformer, stepData.stepJumpAt);
+    } else if (lineData.lineType is LineChartCurveData) {
+      final curveData = lineData.lineType as LineChartCurveData;
+      _buildCurvePath(path, points, transformer, curveData.curveSmoothness);
+    } else {
+      // Straight lines
+      for (int i = 1; i < points.length; i++) {
+        final point = transformer.transformPoint(points[i].x, points[i].y);
+        path.lineTo(point.dx, point.dy);
+      }
+    }
+
+    return path;
+  }
+
+  void _buildStepPath(
+    Path path,
+    List<DataPoint> points,
+    CoordinateTransformer transformer,
+    double stepJumpAt,
+  ) {
+    for (int i = 1; i < points.length; i++) {
+      final prev = points[i - 1];
+      final curr = points[i];
+
+      final prevX = transformer.transformX(prev.x);
+      final currX = transformer.transformX(curr.x);
+      final prevY = transformer.transformY(prev.y);
+      final currY = transformer.transformY(curr.y);
+
+      final stepX = prevX + (currX - prevX) * stepJumpAt;
+
+      // Horizontal line to step position
+      path.lineTo(stepX, prevY);
+      // Vertical line to new Y
+      path.lineTo(stepX, currY);
+      // Horizontal line to current X
+      path.lineTo(currX, currY);
+    }
+  }
+
+  void _buildCurvePath(
+    Path path,
+    List<DataPoint> points,
+    CoordinateTransformer transformer,
+    double smoothness,
+  ) {
+    if (points.length < 2) return;
+
+    for (int i = 1; i < points.length; i++) {
+      final prev = points[i - 1];
+      final curr = points[i];
+
+      final prevPoint = transformer.transformPoint(prev.x, prev.y);
+      final currPoint = transformer.transformPoint(curr.x, curr.y);
+
+      if (i == 1) {
+        // First segment: use current point as control
+        final controlX = prevPoint.dx + (currPoint.dx - prevPoint.dx) * smoothness;
+        path.quadraticBezierTo(
+          controlX,
+          prevPoint.dy,
+          currPoint.dx,
+          currPoint.dy,
+        );
+      } else if (i == points.length - 1) {
+        // Last segment: use previous point as control
+        final controlX = currPoint.dx - (currPoint.dx - prevPoint.dx) * smoothness;
+        path.quadraticBezierTo(
+          controlX,
+          currPoint.dy,
+          currPoint.dx,
+          currPoint.dy,
+        );
+      } else {
+        // Middle segments: use both points for smooth curve
+        final next = points[i + 1];
+        final nextPoint = transformer.transformPoint(next.x, next.y);
+
+        final controlX1 = prevPoint.dx + (currPoint.dx - prevPoint.dx) * smoothness;
+        final controlX2 = currPoint.dx - (nextPoint.dx - currPoint.dx) * smoothness;
+
+        path.cubicTo(
+          controlX1,
+          prevPoint.dy,
+          controlX2,
+          currPoint.dy,
+          currPoint.dx,
+          currPoint.dy,
+        );
+      }
+    }
+  }
+
+  void _drawPoints(
+    Canvas canvas,
+    LineData lineData,
+    CoordinateTransformer transformer,
+    Paint paint,
+  ) {
+    if (lineData.pointStyle is! CircleDataPointStyle) return;
+
+    final style = lineData.pointStyle as CircleDataPointStyle;
+    paint.style = PaintingStyle.fill;
+    paint.color = style.color;
+
+    for (final point in lineData.points) {
+      final screenPoint = transformer.transformPoint(point.x, point.y);
+      canvas.drawCircle(screenPoint, style.radius, paint);
+    }
+  }
+}
