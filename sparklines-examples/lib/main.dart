@@ -12,8 +12,9 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Sparklines Examples',
+      debugShowCheckedModeBanner: false,
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+        colorScheme: ColorScheme.fromSeed(seedColor: Colors.blueGrey),
         useMaterial3: true,
       ),
       home: const MyHomePage(title: 'Sparklines Examples'),
@@ -117,7 +118,7 @@ List<ExampleChart> lineCharts() {
             (i) => DataPoint(x: i / 14, y: 0.2 + (i % 4) * 0.2),
           ),
           color: Colors.blue,
-          width: 2.0,
+          width: 0.03,
         ),
         LineData(
           points: List.generate(
@@ -125,7 +126,7 @@ List<ExampleChart> lineCharts() {
             (i) => DataPoint(x: i / 14, y: 0.3 + (i % 3) * 0.15),
           ),
           color: Colors.green,
-          width: 2.0,
+          width: 0.05,
         ),
       ],
       toggleCharts: [
@@ -135,7 +136,7 @@ List<ExampleChart> lineCharts() {
             (i) => DataPoint(x: i / 14, y: 0.4 + (i % 5) * 0.1),
           ),
           color: Colors.purple,
-          width: 2.0,
+          width: 0.02,
         ),
         LineData(
           points: List.generate(
@@ -143,7 +144,7 @@ List<ExampleChart> lineCharts() {
             (i) => DataPoint(x: i / 14, y: 0.1 + (i % 2) * 0.2),
           ),
           color: Colors.orange,
-          width: 2.0,
+          width: 0.07,
         ),
       ],
     ),
@@ -382,8 +383,10 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
-  double _customWidth = 100.0;
-  double _customHeight = 100.0;
+  static const w = 150.0;
+  static const h = 150.0;
+  double _customWidth = w;
+  double _customHeight = h;
   bool _animation = true;
   bool _crop = false;
   final Map<String, Map<String, bool>> _chartStates = {};
@@ -418,9 +421,16 @@ class _MyHomePageState extends State<MyHomePage>
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
+        backgroundColor: Colors.white,
+        shadowColor: Colors.transparent,
         title: Text(widget.title),
+        elevation: 0,
+        forceMaterialTransparency: true,
+        scrolledUnderElevation: 0,
+        surfaceTintColor: Colors.transparent,
         bottom: TabBar(
+          dividerColor: Colors.transparent,
+          dividerHeight: 0,
           controller: _tabController,
           tabs: examples.keys.map((key) => Tab(text: key)).toList(),
         ),
@@ -445,6 +455,7 @@ class _MyHomePageState extends State<MyHomePage>
                 Row(
                   children: [
                     Expanded(
+                      flex: 2,
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
@@ -453,7 +464,7 @@ class _MyHomePageState extends State<MyHomePage>
                             value: _customWidth,
                             min: 0,
                             max: 300,
-                            divisions: 300,
+                            divisions: 30,
                             onChanged: (value) {
                               setState(() {
                                 _customWidth = value;
@@ -465,18 +476,15 @@ class _MyHomePageState extends State<MyHomePage>
                     ),
                     const SizedBox(width: 16),
                     Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
+                      child: Row(
                         children: [
-                          Text('Height: ${_customHeight.toInt()}'),
-                          Slider(
-                            value: _customHeight,
-                            min: 0,
-                            max: 300,
-                            divisions: 300,
+                          Text('Animation:'),
+                          const SizedBox(width: 8),
+                          Switch(
+                            value: _animation,
                             onChanged: (value) {
                               setState(() {
-                                _customHeight = value;
+                                _animation = value;
                               });
                             },
                           ),
@@ -488,15 +496,19 @@ class _MyHomePageState extends State<MyHomePage>
                 Row(
                   children: [
                     Expanded(
-                      child: Row(
+                      flex: 2,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text('Animation:'),
-                          const SizedBox(width: 8),
-                          Switch(
-                            value: _animation,
+                          Text('Height: ${_customHeight.toInt()}'),
+                          Slider(
+                            value: _customHeight,
+                            min: 0,
+                            max: 300,
+                            divisions: 30,
                             onChanged: (value) {
                               setState(() {
-                                _animation = value;
+                                _customHeight = value;
                               });
                             },
                           ),
@@ -560,8 +572,8 @@ class _MyHomePageState extends State<MyHomePage>
 
     final sizeVariants = [
       {'width': _customWidth, 'height': _customHeight},
-      {'width': 100.0, 'height': 50.0},
-      {'width': 50.0, 'height': 100.0},
+      {'width': w, 'height': h / 2.0},
+      {'width': w / 2.0, 'height': h},
     ];
 
     return Column(
@@ -573,8 +585,8 @@ class _MyHomePageState extends State<MyHomePage>
         ),
         const SizedBox(height: 8),
         Wrap(
-          spacing: 16,
-          runSpacing: 16,
+          spacing: 24,
+          runSpacing: 24,
           children: sizeVariants.map((variant) {
             final options = baseOptions.copyWith(
               width: variant['width'] as double,
@@ -585,8 +597,8 @@ class _MyHomePageState extends State<MyHomePage>
               onTap: () => _toggleChart(category, chart.title),
               child: Container(
                 decoration: BoxDecoration(
-                  border: Border.all(color: Colors.grey.shade300),
-                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(color: Colors.grey.shade200),
+                  borderRadius: BorderRadius.circular(3),
                 ),
                 child: Container(
                   width: variant['width'] as double,
