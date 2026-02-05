@@ -50,7 +50,7 @@ class LineData implements ISparklinesData {
   final double width;
   final Gradient? gradient;
   final Gradient? gradientArea;
-  final ILineTypeData lineType;
+  final ILineTypeData? lineType;
   final bool isStrokeCapRound;
   final bool isStrokeJoinRound;
   final IDataPointStyle? pointStyle;
@@ -64,7 +64,7 @@ class LineData implements ISparklinesData {
     this.width = 2.0,
     this.gradient,
     this.gradientArea,
-    this.lineType = const LineChartCurveData(),
+    this.lineType,
     this.isStrokeCapRound = false,
     this.isStrokeJoinRound = false,
     this.pointStyle,

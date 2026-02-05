@@ -101,14 +101,20 @@ class LineChartRenderer extends BaseRenderer {
 
     if (points.length == 1) return path;
 
-    if (lineData.lineType is LineChartStepData) {
+    if (lineData.lineType == null) {
+      // Straight lines (non-curved path)
+      for (int i = 1; i < points.length; i++) {
+        final point = transformer.transformPoint(points[i].x, points[i].y);
+        path.lineTo(point.dx, point.dy);
+      }
+    } else if (lineData.lineType is LineChartStepData) {
       final stepData = lineData.lineType as LineChartStepData;
       _buildStepPath(path, points, transformer, stepData.stepJumpAt);
     } else if (lineData.lineType is LineChartCurveData) {
       final curveData = lineData.lineType as LineChartCurveData;
       _buildCurvePath(path, points, transformer, curveData.curveSmoothness);
     } else {
-      // Straight lines
+      // Fallback to straight lines for unknown types
       for (int i = 1; i < points.length; i++) {
         final point = transformer.transformPoint(points[i].x, points[i].y);
         path.lineTo(point.dx, point.dy);
