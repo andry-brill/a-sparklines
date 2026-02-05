@@ -1,6 +1,7 @@
 name: sparklines_examples
 description: Examples demonstrating the sparklines library
 version: 0.1.0
+publish_to: none
 
 environment:
   sdk: '>=3.0.0 <4.0.0'
