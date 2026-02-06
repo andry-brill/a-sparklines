@@ -17,7 +17,7 @@ class CoordinateTransformer implements ILayoutDimensions {
   final double height;
 
   late final IChartLayout layout;
-  late final bool crop;
+  final bool crop;
 
   CoordinateTransformer({
     required this.minX,
@@ -27,13 +27,12 @@ class CoordinateTransformer implements ILayoutDimensions {
     required this.width,
     required this.height,
     required IChartLayout layout,
+    required this.crop,
   }) {
     assert(minX < maxX, 'minX must be less than maxX');
     assert(minY < maxY, 'minY must be less than maxY');
     // Resolve layout with this transformer's dimensions
     this.layout = layout.resolve(this);
-    // Use crop from resolved layout
-    this.crop = this.layout.crop;
   }
 
   /// Transform X coordinate from data space to screen space

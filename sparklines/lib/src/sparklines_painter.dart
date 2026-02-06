@@ -6,6 +6,7 @@ import 'interfaces.dart';
 class SparklinesPainter extends CustomPainter {
   final List<ISparklinesData> charts;
   final IChartLayout defaultLayout;
+  final bool defaultCrop;
   final double width;
   final double height;
   final List<ISparklinesData>? oldCharts;
@@ -13,6 +14,7 @@ class SparklinesPainter extends CustomPainter {
   SparklinesPainter({
     required this.charts,
     required this.defaultLayout,
+    required this.defaultCrop,
     required this.width,
     required this.height,
     this.oldCharts,
@@ -26,6 +28,9 @@ class SparklinesPainter extends CustomPainter {
       // Get chart's layout or use default
       final chartLayout = chart.layout ?? defaultLayout;
 
+      // Get chart's crop or use default
+      final chartCrop = chart.crop ?? defaultCrop;
+
       // Create transformer for this chart
       final transformer = CoordinateTransformer(
         minX: chart.minX,
@@ -35,6 +40,7 @@ class SparklinesPainter extends CustomPainter {
         width: width,
         height: height,
         layout: chartLayout,
+        crop: chartCrop,
       );
 
       // Render chart with its own transformer
@@ -50,6 +56,10 @@ class SparklinesPainter extends CustomPainter {
     }
 
     if (oldDelegate.defaultLayout != defaultLayout) {
+      return true;
+    }
+
+    if (oldDelegate.defaultCrop != defaultCrop) {
       return true;
     }
 

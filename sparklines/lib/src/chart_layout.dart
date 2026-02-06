@@ -8,14 +8,12 @@ class AbsoluteLayout implements IChartLayout {
   final double maxX;
   final double minY;
   final double maxY;
-  final bool crop;
 
   const AbsoluteLayout({
     this.minX = double.negativeInfinity,
     this.maxX = double.infinity,
     this.minY = double.negativeInfinity,
     this.maxY = double.infinity,
-    this.crop = false,
   });
 
   @override
@@ -37,7 +35,6 @@ class AbsoluteLayout implements IChartLayout {
       maxX: finalMaxX,
       minY: finalMinY,
       maxY: finalMaxY,
-      crop: crop,
     );
   }
 
@@ -60,11 +57,9 @@ class AbsoluteLayout implements IChartLayout {
 
 /// Relative layout with normalized bounds (0.0-1.0)
 class RelativeLayout implements IChartLayout {
-  final bool crop;
   final RelativeDimension relativeTo;
 
   const RelativeLayout({
-    this.crop = false,
     this.relativeTo = RelativeDimension.width,
   });
 

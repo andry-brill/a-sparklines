@@ -22,6 +22,8 @@ class BarData implements ISparklinesData {
   @override
   final IChartLayout? layout;
   @override
+  final bool? crop;
+  @override
   IChartRenderer get renderer => defaultRenderer;
 
   final List<DataPoint> bars;
@@ -50,6 +52,7 @@ class BarData implements ISparklinesData {
     this.rotation = 0.0,
     this.origin = Offset.zero,
     this.layout,
+    this.crop,
     required this.bars,
     this.stacked = false,
     required this.width,
@@ -102,6 +105,7 @@ class BarData implements ISparklinesData {
       rotation: lerpDouble(rotation, next.rotation, t) ?? next.rotation,
       origin: Offset.lerp(origin, next.origin, t) ?? next.origin,
       layout: next.layout,
+      crop: next.crop,
       bars: interpolatedBars,
       stacked: next.stacked,
       width: lerpDouble(width, next.width, t) ?? next.width,
@@ -128,6 +132,8 @@ class LineData implements ISparklinesData {
   final Offset origin;
   @override
   final IChartLayout? layout;
+  @override
+  final bool? crop;
   @override
   IChartRenderer get renderer => defaultRenderer;
 
@@ -158,6 +164,7 @@ class LineData implements ISparklinesData {
     this.rotation = 0.0,
     this.origin = Offset.zero,
     this.layout,
+    this.crop,
     required this.points,
     this.color,
     this.width = 2.0,
@@ -212,6 +219,7 @@ class LineData implements ISparklinesData {
       rotation: lerpDouble(rotation, next.rotation, t) ?? next.rotation,
       origin: Offset.lerp(origin, next.origin, t) ?? next.origin,
       layout: next.layout,
+      crop: next.crop,
       points: interpolatedPoints,
       color: Color.lerp(color, next.color, t),
       width: lerpDouble(width, next.width, t) ?? next.width,
@@ -240,6 +248,8 @@ class BetweenLineData implements ISparklinesData {
   @override
   final IChartLayout? layout;
   @override
+  final bool? crop;
+  @override
   IChartRenderer get renderer => defaultRenderer;
 
   final LineData from;
@@ -264,6 +274,7 @@ class BetweenLineData implements ISparklinesData {
     this.rotation = 0.0,
     this.origin = Offset.zero,
     this.layout,
+    this.crop,
     required this.from,
     required this.to,
     this.color,
@@ -298,6 +309,7 @@ class BetweenLineData implements ISparklinesData {
       rotation: lerpDouble(rotation, next.rotation, t) ?? next.rotation,
       origin: Offset.lerp(origin, next.origin, t) ?? next.origin,
       layout: next.layout,
+      crop: next.crop,
       from: from.lerpTo(next.from, t) as LineData,
       to: to.lerpTo(next.to, t) as LineData,
       color: Color.lerp(color, next.color, t),
@@ -318,6 +330,8 @@ class PieData implements ISparklinesData {
   final Offset origin;
   @override
   final IChartLayout? layout;
+  @override
+  final bool? crop;
   @override
   IChartRenderer get renderer => defaultRenderer;
 
@@ -348,6 +362,7 @@ class PieData implements ISparklinesData {
     this.rotation = 0.0,
     this.origin = Offset.zero,
     this.layout,
+    this.crop,
     required this.pies,
     this.stroke = double.infinity,
     this.strokeAlign = StrokeAlign.center,
@@ -402,6 +417,7 @@ class PieData implements ISparklinesData {
       rotation: lerpDouble(rotation, next.rotation, t) ?? next.rotation,
       origin: Offset.lerp(origin, next.origin, t) ?? next.origin,
       layout: next.layout,
+      crop: next.crop,
       pies: interpolatedPies,
       stroke: lerpDouble(stroke, next.stroke, t) ?? next.stroke,
       strokeAlign: next.strokeAlign,

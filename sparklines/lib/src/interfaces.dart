@@ -20,9 +20,6 @@ abstract class ILayoutDimensions {
 
 /// Chart layout interface for defining coordinate transformation
 abstract class IChartLayout {
-  /// Whether to crop rendering to bounds
-  bool get crop;
-
   /// Resolve layout with actual dimensions (e.g., resolve infinity values)
   /// Returns a resolved layout that can be used for transformation
   IChartLayout resolve(ILayoutDimensions dimensions);
@@ -60,6 +57,9 @@ abstract class ISparklinesData implements ILerpable<ISparklinesData> {
 
   /// Optional layout override for this specific data series
   IChartLayout? get layout;
+
+  /// Whether to crop rendering to bounds (null uses chart default)
+  bool? get crop;
 
   /// Renderer for this chart type
   IChartRenderer get renderer;

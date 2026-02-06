@@ -10,6 +10,7 @@ class SparklinesChart extends StatefulWidget {
   final double? aspectRatio;
 
   final IChartLayout? layout;
+  final bool crop;
 
   final Duration animationDuration;
   final Curve animationCurve;
@@ -23,6 +24,7 @@ class SparklinesChart extends StatefulWidget {
     this.height,
     this.aspectRatio,
     this.layout,
+    this.crop = false,
     this.animationDuration = const Duration(milliseconds: 300),
     this.animationCurve = Curves.easeInOut,
     this.animate = true,
@@ -127,6 +129,7 @@ class _SparklinesChartState extends State<SparklinesChart>
       height: widget.height,
       aspectRatio: widget.aspectRatio,
       layout: widget.layout,
+      crop: widget.crop,
       animation: widget.animate ? _animation : const AlwaysStoppedAnimation(1.0),
       getCharts: _getInterpolatedCharts,
     );
@@ -138,6 +141,7 @@ class _SparklinesRenderWidget extends StatelessWidget {
   final double? height;
   final double? aspectRatio;
   final IChartLayout? layout;
+  final bool crop;
   final Animation<double> animation;
   final List<ISparklinesData> Function(double) getCharts;
 
@@ -146,6 +150,7 @@ class _SparklinesRenderWidget extends StatelessWidget {
     required this.height,
     required this.aspectRatio,
     required this.layout,
+    required this.crop,
     required this.animation,
     required this.getCharts,
   });
@@ -212,6 +217,7 @@ class _SparklinesRenderWidget extends StatelessWidget {
           painter: SparklinesPainter(
             charts: charts,
             defaultLayout: defaultLayout,
+            defaultCrop: crop,
             width: w,
             height: h,
           ),
