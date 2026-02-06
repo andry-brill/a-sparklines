@@ -1,9 +1,6 @@
-import 'dart:ui' show lerpDouble;
 import 'package:flutter/material.dart';
 import 'coordinate_transformer.dart';
 import 'interfaces.dart';
-import 'chart_data.dart';
-import 'data_point.dart';
 import 'sparklines_painter.dart';
 import 'relative_dimension.dart';
 
@@ -129,98 +126,7 @@ class _SparklinesChartState extends State<SparklinesChart>
     ISparklinesData newChart,
     double t,
   ) {
-    if (oldChart is BarData && newChart is BarData) {
-      return _interpolateBarData(oldChart, newChart, t);
-    } else if (oldChart is LineData && newChart is LineData) {
-      return _interpolateLineData(oldChart, newChart, t);
-    } else if (oldChart is PieData && newChart is PieData) {
-      return _interpolatePieData(oldChart, newChart, t);
-    }
-
-    return newChart;
-  }
-
-  BarData _interpolateBarData(BarData old, BarData new_, double t) {
-    if (old.bars.length != new_.bars.length) return new_;
-
-    final interpolatedBars = <DataPoint>[];
-    for (int i = 0; i < old.bars.length; i++) {
-      interpolatedBars.add(DataPoint(
-        x: new_.bars[i].x,
-        y: lerpDouble(old.bars[i].y, new_.bars[i].y, t) ?? new_.bars[i].y,
-        style: new_.bars[i].style,
-      ));
-    }
-
-    return BarData(
-      visible: new_.visible,
-      rotation: lerpDouble(old.rotation, new_.rotation, t) ?? new_.rotation,
-      origin: Offset.lerp(old.origin, new_.origin, t) ?? new_.origin,
-      bars: interpolatedBars,
-      stacked: new_.stacked,
-      width: lerpDouble(old.width, new_.width, t) ?? new_.width,
-      color: Color.lerp(old.color, new_.color, t),
-      gradient: new_.gradient, // Gradients are not interpolated
-      border: new_.border,
-      borderRadius: new_.borderRadius,
-      borderColor: Color.lerp(old.borderColor, new_.borderColor, t),
-    );
-  }
-
-  LineData _interpolateLineData(LineData old, LineData new_, double t) {
-    if (old.points.length != new_.points.length) return new_;
-
-    final interpolatedPoints = <DataPoint>[];
-    for (int i = 0; i < old.points.length; i++) {
-      interpolatedPoints.add(DataPoint(
-        x: new_.points[i].x,
-        y: lerpDouble(old.points[i].y, new_.points[i].y, t) ?? new_.points[i].y,
-        style: new_.points[i].style,
-      ));
-    }
-
-    return LineData(
-      visible: new_.visible,
-      rotation: lerpDouble(old.rotation, new_.rotation, t) ?? new_.rotation,
-      origin: Offset.lerp(old.origin, new_.origin, t) ?? new_.origin,
-      points: interpolatedPoints,
-      color: Color.lerp(old.color, new_.color, t),
-      width: lerpDouble(old.width, new_.width, t) ?? new_.width,
-      gradient: new_.gradient,
-      gradientArea: new_.gradientArea,
-      lineType: new_.lineType,
-      isStrokeCapRound: new_.isStrokeCapRound,
-      isStrokeJoinRound: new_.isStrokeJoinRound,
-      pointStyle: new_.pointStyle,
-    );
-  }
-
-  PieData _interpolatePieData(PieData old, PieData new_, double t) {
-    if (old.pies.length != new_.pies.length) return new_;
-
-    final interpolatedPies = <DataPoint>[];
-    for (int i = 0; i < old.pies.length; i++) {
-      interpolatedPies.add(DataPoint(
-        x: lerpDouble(old.pies[i].x, new_.pies[i].x, t) ?? new_.pies[i].x,
-        y: lerpDouble(old.pies[i].y, new_.pies[i].y, t) ?? new_.pies[i].y,
-        style: new_.pies[i].style,
-      ));
-    }
-
-    return PieData(
-      visible: new_.visible,
-      rotation: lerpDouble(old.rotation, new_.rotation, t) ?? new_.rotation,
-      origin: Offset.lerp(old.origin, new_.origin, t) ?? new_.origin,
-      pies: interpolatedPies,
-      stroke: lerpDouble(old.stroke, new_.stroke, t) ?? new_.stroke,
-      strokeAlign: new_.strokeAlign,
-      color: Color.lerp(old.color, new_.color, t),
-      gradient: new_.gradient,
-      space: lerpDouble(old.space, new_.space, t) ?? new_.space,
-      border: new_.border,
-      borderRadius: new_.borderRadius,
-      borderColor: Color.lerp(old.borderColor, new_.borderColor, t),
-    );
+    return oldChart.lerpTo(newChart, t);
   }
 
   @override

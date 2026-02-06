@@ -1,7 +1,14 @@
 import 'package:flutter/material.dart';
+import 'dart:ui' show lerpDouble;
+
+/// Interface for types that can be interpolated
+abstract class ILerpable<T> {
+  /// Interpolate between this and [next] using interpolation factor [t] (0.0 to 1.0)
+  T lerpTo(T next, double t);
+}
 
 /// Base interface for all chart data types
-abstract class ISparklinesData {
+abstract class ISparklinesData implements ILerpable<ISparklinesData> {
   /// Whether this chart is visible
   bool get visible;
 
@@ -13,7 +20,7 @@ abstract class ISparklinesData {
 }
 
 /// Style interface for data points
-abstract class IDataPointStyle {}
+abstract class IDataPointStyle implements ILerpable<IDataPointStyle> {}
 
 /// Circle style for data points
 class CircleDataPointStyle implements IDataPointStyle {
@@ -24,6 +31,16 @@ class CircleDataPointStyle implements IDataPointStyle {
     required this.radius,
     required this.color,
   });
+
+  @override
+  IDataPointStyle lerpTo(IDataPointStyle next, double t) {
+    if (next is! CircleDataPointStyle) return next;
+
+    return CircleDataPointStyle(
+      radius: lerpDouble(radius, next.radius, t) ?? next.radius,
+      color: Color.lerp(color, next.color, t) ?? next.color,
+    );
+  }
 }
 
 /// Marker interface for line type data
