@@ -1,9 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:sparklines/sparklines.dart';
 
+part 'line_charts.dart';
+part 'bar_charts.dart';
+part 'pie_charts.dart';
+part 'combo_charts.dart';
+
 void main() {
   runApp(const MyApp());
 }
+
+const gridWidth = 150.0;
+const gridHeight = 150.0;
+
+double rX(double value) => value / gridWidth;
+double rY(double value) => value / gridHeight;
+List<DataPoint> rP(Iterable<DataPoint> point) => point.map((p) => DataPoint(x: rX(p.x), y: rY(p.y), style: p.style)).toList();
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
@@ -64,311 +76,12 @@ class ExampleChart {
   });
 }
 
-List<ExampleChart> lineCharts() {
-  return [
-    ExampleChart(
-      title: 'Simple line',
-      plot: (options, charts) => SparklinesChart(
-        width: options.width,
-        height: options.height,
-        charts: charts,
-        animate: options.animation,
-        crop: options.crop,
-      ),
-      initialCharts: [
-        LineData(
-          points: List.generate(
-            20,
-            (i) => DataPoint(
-              x: i / 19,
-              y: 0.5 + 0.3 * (i % 3 - 1),
-            ),
-          ),
-          color: Colors.blue,
-          width: 0.05,
-        ),
-      ],
-      toggleCharts: [
-        LineData(
-          points: List.generate(
-            20,
-            (i) => DataPoint(
-              x: i / 19,
-              y: 0.3 + 0.4 * ((i * 1.5) % 3 - 1),
-            ),
-          ),
-          color: Colors.red,
-          width: 0.07,
-        ),
-      ],
-    ),
-    ExampleChart(
-      title: 'Multiple lines',
-      plot: (options, charts) => SparklinesChart(
-        width: options.width,
-        height: options.height,
-        charts: charts,
-        animate: options.animation,
-        crop: options.crop,
-      ),
-      initialCharts: [
-        LineData(
-          points: List.generate(
-            15,
-            (i) => DataPoint(x: i / 14, y: 0.2 + (i % 4) * 0.2),
-          ),
-          color: Colors.blue,
-          width: 0.03,
-        ),
-        LineData(
-          points: List.generate(
-            15,
-            (i) => DataPoint(x: i / 14, y: 0.3 + (i % 3) * 0.15),
-          ),
-          color: Colors.green,
-          width: 0.05,
-        ),
-      ],
-      toggleCharts: [
-        LineData(
-          points: List.generate(
-            15,
-            (i) => DataPoint(x: i / 14, y: 0.4 + (i % 5) * 0.1),
-          ),
-          color: Colors.purple,
-          width: 0.02,
-        ),
-        LineData(
-          points: List.generate(
-            15,
-            (i) => DataPoint(x: i / 14, y: 0.1 + (i % 2) * 0.2),
-          ),
-          color: Colors.orange,
-          width: 0.07,
-        ),
-      ],
-    ),
-  ];
-}
-
-List<ExampleChart> barCharts() {
-  return [
-    ExampleChart(
-      title: 'Simple bar',
-      plot: (options, charts) => SparklinesChart(
-        width: options.width,
-        height: options.height,
-        charts: charts,
-        animate: options.animation,
-        crop: options.crop,
-      ),
-      initialCharts: [
-        BarData(
-          bars: List.generate(
-            10,
-            (i) => DataPoint(
-              x: i / 9,
-              y: 0.2 + (i % 5) * 0.15,
-            ),
-          ),
-          width: 0.08,
-          color: Colors.green,
-        ),
-      ],
-      toggleCharts: [
-        BarData(
-          bars: List.generate(
-            10,
-            (i) => DataPoint(
-              x: i / 9,
-              y: 0.1 + (i % 7) * 0.12,
-            ),
-          ),
-          width: 0.08,
-          color: Colors.blue,
-        ),
-      ],
-    ),
-    ExampleChart(
-      title: 'Stacked bars',
-      plot: (options, charts) => SparklinesChart(
-        width: options.width,
-        height: options.height,
-        charts: charts,
-        animate: options.animation,
-        crop: options.crop,
-      ),
-      initialCharts: [
-        BarData(
-          bars: List.generate(
-            8,
-            (i) => DataPoint(x: i / 7, y: 0.2 + (i % 3) * 0.1),
-          ),
-          width: 0.1,
-          color: Colors.blue,
-          stacked: true,
-        ),
-        BarData(
-          bars: List.generate(
-            8,
-            (i) => DataPoint(x: i / 7, y: 0.15 + (i % 2) * 0.1),
-          ),
-          width: 0.1,
-          color: Colors.orange,
-          stacked: true,
-        ),
-      ],
-      toggleCharts: [
-        BarData(
-          bars: List.generate(
-            8,
-            (i) => DataPoint(x: i / 7, y: 0.3 + (i % 4) * 0.08),
-          ),
-          width: 0.1,
-          color: Colors.purple,
-          stacked: true,
-        ),
-        BarData(
-          bars: List.generate(
-            8,
-            (i) => DataPoint(x: i / 7, y: 0.1 + (i % 3) * 0.12),
-          ),
-          width: 0.1,
-          color: Colors.teal,
-          stacked: true,
-        ),
-      ],
-    ),
-  ];
-}
-
-List<ExampleChart> pieCharts() {
-  return [
-    ExampleChart(
-      title: 'Simple pie',
-      plot: (options, charts) => SparklinesChart(
-        width: options.width,
-        height: options.height,
-        charts: charts,
-        animate: options.animation,
-        crop: options.crop,
-      ),
-      initialCharts: [
-        PieData(
-          pies: [
-            DataPoint(x: 0, y: 30),
-            DataPoint(x: 0, y: 20),
-            DataPoint(x: 0, y: 25),
-            DataPoint(x: 0, y: 25),
-          ],
-          color: Colors.purple,
-        ),
-      ],
-      toggleCharts: [
-        PieData(
-          pies: [
-            DataPoint(x: 0, y: 40),
-            DataPoint(x: 0, y: 15),
-            DataPoint(x: 0, y: 20),
-            DataPoint(x: 0, y: 25),
-          ],
-          color: Colors.purple,
-        ),
-      ],
-    ),
-    ExampleChart(
-      title: 'Pie with spacing',
-      plot: (options, charts) => SparklinesChart(
-        width: options.width,
-        height: options.height,
-        charts: charts,
-        animate: options.animation,
-        crop: options.crop,
-      ),
-      initialCharts: [
-        PieData(
-          pies: [
-            DataPoint(x: 0, y: 25),
-            DataPoint(x: 0, y: 20),
-            DataPoint(x: 0, y: 30),
-            DataPoint(x: 0, y: 25),
-          ],
-          color: Colors.blue,
-          space: 2.0,
-        ),
-      ],
-      toggleCharts: [
-        PieData(
-          pies: [
-            DataPoint(x: 0, y: 35),
-            DataPoint(x: 0, y: 15),
-            DataPoint(x: 0, y: 25),
-            DataPoint(x: 0, y: 25),
-          ],
-          color: Colors.blue,
-          space: 2.0,
-        ),
-      ],
-    ),
-  ];
-}
-
-List<ExampleChart> multiCharts() {
-  return [
-    ExampleChart(
-      title: 'Line and bar',
-      plot: (options, charts) => SparklinesChart(
-        width: options.width,
-        height: options.height,
-        charts: charts,
-        animate: options.animation,
-        crop: options.crop,
-      ),
-      initialCharts: [
-        BarData(
-          bars: List.generate(
-            10,
-            (i) => DataPoint(x: i / 9, y: 0.2 + (i % 4) * 0.1),
-          ),
-          width: 0.08,
-          color: Colors.green.withValues(alpha: 0.5),
-        ),
-        LineData(
-          points: List.generate(
-            10,
-            (i) => DataPoint(x: i / 9, y: 0.3 + (i % 3) * 0.15),
-          ),
-          color: Colors.blue,
-          width: 2.0,
-        ),
-      ],
-      toggleCharts: [
-        BarData(
-          bars: List.generate(
-            10,
-            (i) => DataPoint(x: i / 9, y: 0.15 + (i % 5) * 0.12),
-          ),
-          width: 0.08,
-          color: Colors.orange.withValues(alpha: 0.5),
-        ),
-        LineData(
-          points: List.generate(
-            10,
-            (i) => DataPoint(x: i / 9, y: 0.4 + (i % 4) * 0.1),
-          ),
-          color: Colors.red,
-          width: 2.0,
-        ),
-      ],
-    ),
-  ];
-}
 
 final examples = {
   'Line charts': lineCharts(),
   'Bar charts': barCharts(),
   'Pie charts': pieCharts(),
-  'Multi charts': multiCharts(),
+  'Combo charts': comboCharts(),
 };
 
 class MyHomePage extends StatefulWidget {
@@ -383,10 +96,8 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
-  static const w = 150.0;
-  static const h = 150.0;
-  double _customWidth = w;
-  double _customHeight = h;
+  double _customWidth = gridWidth;
+  double _customHeight = gridHeight;
   bool _animation = true;
   bool _crop = false;
   final Map<String, Map<String, bool>> _chartStates = {};
@@ -572,8 +283,8 @@ class _MyHomePageState extends State<MyHomePage>
 
     final sizeVariants = [
       {'width': _customWidth, 'height': _customHeight},
-      {'width': w, 'height': h / 2.0},
-      {'width': w / 2.0, 'height': h},
+      {'width': gridWidth, 'height': gridHeight / 2.0},
+      {'width': gridWidth / 2.0, 'height': gridHeight},
     ];
 
     return Column(
