@@ -1,4 +1,5 @@
 import 'dart:ui' show lerpDouble;
+import 'dart:math' as math;
 import 'interfaces.dart';
 
 /// A single data point with x, y coordinates and optional style
@@ -27,5 +28,32 @@ class DataPoint implements ILerpable<DataPoint> {
       y: lerpDouble(y, next.y, t) ?? next.y,
       style: interpolatedStyle,
     );
+  }
+}
+
+/// Extension on Iterable<DataPoint> for calculating bounds
+extension DataPointBounds on Iterable<DataPoint> {
+  /// Minimum X coordinate
+  double get minX {
+    if (isEmpty) return 0.0;
+    return map((p) => p.x).reduce((a, b) => math.min(a, b));
+  }
+
+  /// Maximum X coordinate
+  double get maxX {
+    if (isEmpty) return 1.0;
+    return map((p) => p.x).reduce((a, b) => math.max(a, b));
+  }
+
+  /// Minimum Y coordinate
+  double get minY {
+    if (isEmpty) return 0.0;
+    return map((p) => p.y).reduce((a, b) => math.min(a, b));
+  }
+
+  /// Maximum Y coordinate
+  double get maxY {
+    if (isEmpty) return 1.0;
+    return map((p) => p.y).reduce((a, b) => math.max(a, b));
   }
 }

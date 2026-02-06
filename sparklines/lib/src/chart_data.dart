@@ -1,19 +1,42 @@
 import 'package:flutter/material.dart';
 import 'dart:ui' show lerpDouble;
+import 'dart:math' as math;
 import 'data_point.dart';
 import 'interfaces.dart';
 import 'stroke_align.dart';
+import 'renderers/bar_chart_renderer.dart';
+import 'renderers/line_chart_renderer.dart';
+import 'renderers/between_line_renderer.dart';
+import 'renderers/pie_chart_renderer.dart';
 
 /// Bar chart data
 class BarData implements ISparklinesData {
+  static final IChartRenderer defaultRenderer = BarChartRenderer();
+
   @override
   final bool visible;
   @override
   final double rotation;
   @override
   final Offset origin;
+  @override
+  final IChartLayout? layout;
+  @override
+  IChartRenderer get renderer => defaultRenderer;
 
   final List<DataPoint> bars;
+
+  @override
+  double get minX => bars.minX;
+
+  @override
+  double get maxX => bars.maxX;
+
+  @override
+  double get minY => bars.minY;
+
+  @override
+  double get maxY => bars.maxY;
   final bool stacked;
   final double width;
   final Color? color;
@@ -26,6 +49,7 @@ class BarData implements ISparklinesData {
     this.visible = true,
     this.rotation = 0.0,
     this.origin = Offset.zero,
+    this.layout,
     required this.bars,
     this.stacked = false,
     required this.width,
@@ -51,6 +75,7 @@ class BarData implements ISparklinesData {
       visible: next.visible,
       rotation: lerpDouble(rotation, next.rotation, t) ?? next.rotation,
       origin: Offset.lerp(origin, next.origin, t) ?? next.origin,
+      layout: next.layout,
       bars: interpolatedBars,
       stacked: next.stacked,
       width: lerpDouble(width, next.width, t) ?? next.width,
@@ -67,14 +92,32 @@ class BarData implements ISparklinesData {
 
 /// Line chart data
 class LineData implements ISparklinesData {
+  static final IChartRenderer defaultRenderer = LineChartRenderer();
+
   @override
   final bool visible;
   @override
   final double rotation;
   @override
   final Offset origin;
+  @override
+  final IChartLayout? layout;
+  @override
+  IChartRenderer get renderer => defaultRenderer;
 
   final List<DataPoint> points;
+
+  @override
+  double get minX => points.minX;
+
+  @override
+  double get maxX => points.maxX;
+
+  @override
+  double get minY => points.minY;
+
+  @override
+  double get maxY => points.maxY;
   final Color? color;
   final double width;
   final Gradient? gradient;
@@ -88,6 +131,7 @@ class LineData implements ISparklinesData {
     this.visible = true,
     this.rotation = 0.0,
     this.origin = Offset.zero,
+    this.layout,
     required this.points,
     this.color,
     this.width = 2.0,
@@ -114,6 +158,7 @@ class LineData implements ISparklinesData {
       visible: next.visible,
       rotation: lerpDouble(rotation, next.rotation, t) ?? next.rotation,
       origin: Offset.lerp(origin, next.origin, t) ?? next.origin,
+      layout: next.layout,
       points: interpolatedPoints,
       color: Color.lerp(color, next.color, t),
       width: lerpDouble(width, next.width, t) ?? next.width,
@@ -131,15 +176,33 @@ class LineData implements ISparklinesData {
 
 /// Between line chart data (fills area between two lines)
 class BetweenLineData implements ISparklinesData {
+  static final IChartRenderer defaultRenderer = BetweenLineRenderer();
+
   @override
   final bool visible;
   @override
   final double rotation;
   @override
   final Offset origin;
+  @override
+  final IChartLayout? layout;
+  @override
+  IChartRenderer get renderer => defaultRenderer;
 
   final LineData from;
   final LineData to;
+
+  @override
+  double get minX => math.min(from.minX, to.minX);
+
+  @override
+  double get maxX => math.max(from.maxX, to.maxX);
+
+  @override
+  double get minY => math.min(from.minY, to.minY);
+
+  @override
+  double get maxY => math.max(from.maxY, to.maxY);
   final Color? color;
   final Gradient? gradient;
 
@@ -147,6 +210,7 @@ class BetweenLineData implements ISparklinesData {
     this.visible = true,
     this.rotation = 0.0,
     this.origin = Offset.zero,
+    this.layout,
     required this.from,
     required this.to,
     this.color,
@@ -162,6 +226,7 @@ class BetweenLineData implements ISparklinesData {
       visible: next.visible,
       rotation: lerpDouble(rotation, next.rotation, t) ?? next.rotation,
       origin: Offset.lerp(origin, next.origin, t) ?? next.origin,
+      layout: next.layout,
       from: from.lerpTo(next.from, t) as LineData,
       to: to.lerpTo(next.to, t) as LineData,
       color: Color.lerp(color, next.color, t),
@@ -172,14 +237,32 @@ class BetweenLineData implements ISparklinesData {
 
 /// Pie chart data
 class PieData implements ISparklinesData {
+  static final IChartRenderer defaultRenderer = PieChartRenderer();
+
   @override
   final bool visible;
   @override
   final double rotation;
   @override
   final Offset origin;
+  @override
+  final IChartLayout? layout;
+  @override
+  IChartRenderer get renderer => defaultRenderer;
 
   final List<DataPoint> pies;
+
+  @override
+  double get minX => pies.minX;
+
+  @override
+  double get maxX => pies.maxX;
+
+  @override
+  double get minY => pies.minY;
+
+  @override
+  double get maxY => pies.maxY;
   final double stroke;
   final StrokeAlign strokeAlign;
   final Color? color;
@@ -193,6 +276,7 @@ class PieData implements ISparklinesData {
     this.visible = true,
     this.rotation = 0.0,
     this.origin = Offset.zero,
+    this.layout,
     required this.pies,
     this.stroke = double.infinity,
     this.strokeAlign = StrokeAlign.center,
@@ -219,6 +303,7 @@ class PieData implements ISparklinesData {
       visible: next.visible,
       rotation: lerpDouble(rotation, next.rotation, t) ?? next.rotation,
       origin: Offset.lerp(origin, next.origin, t) ?? next.origin,
+      layout: next.layout,
       pies: interpolatedPies,
       stroke: lerpDouble(stroke, next.stroke, t) ?? next.stroke,
       strokeAlign: next.strokeAlign,

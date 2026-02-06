@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
-import 'coordinate_transformer.dart';
 import 'interfaces.dart';
 import 'sparklines_painter.dart';
-import 'relative_dimension.dart';
+import 'chart_layout.dart';
 
 /// Main sparklines chart widget
 class SparklinesChart extends StatefulWidget {
@@ -10,14 +9,7 @@ class SparklinesChart extends StatefulWidget {
   final double? height;
   final double? aspectRatio;
 
-  final double minX;
-  final double maxX;
-  final double minY;
-  final double maxY;
-
-  final bool crop;
-  final bool relativeDataPoints;
-  final RelativeDimension relativeDimensions;
+  final IChartLayout? layout;
 
   final Duration animationDuration;
   final Curve animationCurve;
@@ -30,19 +22,12 @@ class SparklinesChart extends StatefulWidget {
     this.width,
     this.height,
     this.aspectRatio,
-    this.minX = 0.0,
-    this.maxX = 1.0,
-    this.minY = 0.0,
-    this.maxY = 1.0,
-    this.crop = false,
-    this.relativeDataPoints = true,
-    this.relativeDimensions = RelativeDimension.width,
+    this.layout,
     this.animationDuration = const Duration(milliseconds: 300),
     this.animationCurve = Curves.easeInOut,
     this.animate = true,
     required this.charts,
-  }) : assert(minX < maxX, 'minX must be less than maxX'),
-       assert(minY < maxY, 'minY must be less than maxY');
+  });
 
   @override
   State<SparklinesChart> createState() => _SparklinesChartState();
@@ -141,13 +126,7 @@ class _SparklinesChartState extends State<SparklinesChart>
       width: widget.width,
       height: widget.height,
       aspectRatio: widget.aspectRatio,
-      minX: widget.minX,
-      maxX: widget.maxX,
-      minY: widget.minY,
-      maxY: widget.maxY,
-      crop: widget.crop,
-      relativeDataPoints: widget.relativeDataPoints,
-      relativeDimensions: widget.relativeDimensions,
+      layout: widget.layout,
       animation: widget.animate ? _animation : const AlwaysStoppedAnimation(1.0),
       getCharts: _getInterpolatedCharts,
     );
@@ -158,13 +137,7 @@ class _SparklinesRenderWidget extends StatelessWidget {
   final double? width;
   final double? height;
   final double? aspectRatio;
-  final double minX;
-  final double maxX;
-  final double minY;
-  final double maxY;
-  final bool crop;
-  final bool relativeDataPoints;
-  final RelativeDimension relativeDimensions;
+  final IChartLayout? layout;
   final Animation<double> animation;
   final List<ISparklinesData> Function(double) getCharts;
 
@@ -172,13 +145,7 @@ class _SparklinesRenderWidget extends StatelessWidget {
     required this.width,
     required this.height,
     required this.aspectRatio,
-    required this.minX,
-    required this.maxX,
-    required this.minY,
-    required this.maxY,
-    required this.crop,
-    required this.relativeDataPoints,
-    required this.relativeDimensions,
+    required this.layout,
     required this.animation,
     required this.getCharts,
   });
@@ -236,23 +203,17 @@ class _SparklinesRenderWidget extends StatelessWidget {
       animation: animation,
       builder: (context, child) {
         final charts = getCharts(animation.value);
-        final transformer = CoordinateTransformer(
-          minX: minX,
-          maxX: maxX,
-          minY: minY,
-          maxY: maxY,
-          width: w,
-          height: h,
-          relativeDataPoints: relativeDataPoints,
-          relativeDimensions: relativeDimensions,
-          crop: crop,
-        );
+
+        // Get default layout (defaults to RelativeLayout if none provided)
+        final defaultLayout = layout ?? const RelativeLayout();
 
         return CustomPaint(
           size: Size(w, h),
           painter: SparklinesPainter(
-            transformer: transformer,
             charts: charts,
+            defaultLayout: defaultLayout,
+            width: w,
+            height: h,
           ),
         );
       },

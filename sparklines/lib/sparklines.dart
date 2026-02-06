@@ -10,6 +10,9 @@ export 'src/chart_data.dart';
 // Interfaces
 export 'src/interfaces.dart';
 
+// Layout
+export 'src/chart_layout.dart';
+
 // Enums
 export 'src/stroke_align.dart';
 export 'src/relative_dimension.dart';

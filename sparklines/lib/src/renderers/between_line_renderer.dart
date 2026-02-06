@@ -2,11 +2,10 @@ import 'package:flutter/material.dart';
 import '../coordinate_transformer.dart';
 import '../chart_data.dart';
 import '../interfaces.dart';
-import 'base_renderer.dart';
 import 'line_chart_renderer.dart';
 
 /// Renders area between two lines
-class BetweenLineRenderer extends BaseRenderer {
+class BetweenLineRenderer implements IChartRenderer {
   final LineChartRenderer _lineRenderer = LineChartRenderer();
 
   @override

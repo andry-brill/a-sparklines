@@ -4,10 +4,9 @@ import '../coordinate_transformer.dart';
 import '../chart_data.dart';
 import '../interfaces.dart';
 import '../stroke_align.dart';
-import 'base_renderer.dart';
 
 /// Renders pie charts
-class PieChartRenderer extends BaseRenderer {
+class PieChartRenderer implements IChartRenderer {
   @override
   void render(
     Canvas canvas,

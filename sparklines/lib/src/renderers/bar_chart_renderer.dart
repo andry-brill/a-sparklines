@@ -4,10 +4,9 @@ import '../coordinate_transformer.dart';
 import '../chart_data.dart';
 import '../data_point.dart';
 import '../interfaces.dart';
-import 'base_renderer.dart';
 
 /// Renders bar charts
-class BarChartRenderer extends BaseRenderer {
+class BarChartRenderer implements IChartRenderer {
   @override
   void render(
     Canvas canvas,

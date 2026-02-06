@@ -1,26 +1,20 @@
 import 'package:flutter/material.dart';
 import 'coordinate_transformer.dart';
 import 'interfaces.dart';
-import 'renderers/bar_chart_renderer.dart';
-import 'renderers/line_chart_renderer.dart';
-import 'renderers/between_line_renderer.dart';
-import 'renderers/pie_chart_renderer.dart';
-import 'chart_data.dart';
 
 /// Custom painter for sparklines charts
 class SparklinesPainter extends CustomPainter {
-  final CoordinateTransformer transformer;
   final List<ISparklinesData> charts;
+  final IChartLayout defaultLayout;
+  final double width;
+  final double height;
   final List<ISparklinesData>? oldCharts;
 
-  final BarChartRenderer _barRenderer = BarChartRenderer();
-  final LineChartRenderer _lineRenderer = LineChartRenderer();
-  final BetweenLineRenderer _betweenRenderer = BetweenLineRenderer();
-  final PieChartRenderer _pieRenderer = PieChartRenderer();
-
   SparklinesPainter({
-    required this.transformer,
     required this.charts,
+    required this.defaultLayout,
+    required this.width,
+    required this.height,
     this.oldCharts,
   });
 
@@ -29,27 +23,34 @@ class SparklinesPainter extends CustomPainter {
     for (final chart in charts) {
       if (!chart.visible) continue;
 
-      if (chart is BarData) {
-        _barRenderer.render(canvas, transformer, chart);
-      } else if (chart is LineData) {
-        _lineRenderer.render(canvas, transformer, chart);
-      } else if (chart is BetweenLineData) {
-        _betweenRenderer.render(canvas, transformer, chart);
-      } else if (chart is PieData) {
-        _pieRenderer.render(canvas, transformer, chart);
-      }
+      // Get chart's layout or use default
+      final chartLayout = chart.layout ?? defaultLayout;
+
+      // Create transformer for this chart
+      final transformer = CoordinateTransformer(
+        minX: chart.minX,
+        maxX: chart.maxX,
+        minY: chart.minY,
+        maxY: chart.maxY,
+        width: width,
+        height: height,
+        layout: chartLayout,
+      );
+
+      // Render chart with its own transformer
+      chart.renderer.render(canvas, transformer, chart);
     }
   }
 
   @override
   bool shouldRepaint(SparklinesPainter oldDelegate) {
-    // Repaint if transformer changed
-    if (oldDelegate.transformer.width != transformer.width ||
-        oldDelegate.transformer.height != transformer.height ||
-        oldDelegate.transformer.minX != transformer.minX ||
-        oldDelegate.transformer.maxX != transformer.maxX ||
-        oldDelegate.transformer.minY != transformer.minY ||
-        oldDelegate.transformer.maxY != transformer.maxY) {
+    // Repaint if dimensions changed
+    if (oldDelegate.width != width || oldDelegate.height != height) {
+      return true;
+    }
+
+    // Repaint if default layout changed
+    if (oldDelegate.defaultLayout != defaultLayout) {
       return true;
     }
 
