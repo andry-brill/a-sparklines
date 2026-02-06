@@ -75,6 +75,10 @@ abstract class ISparklinesData implements ILerpable<ISparklinesData> {
 
   /// Maximum Y coordinate from data points
   double get maxY;
+
+  /// Check if this chart should repaint compared to [other]
+  /// Returns true if any property that affects rendering has changed
+  bool shouldRepaint(ISparklinesData other);
 }
 
 /// Style interface for data points

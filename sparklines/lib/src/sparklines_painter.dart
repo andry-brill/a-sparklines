@@ -44,24 +44,21 @@ class SparklinesPainter extends CustomPainter {
 
   @override
   bool shouldRepaint(SparklinesPainter oldDelegate) {
-    // Repaint if dimensions changed
+
     if (oldDelegate.width != width || oldDelegate.height != height) {
       return true;
     }
 
-    // Repaint if default layout changed
     if (oldDelegate.defaultLayout != defaultLayout) {
       return true;
     }
 
-    // Repaint if charts changed
     if (oldDelegate.charts.length != charts.length) {
       return true;
     }
 
-    // Simple comparison - in production, you'd want deeper comparison
     for (int i = 0; i < charts.length; i++) {
-      if (oldDelegate.charts[i] != charts[i]) {
+      if (charts[i].shouldRepaint(oldDelegate.charts[i])) {
         return true;
       }
     }

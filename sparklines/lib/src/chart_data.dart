@@ -61,6 +61,32 @@ class BarData implements ISparklinesData {
   });
 
   @override
+  bool shouldRepaint(ISparklinesData other) {
+    if (other is! BarData) return true;
+    if (visible != other.visible) return true;
+    if (rotation != other.rotation) return true;
+    if (origin != other.origin) return true;
+    if (layout != other.layout) return true;
+    if (stacked != other.stacked) return true;
+    if (width != other.width) return true;
+    if (bars.length != other.bars.length) return true;
+    if (color != other.color) return true;
+    if (gradient != other.gradient) return true;
+    if (border != other.border) return true;
+    if (borderRadius != other.borderRadius) return true;
+    if (borderColor != other.borderColor) return true;
+
+    // Check if data points changed
+    for (int i = 0; i < bars.length; i++) {
+      if (bars[i].x != other.bars[i].x || bars[i].y != other.bars[i].y) {
+        return true;
+      }
+    }
+
+    return false;
+  }
+
+  @override
   ISparklinesData lerpTo(ISparklinesData next, double t) {
     if (next is! BarData) return next;
     if (bars.length != next.bars.length) return next;
@@ -144,6 +170,33 @@ class LineData implements ISparklinesData {
   });
 
   @override
+  bool shouldRepaint(ISparklinesData other) {
+    if (other is! LineData) return true;
+    if (visible != other.visible) return true;
+    if (rotation != other.rotation) return true;
+    if (origin != other.origin) return true;
+    if (layout != other.layout) return true;
+    if (points.length != other.points.length) return true;
+    if (color != other.color) return true;
+    if (width != other.width) return true;
+    if (gradient != other.gradient) return true;
+    if (gradientArea != other.gradientArea) return true;
+    if (lineType != other.lineType) return true;
+    if (isStrokeCapRound != other.isStrokeCapRound) return true;
+    if (isStrokeJoinRound != other.isStrokeJoinRound) return true;
+    if (pointStyle != other.pointStyle) return true;
+
+    // Check if data points changed
+    for (int i = 0; i < points.length; i++) {
+      if (points[i].x != other.points[i].x || points[i].y != other.points[i].y) {
+        return true;
+      }
+    }
+
+    return false;
+  }
+
+  @override
   ISparklinesData lerpTo(ISparklinesData next, double t) {
     if (next is! LineData) return next;
     if (points.length != next.points.length) return next;
@@ -218,6 +271,24 @@ class BetweenLineData implements ISparklinesData {
   });
 
   @override
+  bool shouldRepaint(ISparklinesData other) {
+    if (other is! BetweenLineData) return true;
+    if (visible != other.visible) return true;
+    if (rotation != other.rotation) return true;
+    if (origin != other.origin) return true;
+    if (layout != other.layout) return true;
+    if (color != other.color) return true;
+    if (gradient != other.gradient) return true;
+
+    // Check if nested line data changed
+    if (from.shouldRepaint(other.from) || to.shouldRepaint(other.to)) {
+      return true;
+    }
+
+    return false;
+  }
+
+  @override
   ISparklinesData lerpTo(ISparklinesData next, double t) {
     if (next is! BetweenLineData) return next;
     if (visible != next.visible) return next;
@@ -287,6 +358,33 @@ class PieData implements ISparklinesData {
     this.borderRadius,
     this.borderColor,
   });
+
+  @override
+  bool shouldRepaint(ISparklinesData other) {
+    if (other is! PieData) return true;
+    if (visible != other.visible) return true;
+    if (rotation != other.rotation) return true;
+    if (origin != other.origin) return true;
+    if (layout != other.layout) return true;
+    if (pies.length != other.pies.length) return true;
+    if (stroke != other.stroke) return true;
+    if (strokeAlign != other.strokeAlign) return true;
+    if (color != other.color) return true;
+    if (gradient != other.gradient) return true;
+    if (space != other.space) return true;
+    if (border != other.border) return true;
+    if (borderRadius != other.borderRadius) return true;
+    if (borderColor != other.borderColor) return true;
+
+    // Check if data points changed
+    for (int i = 0; i < pies.length; i++) {
+      if (pies[i].x != other.pies[i].x || pies[i].y != other.pies[i].y) {
+        return true;
+      }
+    }
+
+    return false;
+  }
 
   @override
   ISparklinesData lerpTo(ISparklinesData next, double t) {
