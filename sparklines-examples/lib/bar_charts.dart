@@ -5,13 +5,6 @@ List<ExampleChart> barCharts() {
   return [
     ExampleChart(
       title: 'Simple bar',
-      plot: (options, charts) => SparklinesChart(
-        width: options.width,
-        height: options.height,
-        charts: charts,
-        animate: options.animation,
-        crop: options.crop,
-      ),
       initialCharts: [
         BarData(
           bars: List.generate(
@@ -41,13 +34,6 @@ List<ExampleChart> barCharts() {
     ),
     ExampleChart(
       title: 'Stacked bars',
-      plot: (options, charts) => SparklinesChart(
-        width: options.width,
-        height: options.height,
-        charts: charts,
-        animate: options.animation,
-        crop: options.crop,
-      ),
       initialCharts: [
         BarData(
           bars: List.generate(

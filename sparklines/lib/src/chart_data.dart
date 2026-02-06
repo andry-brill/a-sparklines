@@ -63,6 +63,38 @@ class BarData implements ISparklinesData {
     this.borderColor,
   });
 
+  BarData copyWith({
+    bool? visible,
+    double? rotation,
+    Offset? origin,
+    IChartLayout? layout,
+    bool? crop,
+    List<DataPoint>? bars,
+    bool? stacked,
+    double? width,
+    Color? color,
+    Gradient? gradient,
+    BorderSide? border,
+    BorderRadius? borderRadius,
+    Color? borderColor,
+  }) {
+    return BarData(
+      visible: visible ?? this.visible,
+      rotation: rotation ?? this.rotation,
+      origin: origin ?? this.origin,
+      layout: layout ?? this.layout,
+      crop: crop ?? this.crop,
+      bars: bars ?? this.bars,
+      stacked: stacked ?? this.stacked,
+      width: width ?? this.width,
+      color: color ?? this.color,
+      gradient: gradient ?? this.gradient,
+      border: border ?? this.border,
+      borderRadius: borderRadius ?? this.borderRadius,
+      borderColor: borderColor ?? this.borderColor,
+    );
+  }
+
   @override
   bool shouldRepaint(ISparklinesData other) {
     if (other is! BarData) return true;
@@ -176,6 +208,40 @@ class LineData implements ISparklinesData {
     this.pointStyle,
   });
 
+  LineData copyWith({
+    bool? visible,
+    double? rotation,
+    Offset? origin,
+    IChartLayout? layout,
+    bool? crop,
+    List<DataPoint>? points,
+    Color? color,
+    double? width,
+    Gradient? gradient,
+    Gradient? gradientArea,
+    ILineTypeData? lineType,
+    bool? isStrokeCapRound,
+    bool? isStrokeJoinRound,
+    IDataPointStyle? pointStyle,
+  }) {
+    return LineData(
+      visible: visible ?? this.visible,
+      rotation: rotation ?? this.rotation,
+      origin: origin ?? this.origin,
+      layout: layout ?? this.layout,
+      crop: crop ?? this.crop,
+      points: points ?? this.points,
+      color: color ?? this.color,
+      width: width ?? this.width,
+      gradient: gradient ?? this.gradient,
+      gradientArea: gradientArea ?? this.gradientArea,
+      lineType: lineType ?? this.lineType,
+      isStrokeCapRound: isStrokeCapRound ?? this.isStrokeCapRound,
+      isStrokeJoinRound: isStrokeJoinRound ?? this.isStrokeJoinRound,
+      pointStyle: pointStyle ?? this.pointStyle,
+    );
+  }
+
   @override
   bool shouldRepaint(ISparklinesData other) {
     if (other is! LineData) return true;
@@ -281,6 +347,30 @@ class BetweenLineData implements ISparklinesData {
     this.gradient,
   });
 
+  BetweenLineData copyWith({
+    bool? visible,
+    double? rotation,
+    Offset? origin,
+    IChartLayout? layout,
+    bool? crop,
+    LineData? from,
+    LineData? to,
+    Color? color,
+    Gradient? gradient,
+  }) {
+    return BetweenLineData(
+      visible: visible ?? this.visible,
+      rotation: rotation ?? this.rotation,
+      origin: origin ?? this.origin,
+      layout: layout ?? this.layout,
+      crop: crop ?? this.crop,
+      from: from ?? this.from,
+      to: to ?? this.to,
+      color: color ?? this.color,
+      gradient: gradient ?? this.gradient,
+    );
+  }
+
   @override
   bool shouldRepaint(ISparklinesData other) {
     if (other is! BetweenLineData) return true;
@@ -373,6 +463,40 @@ class PieData implements ISparklinesData {
     this.borderRadius,
     this.borderColor,
   });
+
+  PieData copyWith({
+    bool? visible,
+    double? rotation,
+    Offset? origin,
+    IChartLayout? layout,
+    bool? crop,
+    List<DataPoint>? pies,
+    double? stroke,
+    StrokeAlign? strokeAlign,
+    Color? color,
+    Gradient? gradient,
+    double? space,
+    BorderSide? border,
+    BorderRadius? borderRadius,
+    Color? borderColor,
+  }) {
+    return PieData(
+      visible: visible ?? this.visible,
+      rotation: rotation ?? this.rotation,
+      origin: origin ?? this.origin,
+      layout: layout ?? this.layout,
+      crop: crop ?? this.crop,
+      pies: pies ?? this.pies,
+      stroke: stroke ?? this.stroke,
+      strokeAlign: strokeAlign ?? this.strokeAlign,
+      color: color ?? this.color,
+      gradient: gradient ?? this.gradient,
+      space: space ?? this.space,
+      border: border ?? this.border,
+      borderRadius: borderRadius ?? this.borderRadius,
+      borderColor: borderColor ?? this.borderColor,
+    );
+  }
 
   @override
   bool shouldRepaint(ISparklinesData other) {

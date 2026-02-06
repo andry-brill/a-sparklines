@@ -106,12 +106,12 @@ class LineChartRenderer implements IChartRenderer {
         final point = transformer.transformPoint(points[i].x, points[i].y);
         path.lineTo(point.dx, point.dy);
       }
-    } else if (lineData.lineType is LineChartStepData) {
-      final stepData = lineData.lineType as LineChartStepData;
+    } else if (lineData.lineType is SteppedLineType) {
+      final stepData = lineData.lineType as SteppedLineType;
       _buildStepPath(path, points, transformer, stepData.stepJumpAt);
-    } else if (lineData.lineType is LineChartCurveData) {
-      final curveData = lineData.lineType as LineChartCurveData;
-      _buildCurvePath(path, points, transformer, curveData.curveSmoothness);
+    } else if (lineData.lineType is CurvedLineType) {
+      final curveData = lineData.lineType as CurvedLineType;
+      _buildCurvePath(path, points, transformer, curveData.smoothness);
     } else {
       // Fallback to straight lines for unknown types
       for (int i = 1; i < points.length; i++) {

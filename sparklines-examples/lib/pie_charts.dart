@@ -5,13 +5,6 @@ List<ExampleChart> pieCharts() {
   return [
     ExampleChart(
       title: 'Simple pie',
-      plot: (options, charts) => SparklinesChart(
-        width: options.width,
-        height: options.height,
-        charts: charts,
-        animate: options.animation,
-        crop: options.crop,
-      ),
       initialCharts: [
         PieData(
           pies: [
@@ -37,13 +30,6 @@ List<ExampleChart> pieCharts() {
     ),
     ExampleChart(
       title: 'Pie with spacing',
-      plot: (options, charts) => SparklinesChart(
-        width: options.width,
-        height: options.height,
-        charts: charts,
-        animate: options.animation,
-        crop: options.crop,
-      ),
       initialCharts: [
         PieData(
           pies: [

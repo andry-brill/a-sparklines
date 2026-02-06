@@ -2,89 +2,142 @@
 part of 'main.dart';
 
 
+final blueLine = [
+  dpI(-6, 8),
+  dpI(-3, -3),
+  dpI(0, 0),
+  dpI(3, 7),
+  dpI(6, 2),
+  dpI(9, 9),
+  dpI(12, 3),
+  dpI(15, 3),
+];
+
+final blueLineMod = [
+  dpI(-6, 4),
+  dpI(-3, 1),
+  dpI(0, -2),
+  dpI(3, 6),
+  dpI(6, 10),
+  dpI(9, 1),
+  dpI(12, 5),
+  dpI(15, 0),
+];
+
+final orangeLine = [
+  dpI(-6, 8),
+  dpI(-4, -3),
+  dpI(-2, 5),
+  dpI(0, 9),
+  dpI(2, 6),
+  dpI(4, 0),
+  dpI(8, -2),
+  dpI(10, 4),
+  dpI(12, -1),
+  dpI(14, -5),
+  dpI(16, 10),
+];
+
+final orangeLineMod = [
+  dpI(-6, 4),
+  dpI(-4, 0),
+  dpI(-2, -1),
+  dpI(0, 6),
+  dpI(2, 2),
+  dpI(4, 0),
+  dpI(8, 9),
+  dpI(10, -3),
+  dpI(12, 5),
+  dpI(14, -4),
+  dpI(16, 0),
+];
+
+final initialCharts = [
+  LineData(
+    points: blueLine,
+    color: Colors.blue,
+    width: 4
+  ),
+  LineData(
+    points: orangeLine,
+    color: Colors.deepOrange,
+    width: 4
+  ),
+];
+
+final toggleCharts = [
+  LineData(
+    points: blueLineMod,
+    color: Colors.blue,
+    width: 4,
+  ),
+  LineData(
+    points: orangeLineMod,
+    color: Colors.deepOrange,
+    width: 4,
+  ),
+];
+
+final lineBase = ExampleChart(
+  title: 'BASE',
+  initialCharts: initialCharts,
+  toggleCharts: toggleCharts,
+);
+
+final lineFull = lineBase.modify(
+  title: 'FULL',
+  modifier: (c) => c.copyWith(layout: RelativeLayout.full()),
+);
+
 List<ExampleChart> lineCharts() {
   return [
-    ExampleChart(
-      title: 'Simple line',
-      plot: (options, charts) => SparklinesChart(
-        width: options.width,
-        height: options.height,
-        charts: charts,
-        animate: options.animation,
-        crop: options.crop,
-      ),
-      initialCharts: [
-        LineData(
-          points: List.generate(
-            20,
-                (i) => DataPoint(
-              x: i / 19,
-              y: 0.5 + 0.3 * (i % 3 - 1),
-            ),
-          ),
-          color: Colors.blue,
-          width: 0.05,
-        ),
-      ],
-      toggleCharts: [
-        LineData(
-          points: List.generate(
-            20,
-                (i) => DataPoint(
-              x: i / 19,
-              y: 0.3 + 0.4 * ((i * 1.5) % 3 - 1),
-            ),
-          ),
-          color: Colors.red,
-          width: 0.07,
-        ),
-      ],
+    lineBase.modify(
+      title: 'Absolute layout',
+      subtitle: 'Values rendered as is, no transformation',
+      modifier: (c) => c,
     ),
-    ExampleChart(
-      title: 'Multiple lines',
-      plot: (options, charts) => SparklinesChart(
-        width: options.width,
-        height: options.height,
-        charts: charts,
-        animate: options.animation,
-        crop: options.crop,
+    lineBase.modify(
+      title: 'Relative finite layout',
+      subtitle: 'Values rendered in specified bounds (mixX-maxX,minY-maxY)',
+      modifier: (c) => c.copyWith(layout: RelativeLayout(
+        minX: xI(-3),
+        minY: yI(-3),
+        maxX: xI(12),
+        maxY: yI(12),
+      )),
+    ),
+    lineBase.modify(
+      title: 'Relative full layout',
+      subtitle: 'All values are fit - rendered in bounds between min data and max data',
+      modifier: (c) => c.copyWith(layout: RelativeLayout.full()),
+    ),
+    lineFull.modify(
+      title: 'Joins rounded',
+      subtitle: 'Stroke cap & join rounded (= true)',
+      modifier: (c) => c.copyWith(isStrokeCapRound: true, isStrokeJoinRound: true),
+    ),
+    lineFull.modify(
+      title: 'Curved',
+      subtitle: 'Lines rendered as curves, with smoothness=0.4',
+      modifier: (c) => c.copyWith(lineType: CurvedLineType(smoothness: 0.4)),
+    ),
+    lineFull.modify(
+      title: 'Stepped',
+      subtitle: 'Lines rendered as steps, with jump in the middle between data points',
+      modifier: (c) => c.copyWith(
+          lineType: SteppedLineType.middle(),
+          pointStyle: CircleDataPointStyle(radius: 2, color: Color(0xFF272727))
       ),
-      initialCharts: [
-        LineData(
-          points: List.generate(
-            15,
-                (i) => DataPoint(x: i / 14, y: 0.2 + (i % 4) * 0.2),
-          ),
-          color: Colors.blue,
-          width: 0.03,
-        ),
-        LineData(
-          points: List.generate(
-            15,
-                (i) => DataPoint(x: i / 14, y: 0.3 + (i % 3) * 0.15),
-          ),
-          color: Colors.green,
-          width: 0.05,
-        ),
-      ],
-      toggleCharts: [
-        LineData(
-          points: List.generate(
-            15,
-                (i) => DataPoint(x: i / 14, y: 0.4 + (i % 5) * 0.1),
-          ),
-          color: Colors.purple,
-          width: 0.02,
-        ),
-        LineData(
-          points: List.generate(
-            15,
-                (i) => DataPoint(x: i / 14, y: 0.1 + (i % 2) * 0.2),
-          ),
-          color: Colors.orange,
-          width: 0.07,
-        ),
-      ],
+    ),
+    lineFull.modify(
+      title: 'Stepped and rounded',
+      subtitle: 'Lines rendered as steps, with jump at end',
+      modifier: (c) => c.copyWith(
+          lineType: SteppedLineType.end(),
+          isStrokeCapRound: true,
+          isStrokeJoinRound: true,
+          pointStyle: CircleDataPointStyle(radius: 2, color: Color(0xFF272727))
+      ),
     ),
   ];
 }

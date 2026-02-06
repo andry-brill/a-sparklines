@@ -13,9 +13,13 @@ void main() {
 const gridWidth = 150.0;
 const gridHeight = 150.0;
 
-double rX(double value) => value / gridWidth;
-double rY(double value) => value / gridHeight;
-List<DataPoint> rP(Iterable<DataPoint> point) => point.map((p) => DataPoint(x: rX(p.x), y: rY(p.y), style: p.style)).toList();
+double xR(double value) => value / gridWidth;
+double yR(double value) => value / gridHeight;
+List<DataPoint> dpR(Iterable<DataPoint> point) => point.map((p) => DataPoint(x: xR(p.x), y: yR(p.y), style: p.style)).toList();
+
+double xI(int i) => (gridWidth / 10.0) * i;
+double yI(int i) => (gridHeight / 10.0) * i;
+DataPoint dpI(int xi, int yi) => DataPoint(x: xI(xi), y: yI(yi));
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
@@ -62,18 +66,35 @@ class CommonOptions {
   }
 }
 
-class ExampleChart {
-  final String title;
-  final Widget Function(CommonOptions options, List<ISparklinesData> charts) plot;
-  final List<ISparklinesData> initialCharts;
-  final List<ISparklinesData> toggleCharts;
+class ExampleChart<C extends ISparklinesData> {
 
-  const ExampleChart({
+  final String title;
+  final String? subtitle;
+  final List<C> initialCharts;
+  final List<C> toggleCharts;
+
+  ExampleChart({
     required this.title,
-    required this.plot,
-    required this.initialCharts,
-    required this.toggleCharts,
-  });
+    this.subtitle,
+    required List<C> initialCharts,
+    required List<C> toggleCharts,
+    C Function(C)? modifier
+  }) :
+    this.initialCharts = modifier == null ? initialCharts : initialCharts.map(modifier).toList(),
+    this.toggleCharts = modifier == null ? toggleCharts : toggleCharts.map(modifier).toList();
+
+  ExampleChart<C> modify({required String title,
+    String? subtitle,
+    required C Function(C) modifier
+  }) => ExampleChart<C>(title: title, subtitle: subtitle, initialCharts: initialCharts, toggleCharts: toggleCharts, modifier: modifier);
+
+  Widget plot(options, charts) => SparklinesChart(
+    width: options.width,
+    height: options.height,
+    charts: charts,
+    animate: options.animation,
+    crop: options.crop,
+  );
 }
 
 
@@ -99,7 +120,7 @@ class _MyHomePageState extends State<MyHomePage>
   double _customWidth = gridWidth;
   double _customHeight = gridHeight;
   bool _animation = true;
-  bool _crop = false;
+  bool _crop = true;
   final Map<String, Map<String, bool>> _chartStates = {};
 
   @override
@@ -290,12 +311,11 @@ class _MyHomePageState extends State<MyHomePage>
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          chart.title,
-          style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-        ),
-        const SizedBox(height: 8),
-        Wrap(
+        const SizedBox(height: 24),
+        Text(chart.title, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+        if (chart.subtitle != null) Text(chart.subtitle!, style: const TextStyle(fontSize: 16)),
+        const SizedBox(height: 16),
+          Wrap(
           spacing: 24,
           runSpacing: 24,
           children: sizeVariants.map((variant) {

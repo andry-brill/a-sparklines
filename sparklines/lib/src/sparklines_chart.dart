@@ -24,7 +24,7 @@ class SparklinesChart extends StatefulWidget {
     this.width,
     this.height,
     this.aspectRatio,
-    this.layout = const DefaultLayout(),
+    this.layout = const AbsoluteLayout(),
     this.crop = false,
     this.animationDuration = const Duration(milliseconds: 300),
     this.animationCurve = Curves.easeInOut,

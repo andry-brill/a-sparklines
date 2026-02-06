@@ -3,6 +3,7 @@ import 'interfaces.dart';
 
 /// Transforms data coordinates to screen coordinates
 class CoordinateTransformer implements ILayoutDimensions {
+
   @override
   final double minX;
   @override
@@ -57,16 +58,8 @@ class CoordinateTransformer implements ILayoutDimensions {
   }
 
   /// Transform a dimensional value based on layout settings
-  /// If value is infinity, returns it unchanged
   double transformDimension(double value) {
-    if (value == double.infinity || value == double.negativeInfinity) {
-      return value;
-    }
     return layout.transformDimension(value, this);
   }
 
-  /// Check if a point is within the plot bounds
-  bool isWithinBounds(double x, double y) {
-    return x >= minX && x <= maxX && y >= minY && y <= maxY;
-  }
 }

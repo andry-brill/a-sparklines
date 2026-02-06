@@ -109,17 +109,21 @@ class CircleDataPointStyle implements IDataPointStyle {
 abstract class ILineTypeData {}
 
 /// Step line type data
-class LineChartStepData implements ILineTypeData {
+class SteppedLineType implements ILineTypeData {
+
   /// 0.0 → previous point, 1.0 → next point
   final double stepJumpAt;
 
-  const LineChartStepData({this.stepJumpAt = 0.5});
+  const SteppedLineType({this.stepJumpAt = 0.5});
+  const SteppedLineType.start() : stepJumpAt = 0.0;
+  const SteppedLineType.middle() : stepJumpAt = 0.5;
+  const SteppedLineType.end() : stepJumpAt = 1.0;
 }
 
-/// Curve line type data
-class LineChartCurveData implements ILineTypeData {
-  /// Curve smoothness (0.0 to 1.0)
-  final double curveSmoothness;
+class CurvedLineType implements ILineTypeData {
 
-  const LineChartCurveData({this.curveSmoothness = 0.35});
+  /// Curve smoothness (0.0 to 1.0)
+  final double smoothness;
+
+  const CurvedLineType({this.smoothness = 0.35});
 }
