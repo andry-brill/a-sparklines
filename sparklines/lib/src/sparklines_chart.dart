@@ -5,11 +5,12 @@ import 'chart_layout.dart';
 
 /// Main sparklines chart widget
 class SparklinesChart extends StatefulWidget {
+
   final double? width;
   final double? height;
   final double? aspectRatio;
 
-  final IChartLayout? layout;
+  final IChartLayout layout;
   final bool crop;
 
   final Duration animationDuration;
@@ -23,7 +24,7 @@ class SparklinesChart extends StatefulWidget {
     this.width,
     this.height,
     this.aspectRatio,
-    this.layout,
+    this.layout = const DefaultLayout(),
     this.crop = false,
     this.animationDuration = const Duration(milliseconds: 300),
     this.animationCurve = Curves.easeInOut,
@@ -140,7 +141,7 @@ class _SparklinesRenderWidget extends StatelessWidget {
   final double? width;
   final double? height;
   final double? aspectRatio;
-  final IChartLayout? layout;
+  final IChartLayout layout;
   final bool crop;
   final Animation<double> animation;
   final List<ISparklinesData> Function(double) getCharts;
@@ -207,16 +208,14 @@ class _SparklinesRenderWidget extends StatelessWidget {
     return AnimatedBuilder(
       animation: animation,
       builder: (context, child) {
-        final charts = getCharts(animation.value);
 
-        // Get default layout (defaults to RelativeLayout if none provided)
-        final defaultLayout = layout ?? const RelativeLayout();
+        final charts = getCharts(animation.value);
 
         return CustomPaint(
           size: Size(w, h),
           painter: SparklinesPainter(
             charts: charts,
-            defaultLayout: defaultLayout,
+            defaultLayout: layout,
             defaultCrop: crop,
             width: w,
             height: h,

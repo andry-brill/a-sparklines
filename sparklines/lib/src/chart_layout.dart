@@ -1,6 +1,26 @@
 import 'interfaces.dart';
 import 'relative_dimension.dart';
 
+
+/// No transformations at all, returning values as is
+class DefaultLayout implements IChartLayout {
+
+  const DefaultLayout();
+
+  @override
+  IChartLayout resolve(ILayoutDimensions dimensions) => this;
+
+  @override
+  double transformDimension(double value, ILayoutDimensions dimensions) => value;
+
+  @override
+  double transformX(double x, ILayoutDimensions dimensions) => x;
+
+  @override
+  double transformY(double y, ILayoutDimensions dimensions) => y;
+
+}
+
 /// Absolute layout with explicit bounds (non-relative transformation)
 /// Can use infinity values for auto-calculation from data
 class AbsoluteLayout implements IChartLayout {
