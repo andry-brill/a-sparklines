@@ -38,4 +38,30 @@ abstract class BaseRenderer<DT extends ISparklinesData> implements IChartRendere
   }
 
   void renderData(Canvas canvas, CoordinateTransformer transformer, DT data);
+
+
+  /// Transform BorderRadius values based on relativeDimensions
+  BorderRadius transformBorderRadius(
+      BorderRadius borderRadius,
+      CoordinateTransformer transformer,
+      ) {
+    return BorderRadius.only(
+      topLeft: Radius.elliptical(
+        transformer.transformDimension(borderRadius.topLeft.x),
+        transformer.transformDimension(borderRadius.topLeft.y),
+      ),
+      topRight: Radius.elliptical(
+        transformer.transformDimension(borderRadius.topRight.x),
+        transformer.transformDimension(borderRadius.topRight.y),
+      ),
+      bottomLeft: Radius.elliptical(
+        transformer.transformDimension(borderRadius.bottomLeft.x),
+        transformer.transformDimension(borderRadius.bottomLeft.y),
+      ),
+      bottomRight: Radius.elliptical(
+        transformer.transformDimension(borderRadius.bottomRight.x),
+        transformer.transformDimension(borderRadius.bottomRight.y),
+      ),
+    );
+  }
 }

@@ -82,7 +82,7 @@ class PieChartRenderer extends BaseRenderer<PieData> {
   ) {
     BorderRadius? transformedBorderRadius;
     if (pieData.borderRadius != null) {
-      transformedBorderRadius = _transformBorderRadius(
+      transformedBorderRadius = transformBorderRadius(
         pieData.borderRadius!,
         transformer,
       );
@@ -165,7 +165,7 @@ class PieChartRenderer extends BaseRenderer<PieData> {
 
     BorderRadius? transformedBorderRadius;
     if (pieData.borderRadius != null) {
-      transformedBorderRadius = _transformBorderRadius(
+      transformedBorderRadius = transformBorderRadius(
         pieData.borderRadius!,
         transformer,
       );
@@ -221,31 +221,6 @@ class PieChartRenderer extends BaseRenderer<PieData> {
       paint.color = pieData.borderColor ?? pieData.border?.color ?? Colors.black;
       canvas.drawPath(path, paint);
     }
-  }
-
-  /// Transform BorderRadius values based on relativeDimensions
-  BorderRadius _transformBorderRadius(
-    BorderRadius borderRadius,
-    CoordinateTransformer transformer,
-  ) {
-    return BorderRadius.only(
-      topLeft: Radius.elliptical(
-        transformer.transformDimension(borderRadius.topLeft.x),
-        transformer.transformDimension(borderRadius.topLeft.y),
-      ),
-      topRight: Radius.elliptical(
-        transformer.transformDimension(borderRadius.topRight.x),
-        transformer.transformDimension(borderRadius.topRight.y),
-      ),
-      bottomLeft: Radius.elliptical(
-        transformer.transformDimension(borderRadius.bottomLeft.x),
-        transformer.transformDimension(borderRadius.bottomLeft.y),
-      ),
-      bottomRight: Radius.elliptical(
-        transformer.transformDimension(borderRadius.bottomRight.x),
-        transformer.transformDimension(borderRadius.bottomRight.y),
-      ),
-    );
   }
 
   Path _buildRoundedSectorPath(

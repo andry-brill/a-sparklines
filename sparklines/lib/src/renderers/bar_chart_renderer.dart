@@ -48,7 +48,7 @@ class BarChartRenderer extends BaseRenderer<BarData> {
         // Apply border radius if specified
         RRect? roundedRect;
         if (barData.borderRadius != null) {
-          final transformedBorderRadius = _transformBorderRadius(
+          final transformedBorderRadius = transformBorderRadius(
             barData.borderRadius!,
             transformer,
           );
@@ -60,7 +60,7 @@ class BarChartRenderer extends BaseRenderer<BarData> {
         if (barData.gradient != null) {
           paint.shader = barData.gradient!.createShader(rect);
         } else {
-          paint.color = barData.color ?? Colors.blue;
+          paint.color = barData.color ?? Color(0xFF000000);
         }
         paint.style = PaintingStyle.fill;
 
@@ -93,28 +93,4 @@ class BarChartRenderer extends BaseRenderer<BarData> {
 
   }
 
-  /// Transform BorderRadius values based on relativeDimensions
-  BorderRadius _transformBorderRadius(
-    BorderRadius borderRadius,
-    CoordinateTransformer transformer,
-  ) {
-    return BorderRadius.only(
-      topLeft: Radius.elliptical(
-        transformer.transformDimension(borderRadius.topLeft.x),
-        transformer.transformDimension(borderRadius.topLeft.y),
-      ),
-      topRight: Radius.elliptical(
-        transformer.transformDimension(borderRadius.topRight.x),
-        transformer.transformDimension(borderRadius.topRight.y),
-      ),
-      bottomLeft: Radius.elliptical(
-        transformer.transformDimension(borderRadius.bottomLeft.x),
-        transformer.transformDimension(borderRadius.bottomLeft.y),
-      ),
-      bottomRight: Radius.elliptical(
-        transformer.transformDimension(borderRadius.bottomRight.x),
-        transformer.transformDimension(borderRadius.bottomRight.y),
-      ),
-    );
-  }
 }
