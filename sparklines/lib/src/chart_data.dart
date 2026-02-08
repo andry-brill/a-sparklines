@@ -39,7 +39,6 @@ class BarData implements ISparklinesData {
 
   @override
   double get maxY => bars.maxY;
-  final bool stacked;
   final double width;
   final Color? color;
   final Gradient? gradient;
@@ -54,7 +53,6 @@ class BarData implements ISparklinesData {
     this.layout,
     this.crop,
     required this.bars,
-    this.stacked = false,
     required this.width,
     this.color,
     this.gradient,
@@ -85,7 +83,6 @@ class BarData implements ISparklinesData {
       layout: layout ?? this.layout,
       crop: crop ?? this.crop,
       bars: bars ?? this.bars,
-      stacked: stacked ?? this.stacked,
       width: width ?? this.width,
       color: color ?? this.color,
       gradient: gradient ?? this.gradient,
@@ -102,7 +99,6 @@ class BarData implements ISparklinesData {
     if (rotation != other.rotation) return true;
     if (origin != other.origin) return true;
     if (layout != other.layout) return true;
-    if (stacked != other.stacked) return true;
     if (width != other.width) return true;
     if (bars.length != other.bars.length) return true;
     if (color != other.color) return true;
@@ -113,7 +109,7 @@ class BarData implements ISparklinesData {
 
     // Check if data points changed
     for (int i = 0; i < bars.length; i++) {
-      if (bars[i].x != other.bars[i].x || bars[i].y != other.bars[i].y) {
+      if (bars[i].x != other.bars[i].x || bars[i].dy != other.bars[i].dy) {
         return true;
       }
     }
@@ -125,7 +121,7 @@ class BarData implements ISparklinesData {
   ISparklinesData lerpTo(ISparklinesData next, double t) {
     if (next is! BarData) return next;
     if (bars.length != next.bars.length) return next;
-    if (visible != next.visible || stacked != next.stacked) return next;
+    if (visible != next.visible) return next;
 
     final interpolatedBars = <DataPoint>[];
     for (int i = 0; i < bars.length; i++) {
@@ -139,7 +135,6 @@ class BarData implements ISparklinesData {
       layout: next.layout,
       crop: next.crop,
       bars: interpolatedBars,
-      stacked: next.stacked,
       width: lerpDouble(width, next.width, t) ?? next.width,
       color: Color.lerp(color, next.color, t),
       gradient: Gradient.lerp(gradient, next.gradient, t),
@@ -261,7 +256,7 @@ class LineData implements ISparklinesData {
 
     // Check if data points changed
     for (int i = 0; i < points.length; i++) {
-      if (points[i].x != other.points[i].x || points[i].y != other.points[i].y) {
+      if (points[i].x != other.points[i].x || points[i].dy != other.points[i].dy) {
         return true;
       }
     }
@@ -517,7 +512,7 @@ class PieData implements ISparklinesData {
 
     // Check if data points changed
     for (int i = 0; i < pies.length; i++) {
-      if (pies[i].x != other.pies[i].x || pies[i].y != other.pies[i].y) {
+      if (pies[i].x != other.pies[i].x || pies[i].dy != other.pies[i].dy) {
         return true;
       }
     }

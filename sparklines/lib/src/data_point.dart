@@ -4,15 +4,26 @@ import 'interfaces.dart';
 
 /// A single data point with x, y coordinates and optional style
 class DataPoint implements ILerpable<DataPoint> {
+
   final double x;
   final double y;
+
+  /// Value (offset by y)
+  final double dy;
+
   final IDataPointStyle? style;
 
   const DataPoint({
     required this.x,
-    required this.y,
+    this.y = 0.0,
+    required this.dy,
     this.style,
   });
+
+  const DataPoint.value(this.x, double value, {
+    this.y = 0.0,
+    this.style,
+  }) : dy = value;
 
   @override
   DataPoint lerpTo(DataPoint next, double t) {
@@ -25,7 +36,7 @@ class DataPoint implements ILerpable<DataPoint> {
 
     return DataPoint(
       x: lerpDouble(x, next.x, t) ?? next.x,
-      y: lerpDouble(y, next.y, t) ?? next.y,
+      dy: lerpDouble(dy, next.dy, t) ?? next.dy,
       style: interpolatedStyle,
     );
   }
@@ -48,12 +59,12 @@ extension DataPointBounds on Iterable<DataPoint> {
   /// Minimum Y coordinate
   double get minY {
     if (isEmpty) return 0.0;
-    return map((p) => p.y).reduce((a, b) => math.min(a, b));
+    return map((p) => p.dy).reduce((a, b) => math.min(a, b));
   }
 
   /// Maximum Y coordinate
   double get maxY {
     if (isEmpty) return 1.0;
-    return map((p) => p.y).reduce((a, b) => math.max(a, b));
+    return map((p) => p.dy).reduce((a, b) => math.max(a, b));
   }
 }

@@ -76,7 +76,7 @@ class LineChartRenderer extends BaseRenderer<LineData> {
     if (points.isEmpty) return path;
 
     // Transform first point
-    final firstPoint = transformer.transformPoint(points[0].x, points[0].y);
+    final firstPoint = transformer.transformPoint(points[0].x, points[0].dy);
     path.moveTo(firstPoint.dx, firstPoint.dy);
 
     if (points.length == 1) return path;
@@ -84,7 +84,7 @@ class LineChartRenderer extends BaseRenderer<LineData> {
     if (lineData.lineType == null) {
       // Straight lines (non-curved path)
       for (int i = 1; i < points.length; i++) {
-        final point = transformer.transformPoint(points[i].x, points[i].y);
+        final point = transformer.transformPoint(points[i].x, points[i].dy);
         path.lineTo(point.dx, point.dy);
       }
     } else if (lineData.lineType is SteppedLineType) {
@@ -96,7 +96,7 @@ class LineChartRenderer extends BaseRenderer<LineData> {
     } else {
       // Fallback to straight lines for unknown types
       for (int i = 1; i < points.length; i++) {
-        final point = transformer.transformPoint(points[i].x, points[i].y);
+        final point = transformer.transformPoint(points[i].x, points[i].dy);
         path.lineTo(point.dx, point.dy);
       }
     }
@@ -116,8 +116,8 @@ class LineChartRenderer extends BaseRenderer<LineData> {
 
       final prevX = transformer.transformX(prev.x);
       final currX = transformer.transformX(curr.x);
-      final prevY = transformer.transformY(prev.y);
-      final currY = transformer.transformY(curr.y);
+      final prevY = transformer.transformY(prev.dy);
+      final currY = transformer.transformY(curr.dy);
 
       final stepX = prevX + (currX - prevX) * stepJumpAt;
 
@@ -142,8 +142,8 @@ class LineChartRenderer extends BaseRenderer<LineData> {
       final prev = points[i - 1];
       final curr = points[i];
 
-      final prevPoint = transformer.transformPoint(prev.x, prev.y);
-      final currPoint = transformer.transformPoint(curr.x, curr.y);
+      final prevPoint = transformer.transformPoint(prev.x, prev.dy);
+      final currPoint = transformer.transformPoint(curr.x, curr.dy);
 
       if (i == 1) {
         // First segment: use current point as control
@@ -166,7 +166,7 @@ class LineChartRenderer extends BaseRenderer<LineData> {
       } else {
         // Middle segments: use both points for smooth curve
         final next = points[i + 1];
-        final nextPoint = transformer.transformPoint(next.x, next.y);
+        final nextPoint = transformer.transformPoint(next.x, next.dy);
 
         final controlX1 = prevPoint.dx + (currPoint.dx - prevPoint.dx) * smoothness;
         final controlX2 = currPoint.dx - (nextPoint.dx - currPoint.dx) * smoothness;
@@ -196,7 +196,7 @@ class LineChartRenderer extends BaseRenderer<LineData> {
     paint.color = style.color;
 
     for (final point in lineData.points) {
-      final screenPoint = transformer.transformPoint(point.x, point.y);
+      final screenPoint = transformer.transformPoint(point.x, point.dy);
       final radius = transformer.transformDimension(style.radius);
       canvas.drawCircle(screenPoint, radius, paint);
     }

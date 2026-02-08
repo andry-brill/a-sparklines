@@ -20,7 +20,7 @@ class PieChartRenderer extends BaseRenderer<PieData> {
     // Calculate total arc length
     final totalArc = pieData.pies.fold<double>(
       0.0,
-      (sum, pie) => sum + pie.y,
+      (sum, pie) => sum + pie.dy,
     );
 
     if (totalArc <= 0) return;
@@ -36,7 +36,7 @@ class PieChartRenderer extends BaseRenderer<PieData> {
 
     for (int i = 0; i < pieData.pies.length; i++) {
       final pie = pieData.pies[i];
-      final sweepAngle = (pie.y / totalArc) * 2 * math.pi - spaceAngle;
+      final sweepAngle = (pie.dy / totalArc) * 2 * math.pi - spaceAngle;
 
       if (sweepAngle <= 0) continue;
 
