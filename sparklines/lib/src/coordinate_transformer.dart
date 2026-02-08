@@ -36,15 +36,20 @@ class CoordinateTransformer implements ILayoutDimensions {
     this.layout = layout.resolve(this);
   }
 
-  /// Transform X coordinate from data space to screen space
   double transformX(double x) {
     return layout.transformX(x, this);
   }
 
-  /// Transform Y coordinate from data space to screen space
-  /// Y is inverted to keep math natural for chart data
+  double transformDx(double x) {
+    return layout.transformDx(x, this);
+  }
+
   double transformY(double y) {
     return layout.transformY(y, this);
+  }
+
+  double transformDy(double y) {
+    return layout.transformDy(y, this);
   }
 
   /// Transform a point from data space to screen space

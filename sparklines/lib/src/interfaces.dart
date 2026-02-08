@@ -30,6 +30,12 @@ abstract class IChartLayout {
   /// Transform Y coordinate from data space to screen space
   double transformY(double y, ILayoutDimensions dimensions);
 
+  /// Transform delta over X coordinate from data space to screen space
+  double transformDx(double x, ILayoutDimensions dimensions);
+
+  /// Transform delta over Y coordinate from data space to screen space
+  double transformDy(double y, ILayoutDimensions dimensions);
+
   /// Transform a dimensional value based on layout settings
   double transformDimension(double value, ILayoutDimensions dimensions);
 }

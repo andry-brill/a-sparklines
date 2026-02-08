@@ -1,42 +1,22 @@
 import 'package:flutter/material.dart';
+import 'package:sparklines/src/renderers/base_renderer.dart';
 import '../coordinate_transformer.dart';
 import '../chart_data.dart';
-import '../interfaces.dart';
 import 'line_chart_renderer.dart';
 
 /// Renders area between two lines
-class BetweenLineRenderer implements IChartRenderer {
+class BetweenLineRenderer extends BaseRenderer<BetweenLineData> {
+
   final LineChartRenderer _lineRenderer = LineChartRenderer();
 
   @override
-  void render(
+  void renderData(
     Canvas canvas,
     CoordinateTransformer transformer,
-    ISparklinesData data,
+    BetweenLineData betweenData,
   ) {
-    if (data is! BetweenLineData || !data.visible) return;
 
-    final betweenData = data;
     final paint = Paint();
-
-    // Apply origin offset
-    canvas.save();
-    canvas.translate(betweenData.origin.dx, betweenData.origin.dy);
-
-    // Apply rotation
-    if (betweenData.rotation != 0.0) {
-      final center = Offset(transformer.width / 2, transformer.height / 2);
-      canvas.translate(center.dx, center.dy);
-      canvas.rotate(betweenData.rotation);
-      canvas.translate(-center.dx, -center.dy);
-    }
-
-    // Clip if crop is enabled
-    if (transformer.crop) {
-      canvas.clipRect(
-        Rect.fromLTWH(0, 0, transformer.width, transformer.height),
-      );
-    }
 
     // Build path from 'from' line
     final fromPath = _lineRenderer.buildPath(betweenData.from, transformer);
@@ -58,10 +38,10 @@ class BetweenLineRenderer implements IChartRenderer {
     } else {
       paint.color = betweenData.color ?? Colors.blue.withValues(alpha: 0.3);
     }
+
     paint.style = PaintingStyle.fill;
     canvas.drawPath(combinedPath, paint);
 
-    canvas.restore();
   }
 
   Path _reversePath(Path path) {

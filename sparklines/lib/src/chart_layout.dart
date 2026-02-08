@@ -20,6 +20,12 @@ class AbsoluteLayout implements IChartLayout {
   // Y is inverted to keep math natural for chart data
   double transformY(double y, ILayoutDimensions dimensions) => dimensions.height - y;
 
+  @override
+  double transformDx(double x, ILayoutDimensions dimensions) => x;
+
+  @override
+  double transformDy(double y, ILayoutDimensions dimensions) => y;
+
 }
 
 /// Relative transformation to explicit bounds
@@ -89,15 +95,19 @@ class RelativeLayout implements IChartLayout {
   }
 
   @override
-  double transformX(double x, ILayoutDimensions dimensions) {
-    return (x - minX) * (dimensions.width / (maxX - minX));
-  }
+  double transformX(double x, ILayoutDimensions dimensions) => transformDx(x - minX, dimensions);
+
+  @override
+  double transformDx(double dx, ILayoutDimensions dimensions) => dx * (dimensions.width / (maxX - minX));
 
   @override
   double transformY(double y, ILayoutDimensions dimensions) {
     // Y is inverted to keep math natural for chart data
-    return dimensions.height - ((y - minY) * (dimensions.height / (maxY - minY)));
+    return dimensions.height - transformDy(y - minY, dimensions);
   }
+
+  @override
+  double transformDy(double dy, ILayoutDimensions dimensions) => dy * (dimensions.height / (maxY - minY));
 
   @override
   double transformDimension(double value, ILayoutDimensions dimensions) {
@@ -112,7 +122,7 @@ class RelativeLayout implements IChartLayout {
           value = dimensions.maxX;
         }
 
-        return transformX(value, dimensions);
+        return transformDx(value, dimensions);
       case RelativeDimension.height:
 
         if (value == double.negativeInfinity) {
@@ -121,7 +131,7 @@ class RelativeLayout implements IChartLayout {
           value = dimensions.maxY;
         }
 
-        return transformY(value, dimensions);
+        return transformDy(value, dimensions);
     }
   }
 }

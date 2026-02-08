@@ -1,21 +1,20 @@
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
+import 'package:sparklines/src/renderers/base_renderer.dart';
 import '../coordinate_transformer.dart';
 import '../chart_data.dart';
-import '../interfaces.dart';
 import '../stroke_align.dart';
 
 /// Renders pie charts
-class PieChartRenderer implements IChartRenderer {
+class PieChartRenderer extends BaseRenderer<PieData> {
+
   @override
-  void render(
+  void renderData(
     Canvas canvas,
     CoordinateTransformer transformer,
-    ISparklinesData data,
+    PieData pieData,
   ) {
-    if (data is! PieData || !data.visible) return;
 
-    final pieData = data;
     final paint = Paint();
 
     // Calculate total arc length
@@ -30,23 +29,6 @@ class PieChartRenderer implements IChartRenderer {
     final centerX = transformer.width / 2;
     final centerY = transformer.height / 2;
     final radius = math.min(centerX, centerY) - 10;
-
-    // Apply origin offset
-    canvas.save();
-    final center = Offset(centerX + pieData.origin.dx, centerY + pieData.origin.dy);
-    canvas.translate(center.dx, center.dy);
-
-    // Apply rotation
-    if (pieData.rotation != 0.0) {
-      canvas.rotate(pieData.rotation);
-    }
-
-    // Clip if crop is enabled
-    if (transformer.crop) {
-      canvas.clipRect(
-        Rect.fromLTWH(-centerX, -centerY, transformer.width, transformer.height),
-      );
-    }
 
     // Render each pie segment
     double startAngle = pieData.pies.isNotEmpty ? pieData.pies[0].x : 0.0;
@@ -87,7 +69,6 @@ class PieChartRenderer implements IChartRenderer {
       startAngle = endAngle + spaceAngle;
     }
 
-    canvas.restore();
   }
 
   void _drawFilledSector(
@@ -118,7 +99,7 @@ class PieChartRenderer implements IChartRenderer {
             radius,
             startAngle,
             endAngle,
-            transformedBorderRadius!,
+            transformedBorderRadius,
           )
         : () {
             final p = Path();
@@ -202,7 +183,7 @@ class PieChartRenderer implements IChartRenderer {
             outerRadius,
             startAngle,
             endAngle,
-            transformedBorderRadius!,
+            transformedBorderRadius,
           )
         : () {
             final p = Path();

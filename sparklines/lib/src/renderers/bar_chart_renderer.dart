@@ -3,39 +3,19 @@ import 'package:flutter/material.dart';
 import '../coordinate_transformer.dart';
 import '../chart_data.dart';
 import '../data_point.dart';
-import '../interfaces.dart';
+import 'base_renderer.dart';
 
 /// Renders bar charts
-class BarChartRenderer implements IChartRenderer {
+class BarChartRenderer extends BaseRenderer<BarData> {
+
   @override
-  void render(
+  void renderData(
     Canvas canvas,
     CoordinateTransformer transformer,
-    ISparklinesData data,
+    BarData barData,
   ) {
-    if (data is! BarData || !data.visible) return;
 
-    final barData = data;
     final paint = Paint();
-
-    // Apply origin offset
-    canvas.save();
-    canvas.translate(barData.origin.dx, barData.origin.dy);
-
-    // Apply rotation
-    if (barData.rotation != 0.0) {
-      final center = Offset(transformer.width / 2, transformer.height / 2);
-      canvas.translate(center.dx, center.dy);
-      canvas.rotate(barData.rotation);
-      canvas.translate(-center.dx, -center.dy);
-    }
-
-    // Clip if crop is enabled
-    if (transformer.crop) {
-      canvas.clipRect(
-        Rect.fromLTWH(0, 0, transformer.width, transformer.height),
-      );
-    }
 
     // Group bars by X for stacking
     final Map<double, List<DataPoint>> groupedBars = {};
@@ -111,7 +91,6 @@ class BarChartRenderer implements IChartRenderer {
       }
     }
 
-    canvas.restore();
   }
 
   /// Transform BorderRadius values based on relativeDimensions

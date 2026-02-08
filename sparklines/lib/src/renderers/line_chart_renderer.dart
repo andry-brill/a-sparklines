@@ -3,39 +3,20 @@ import '../coordinate_transformer.dart';
 import '../chart_data.dart';
 import '../data_point.dart';
 import '../interfaces.dart';
+import 'base_renderer.dart';
 
-/// Renders line charts
-class LineChartRenderer implements IChartRenderer {
+class LineChartRenderer extends BaseRenderer<LineData> {
+
   @override
-  void render(
+  void renderData(
     Canvas canvas,
     CoordinateTransformer transformer,
-    ISparklinesData data,
+    LineData lineData,
   ) {
-    if (data is! LineData || !data.visible) return;
-    if (data.points.length < 2) return;
 
-    final lineData = data;
+    if (lineData.points.length < 2) return;
+
     final paint = Paint();
-
-    // Apply origin offset
-    canvas.save();
-    canvas.translate(lineData.origin.dx, lineData.origin.dy);
-
-    // Apply rotation
-    if (lineData.rotation != 0.0) {
-      final center = Offset(transformer.width / 2, transformer.height / 2);
-      canvas.translate(center.dx, center.dy);
-      canvas.rotate(lineData.rotation);
-      canvas.translate(-center.dx, -center.dy);
-    }
-
-    // Clip if crop is enabled
-    if (transformer.crop) {
-      canvas.clipRect(
-        Rect.fromLTWH(0, 0, transformer.width, transformer.height),
-      );
-    }
 
     // Build path based on line type
     final path = buildPath(lineData, transformer);
@@ -75,7 +56,8 @@ class LineChartRenderer implements IChartRenderer {
         Rect.fromLTWH(0, 0, transformer.width, transformer.height),
       );
     } else {
-      paint.color = lineData.color ?? Colors.blue;
+      paint.shader = null;
+      paint.color = lineData.color ?? Color(0xFF000000);
     }
 
     canvas.drawPath(path, paint);
@@ -85,7 +67,6 @@ class LineChartRenderer implements IChartRenderer {
       _drawPoints(canvas, lineData, transformer, paint);
     }
 
-    canvas.restore();
   }
 
   Path buildPath(LineData lineData, CoordinateTransformer transformer) {

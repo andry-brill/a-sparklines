@@ -52,15 +52,18 @@ final orangeLineMod = [
   dpI(16, 0),
 ];
 
+final color1 = Colors.blue;
+final color2 = Colors.deepOrange;
+
 final initialCharts = [
   LineData(
     points: blueLine,
-    color: Colors.blue,
+    color: color1,
     width: 4
   ),
   LineData(
     points: orangeLine,
-    color: Colors.deepOrange,
+    color: color2,
     width: 4
   ),
 ];
@@ -68,12 +71,12 @@ final initialCharts = [
 final toggleCharts = [
   LineData(
     points: blueLineMod,
-    color: Colors.blue,
+    color: color1,
     width: 4,
   ),
   LineData(
     points: orangeLineMod,
-    color: Colors.deepOrange,
+    color: color2,
     width: 4,
   ),
 ];
@@ -122,6 +125,14 @@ List<ExampleChart> lineCharts() {
       modifier: (c) => c.copyWith(lineType: CurvedLineType(smoothness: 0.4)),
     ),
     lineFull.modify(
+      title: 'Gradient area',
+      modifier: (c) => c.copyWith(gradientArea: LinearGradient(
+        colors: [c.color!, Colors.white],
+        begin: Alignment.topCenter,
+        end: Alignment.bottomCenter
+      )),
+    ),
+    lineFull.modify(
       title: 'Stepped',
       subtitle: 'Lines rendered as steps, with jump in the middle between data points',
       modifier: (c) => c.copyWith(
@@ -131,13 +142,21 @@ List<ExampleChart> lineCharts() {
     ),
     lineFull.modify(
       title: 'Stepped and rounded',
-      subtitle: 'Lines rendered as steps, with jump at end',
+      subtitle: 'Jump at end, offset(-20, 10) and rotated 90deg',
       modifier: (c) => c.copyWith(
+          origin: Offset(-20, 10),
+          rotation: pi/2,
           lineType: SteppedLineType.end(),
           isStrokeCapRound: true,
           isStrokeJoinRound: true,
-          pointStyle: CircleDataPointStyle(radius: 2, color: Color(0xFF272727))
+          pointStyle: CircleDataPointStyle(radius: 2, color: Color(0xFF272727)),
+          gradientArea: LinearGradient(
+              colors: [c.color!.withValues(alpha: 0.5), Colors.white.withValues(alpha: 0.0)],
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter
+          )
       ),
     ),
+
   ];
 }
