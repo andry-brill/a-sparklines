@@ -384,7 +384,7 @@ class BetweenLineData implements ISparklinesData {
 }
 
 /// Pie chart data
-class PieData implements ISparklinesData {
+class PieData implements ISparklinesData, IChartThickness, IChartBorder {
   static final IChartRenderer defaultRenderer = PieChartRenderer();
 
   @override
@@ -413,14 +413,16 @@ class PieData implements ISparklinesData {
 
   @override
   double get maxY => points.maxY;
-  final double stroke;
-  final StrokeAlign strokeAlign;
-  final Color? color;
-  final Gradient? gradient;
+
+  @override
+  final ThicknessData thickness;
+
   final double space;
-  final BorderSide? border;
-  final BorderRadius? borderRadius;
-  final Color? borderColor;
+
+  @override
+  final ThicknessData? border;
+  @override
+  final double? borderRadius;
 
   const PieData({
     this.visible = true,
@@ -429,14 +431,10 @@ class PieData implements ISparklinesData {
     this.layout,
     this.crop,
     required this.points,
-    this.stroke = double.infinity,
-    this.strokeAlign = StrokeAlign.center,
-    this.color,
-    this.gradient,
+    this.thickness = const ThicknessData(size: double.infinity, color: Color(0xFF2196F3)),
     this.space = 0.0,
     this.border,
     this.borderRadius,
-    this.borderColor,
   });
 
   PieData copyWith({
@@ -445,15 +443,11 @@ class PieData implements ISparklinesData {
     Offset? origin,
     IChartLayout? layout,
     bool? crop,
-    List<DataPoint>? pies,
-    double? stroke,
-    StrokeAlign? strokeAlign,
-    Color? color,
-    Gradient? gradient,
+    List<DataPoint>? points,
+    ThicknessData? thickness,
     double? space,
-    BorderSide? border,
-    BorderRadius? borderRadius,
-    Color? borderColor,
+    ThicknessData? border,
+    double? borderRadius,
   }) {
     return PieData(
       visible: visible ?? this.visible,
@@ -461,15 +455,11 @@ class PieData implements ISparklinesData {
       origin: origin ?? this.origin,
       layout: layout ?? this.layout,
       crop: crop ?? this.crop,
-      points: pies ?? this.points,
-      stroke: stroke ?? this.stroke,
-      strokeAlign: strokeAlign ?? this.strokeAlign,
-      color: color ?? this.color,
-      gradient: gradient ?? this.gradient,
+      points: points ?? this.points,
+      thickness: thickness ?? this.thickness,
       space: space ?? this.space,
       border: border ?? this.border,
       borderRadius: borderRadius ?? this.borderRadius,
-      borderColor: borderColor ?? this.borderColor,
     );
   }
 
@@ -481,14 +471,10 @@ class PieData implements ISparklinesData {
     if (origin != other.origin) return true;
     if (layout != other.layout) return true;
     if (points.length != other.points.length) return true;
-    if (stroke != other.stroke) return true;
-    if (strokeAlign != other.strokeAlign) return true;
-    if (color != other.color) return true;
-    if (gradient != other.gradient) return true;
+    if (!ThicknessData.isEquals(thickness, other.thickness)) return true;
     if (space != other.space) return true;
-    if (border != other.border) return true;
+    if (!ThicknessData.isEquals(border, other.border)) return true;
     if (borderRadius != other.borderRadius) return true;
-    if (borderColor != other.borderColor) return true;
 
     // Check if data points changed
     for (int i = 0; i < points.length; i++) {
@@ -518,16 +504,10 @@ class PieData implements ISparklinesData {
       layout: next.layout,
       crop: next.crop,
       points: interpolatedPies,
-      stroke: lerpDouble(stroke, next.stroke, t) ?? next.stroke,
-      strokeAlign: next.strokeAlign,
-      color: Color.lerp(color, next.color, t),
-      gradient: Gradient.lerp(gradient, next.gradient, t),
+      thickness: thickness.lerpTo(next.thickness, t),
       space: lerpDouble(space, next.space, t) ?? next.space,
-      border: border != null && next.border != null
-          ? BorderSide.lerp(border!, next.border!, t)
-          : next.border,
-      borderRadius: BorderRadius.lerp(borderRadius, next.borderRadius, t),
-      borderColor: Color.lerp(borderColor, next.borderColor, t),
+      border: ThicknessData.lerp(border, next.border, t),
+      borderRadius: lerpDouble(borderRadius, next.borderRadius, t) ?? next.borderRadius,
     );
   }
 }

@@ -35,7 +35,7 @@ class BarChartRenderer extends BaseRenderer<BarData> {
       RRect? roundedRect = this.roundedRect(transformer, barData, rect);
 
       paint.style = PaintingStyle.fill;
-      // Set paint properties from thickness (fill)
+
       if (thickness.gradient != null) {
         paint.shader = thickness.gradient!.createShader(rect);
       } else {

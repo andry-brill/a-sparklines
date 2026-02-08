@@ -7,24 +7,24 @@ List<ExampleChart> pieCharts() {
       title: 'Simple pie',
       initialCharts: [
         PieData(
-          pies: [
+          points: [
             DataPoint(x: 0, y: 30),
             DataPoint(x: 0, y: 20),
             DataPoint(x: 0, y: 25),
             DataPoint(x: 0, y: 25),
           ],
-          color: Colors.purple,
+          thickness: ThicknessData(size: double.infinity, color: Colors.purple),
         ),
       ],
       toggleCharts: [
         PieData(
-          pies: [
+          points: [
             DataPoint(x: 0, y: 40),
             DataPoint(x: 0, y: 15),
             DataPoint(x: 0, y: 20),
             DataPoint(x: 0, y: 25),
           ],
-          color: Colors.purple,
+          thickness: ThicknessData(size: double.infinity, color: Colors.purple),
         ),
       ],
     ),
@@ -32,25 +32,25 @@ List<ExampleChart> pieCharts() {
       title: 'Pie with spacing',
       initialCharts: [
         PieData(
-          pies: [
+          points: [
             DataPoint(x: 0, y: 25),
             DataPoint(x: 0, y: 20),
             DataPoint(x: 0, y: 30),
             DataPoint(x: 0, y: 25),
           ],
-          color: Colors.blue,
+          thickness: ThicknessData(size: double.infinity, color: Colors.blue),
           space: 2.0,
         ),
       ],
       toggleCharts: [
         PieData(
-          pies: [
+          points: [
             DataPoint(x: 0, y: 35),
             DataPoint(x: 0, y: 15),
             DataPoint(x: 0, y: 25),
             DataPoint(x: 0, y: 25),
           ],
-          color: Colors.blue,
+          thickness: ThicknessData(size: double.infinity, color: Colors.blue),
           space: 2.0,
         ),
       ],
