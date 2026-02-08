@@ -35,15 +35,16 @@ class LineChartRenderer extends BaseRenderer<LineData> {
       areaPath.close();
 
       paint.shader = lineData.gradientArea!.createShader(
-        Rect.fromLTWH(0, 0, transformer.width, transformer.height),
+        transformer.bounds,
       );
       paint.style = PaintingStyle.fill;
       canvas.drawPath(areaPath, paint);
     }
 
-    // Draw line
+    // Draw line (stroke from IChartThickness)
+    final thickness = lineData.thickness;
     paint.style = PaintingStyle.stroke;
-    paint.strokeWidth = transformer.transformDimension(lineData.width);
+    paint.strokeWidth = transformer.transformDimension(thickness.size);
     paint.strokeCap = lineData.isStrokeCapRound
         ? StrokeCap.round
         : StrokeCap.butt;
@@ -51,13 +52,11 @@ class LineChartRenderer extends BaseRenderer<LineData> {
         ? StrokeJoin.round
         : StrokeJoin.miter;
 
-    if (lineData.gradient != null) {
-      paint.shader = lineData.gradient!.createShader(
-        Rect.fromLTWH(0, 0, transformer.width, transformer.height),
-      );
+    if (thickness.gradient != null) {
+      paint.shader = thickness.gradient!.createShader(transformer.bounds);
     } else {
       paint.shader = null;
-      paint.color = lineData.color ?? Color(0xFF000000);
+      paint.color = thickness.color;
     }
 
     canvas.drawPath(path, paint);

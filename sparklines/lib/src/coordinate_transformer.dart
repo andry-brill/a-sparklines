@@ -18,6 +18,9 @@ class CoordinateTransformer implements ILayoutDimensions {
   @override
   final double height;
 
+  /// Bounds rect (0, 0, width, height) for shaders and clipping
+  final Rect bounds;
+
   late final IChartLayout layout;
   final bool crop;
 
@@ -30,7 +33,7 @@ class CoordinateTransformer implements ILayoutDimensions {
     required this.height,
     required IChartLayout layout,
     required this.crop,
-  }) {
+  }) : bounds = Rect.fromLTWH(0, 0, width, height) {
     assert(minX < maxX, 'minX must be less than maxX');
     assert(minY < maxY, 'minY must be less than maxY');
     // Resolve layout with this transformer's dimensions

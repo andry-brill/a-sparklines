@@ -15,9 +15,7 @@ abstract class BaseRenderer<DT extends ISparklinesData> implements IChartRendere
     canvas.save();
 
     if (transformer.crop) {
-      canvas.clipRect(
-        Rect.fromLTWH(0, 0, transformer.width, transformer.height),
-      );
+      canvas.clipRect(transformer.bounds);
     }
 
     canvas.translate(
@@ -39,6 +37,15 @@ abstract class BaseRenderer<DT extends ISparklinesData> implements IChartRendere
 
   void renderData(Canvas canvas, CoordinateTransformer transformer, DT data);
 
+  RRect? roundedRect(CoordinateTransformer transformer, IChartBorder border, Rect rect) {
+
+    if (border.borderRadius == null || border.borderRadius == 0.0) {
+      return null;
+    }
+
+    final r = transformer.transformDimension(border.borderRadius!);
+    return RRect.fromRectXY(rect, r, r);
+  }
 
   /// Transform BorderRadius values based on relativeDimensions
   BorderRadius transformBorderRadius(

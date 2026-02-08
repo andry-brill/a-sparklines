@@ -136,7 +136,7 @@ class BarData implements ISparklinesData, IChartBorder, IChartThickness {
 }
 
 /// Line chart data
-class LineData implements ISparklinesData {
+class LineData implements ISparklinesData, IChartThickness {
   static final LineChartRenderer defaultRenderer = LineChartRenderer();
 
   @override
@@ -166,9 +166,10 @@ class LineData implements ISparklinesData {
 
   @override
   double get maxY => points.maxY;
-  final Color? color;
-  final double width;
-  final Gradient? gradient;
+
+  @override
+  final ThicknessData thickness;
+
   final Gradient? gradientArea;
   final ILineTypeData? lineType;
   final bool isStrokeCapRound;
@@ -182,9 +183,7 @@ class LineData implements ISparklinesData {
     this.layout,
     this.crop,
     required this.points,
-    this.color,
-    this.width = 2.0,
-    this.gradient,
+    this.thickness = const ThicknessData(size: 2.0),
     this.gradientArea,
     this.lineType,
     this.isStrokeCapRound = false,
@@ -199,9 +198,7 @@ class LineData implements ISparklinesData {
     IChartLayout? layout,
     bool? crop,
     List<DataPoint>? points,
-    Color? color,
-    double? width,
-    Gradient? gradient,
+    ThicknessData? thickness,
     Gradient? gradientArea,
     ILineTypeData? lineType,
     bool? isStrokeCapRound,
@@ -215,9 +212,7 @@ class LineData implements ISparklinesData {
       layout: layout ?? this.layout,
       crop: crop ?? this.crop,
       points: points ?? this.points,
-      color: color ?? this.color,
-      width: width ?? this.width,
-      gradient: gradient ?? this.gradient,
+      thickness: thickness ?? this.thickness,
       gradientArea: gradientArea ?? this.gradientArea,
       lineType: lineType ?? this.lineType,
       isStrokeCapRound: isStrokeCapRound ?? this.isStrokeCapRound,
@@ -234,9 +229,7 @@ class LineData implements ISparklinesData {
     if (origin != other.origin) return true;
     if (layout != other.layout) return true;
     if (points.length != other.points.length) return true;
-    if (color != other.color) return true;
-    if (width != other.width) return true;
-    if (gradient != other.gradient) return true;
+    if (!ThicknessData.isEquals(thickness, other.thickness)) return true;
     if (gradientArea != other.gradientArea) return true;
     if (lineType != other.lineType) return true;
     if (isStrokeCapRound != other.isStrokeCapRound) return true;
@@ -271,9 +264,7 @@ class LineData implements ISparklinesData {
       layout: next.layout,
       crop: next.crop,
       points: interpolatedPoints,
-      color: Color.lerp(color, next.color, t),
-      width: lerpDouble(width, next.width, t) ?? next.width,
-      gradient: Gradient.lerp(gradient, next.gradient, t),
+      thickness: thickness.lerpTo(next.thickness, t),
       gradientArea: Gradient.lerp(gradientArea, next.gradientArea, t),
       lineType: next.lineType,
       isStrokeCapRound: next.isStrokeCapRound,

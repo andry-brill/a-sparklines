@@ -58,26 +58,22 @@ final color2 = Colors.deepOrange;
 final initialCharts = [
   LineData(
     points: blueLine,
-    color: color1,
-    width: 4
+    thickness: ThicknessData(size: 4, color: color1),
   ),
   LineData(
     points: orangeLine,
-    color: color2,
-    width: 4
+    thickness: ThicknessData(size: 4, color: color2),
   ),
 ];
 
 final toggleCharts = [
   LineData(
     points: blueLineMod,
-    color: color1,
-    width: 4,
+    thickness: ThicknessData(size: 4, color: color1),
   ),
   LineData(
     points: orangeLineMod,
-    color: color2,
-    width: 4,
+    thickness: ThicknessData(size: 4, color: color2),
   ),
 ];
 
@@ -127,7 +123,7 @@ List<ExampleChart> lineCharts() {
     lineFull.modify(
       title: 'Gradient area',
       modifier: (c) => c.copyWith(gradientArea: LinearGradient(
-        colors: [c.color!, Colors.white],
+        colors: [c.thickness.color, Colors.white],
         begin: Alignment.topCenter,
         end: Alignment.bottomCenter
       )),
@@ -151,7 +147,7 @@ List<ExampleChart> lineCharts() {
           isStrokeJoinRound: true,
           pointStyle: CircleDataPointStyle(radius: 2, color: Color(0xFF272727)),
           gradientArea: LinearGradient(
-              colors: [c.color!.withValues(alpha: 0.5), Colors.white.withValues(alpha: 0.0)],
+              colors: [c.thickness.color.withValues(alpha: 0.5), Colors.white.withValues(alpha: 0.0)],
               begin: Alignment.topCenter,
               end: Alignment.bottomCenter
           )

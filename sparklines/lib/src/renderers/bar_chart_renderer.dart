@@ -32,27 +32,16 @@ class BarChartRenderer extends BaseRenderer<BarData> {
         barHeight,
       );
 
-      // Apply border radius if specified (IChartBorder.borderRadius is uniform double)
-      RRect? roundedRect;
-      if (barData.borderRadius != null) {
-        final uniformRadius = BorderRadius.all(
-          Radius.circular(barData.borderRadius!),
-        );
-        final transformedBorderRadius = transformBorderRadius(
-          uniformRadius,
-          transformer,
-        );
-        roundedRect = transformedBorderRadius.resolve(TextDirection.ltr)
-            .toRRect(rect);
-      }
+      RRect? roundedRect = this.roundedRect(transformer, barData, rect);
 
+      paint.style = PaintingStyle.fill;
       // Set paint properties from thickness (fill)
       if (thickness.gradient != null) {
         paint.shader = thickness.gradient!.createShader(rect);
       } else {
+        paint.shader = null;
         paint.color = thickness.color;
       }
-      paint.style = PaintingStyle.fill;
 
       // Draw bar
       if (roundedRect != null) {
@@ -64,10 +53,16 @@ class BarChartRenderer extends BaseRenderer<BarData> {
       // Draw border if specified (IChartBorder)
       final border = barData.border;
       if (border != null) {
+
         paint.style = PaintingStyle.stroke;
-        final borderWidth = border.size ?? 1.0;
-        paint.strokeWidth = transformer.transformDimension(borderWidth);
-        paint.color = border.color ?? Colors.black;
+        paint.strokeWidth = transformer.transformDimension(border.size);
+
+        if (thickness.gradient != null) {
+          paint.shader = thickness.gradient!.createShader(rect);
+        } else {
+          paint.shader = null;
+          paint.color = thickness.color;
+        }
 
         if (roundedRect != null) {
           canvas.drawRRect(roundedRect, paint);

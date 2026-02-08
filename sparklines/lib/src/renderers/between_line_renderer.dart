@@ -31,7 +31,7 @@ class BetweenLineRenderer extends BaseRenderer<BetweenLineData> {
     // Fill the area
     if (betweenData.gradient != null) {
       paint.shader = betweenData.gradient!.createShader(
-        Rect.fromLTWH(0, 0, transformer.width, transformer.height),
+        transformer.bounds,
       );
     } else {
       paint.color = betweenData.color ?? Colors.blue.withValues(alpha: 0.3);
