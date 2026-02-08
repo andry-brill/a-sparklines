@@ -9,14 +9,14 @@ List<ExampleChart> comboCharts() {
         BarData(
           bars: List.generate(
             10,
-                (i) => DataPoint(x: i / 9, y: 0.2 + (i % 4) * 0.1),
+                (i) => DataPoint.value(i / 9, 0.2 + (i % 4) * 0.1),
           ),
           thickness: ThicknessData(size: 0.08, color: Colors.green.withValues(alpha: 0.5)),
         ),
         LineData(
           points: List.generate(
             10,
-                (i) => DataPoint(x: i / 9, y: 0.3 + (i % 3) * 0.15),
+                (i) => DataPoint.value(i / 9, 0.3 + (i % 3) * 0.15),
           ),
           thickness: ThicknessData(size: 2.0, color: Colors.blue),
         ),
@@ -25,14 +25,14 @@ List<ExampleChart> comboCharts() {
         BarData(
           bars: List.generate(
             10,
-                (i) => DataPoint(x: i / 9, y: 0.15 + (i % 5) * 0.12),
+                (i) => DataPoint.value(i / 9, 0.15 + (i % 5) * 0.12),
           ),
           thickness: ThicknessData(size: 0.08, color: Colors.orange.withValues(alpha: 0.5)),
         ),
         LineData(
           points: List.generate(
             10,
-                (i) => DataPoint(x: i / 9, y: 0.4 + (i % 4) * 0.1),
+                (i) => DataPoint.value(i / 9, 0.4 + (i % 4) * 0.1),
           ),
           thickness: ThicknessData(size: 2.0, color: Colors.red),
         ),

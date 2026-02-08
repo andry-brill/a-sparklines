@@ -99,7 +99,7 @@ class BarData implements ISparklinesData, IChartBorder, IChartThickness {
 
     // Check if data points changed
     for (int i = 0; i < bars.length; i++) {
-      if (bars[i].x != other.bars[i].x || bars[i].dy != other.bars[i].dy) {
+      if (bars[i] != other.bars[i]) {
         return true;
       }
     }
@@ -237,7 +237,7 @@ class LineData implements ISparklinesData, IChartThickness {
 
     // Check if data points changed
     for (int i = 0; i < points.length; i++) {
-      if (points[i].x != other.points[i].x || points[i].dy != other.points[i].dy) {
+      if (points[i] != other.points[i]) {
         return true;
       }
     }
@@ -477,7 +477,7 @@ class PieData implements ISparklinesData, IChartThickness, IChartBorder {
 
     // Check if data points changed
     for (int i = 0; i < points.length; i++) {
-      if (points[i].x != other.points[i].x || points[i].dy != other.points[i].dy) {
+      if (points[i] != other.points[i]) {
         return true;
       }
     }

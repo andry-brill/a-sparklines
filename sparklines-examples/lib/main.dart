@@ -17,11 +17,11 @@ const gridHeight = 150.0;
 
 double xR(double value) => value / gridWidth;
 double yR(double value) => value / gridHeight;
-List<DataPoint> dpR(Iterable<DataPoint> point) => point.map((p) => DataPoint(x: xR(p.x), y: yR(p.y), style: p.style)).toList();
+List<DataPoint> dpR(Iterable<DataPoint> point) => point.map((p) => DataPoint(x: xR(p.x), y: yR(p.y), dy: yR(p.dy), style: p.style)).toList();
 
 double xI(int i) => (gridWidth / 10.0) * i;
 double yI(int i) => (gridHeight / 10.0) * i;
-DataPoint dpI(int xi, int yi) => DataPoint(x: xI(xi), y: yI(yi));
+DataPoint dpI(int xi, int yi) => DataPoint.value(xI(xi), yI(yi));
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});

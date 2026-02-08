@@ -57,7 +57,7 @@ class CoordinateTransformer implements ILayoutDimensions {
   }
 
   Offset transformPoint(DataPoint p) {
-    return Offset(transformX(p.x), transformY(p.y + p.dy));
+    return Offset(transformX(p.x), transformY(p.fy));
   }
 
   double transformDimension(double value) {

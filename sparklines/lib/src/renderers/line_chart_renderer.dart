@@ -115,8 +115,8 @@ class LineChartRenderer extends BaseRenderer<LineData> {
 
       final prevX = transformer.transformX(prev.x);
       final currX = transformer.transformX(curr.x);
-      final prevY = transformer.transformY(prev.dy);
-      final currY = transformer.transformY(curr.dy);
+      final prevY = transformer.transformY(prev.fy);
+      final currY = transformer.transformY(curr.fy);
 
       final stepX = prevX + (currX - prevX) * stepJumpAt;
 

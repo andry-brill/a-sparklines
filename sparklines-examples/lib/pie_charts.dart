@@ -8,10 +8,10 @@ List<ExampleChart> pieCharts() {
       initialCharts: [
         PieData(
           points: [
-            DataPoint(x: 0, y: 30),
-            DataPoint(x: 0, y: 20),
-            DataPoint(x: 0, y: 25),
-            DataPoint(x: 0, y: 25),
+            DataPoint.value(0, 30),
+            DataPoint.value(0, 20),
+            DataPoint.value(0, 25),
+            DataPoint.value(0, 25),
           ],
           thickness: ThicknessData(size: double.infinity, color: Colors.purple),
         ),
@@ -19,10 +19,10 @@ List<ExampleChart> pieCharts() {
       toggleCharts: [
         PieData(
           points: [
-            DataPoint(x: 0, y: 40),
-            DataPoint(x: 0, y: 15),
-            DataPoint(x: 0, y: 20),
-            DataPoint(x: 0, y: 25),
+            DataPoint.value(0, 40),
+            DataPoint.value(0, 15),
+            DataPoint.value(0, 20),
+            DataPoint.value(0, 25),
           ],
           thickness: ThicknessData(size: double.infinity, color: Colors.purple),
         ),
@@ -33,10 +33,10 @@ List<ExampleChart> pieCharts() {
       initialCharts: [
         PieData(
           points: [
-            DataPoint(x: 0, y: 25),
-            DataPoint(x: 0, y: 20),
-            DataPoint(x: 0, y: 30),
-            DataPoint(x: 0, y: 25),
+            DataPoint.value(0, 25),
+            DataPoint.value(0, 20),
+            DataPoint.value(0, 30),
+            DataPoint.value(0, 25),
           ],
           thickness: ThicknessData(size: double.infinity, color: Colors.blue),
           space: 2.0,
@@ -45,10 +45,10 @@ List<ExampleChart> pieCharts() {
       toggleCharts: [
         PieData(
           points: [
-            DataPoint(x: 0, y: 35),
-            DataPoint(x: 0, y: 15),
-            DataPoint(x: 0, y: 25),
-            DataPoint(x: 0, y: 25),
+            DataPoint.value(0, 35),
+            DataPoint.value(0, 15),
+            DataPoint.value(0, 25),
+            DataPoint.value(0, 25),
           ],
           thickness: ThicknessData(size: double.infinity, color: Colors.blue),
           space: 2.0,

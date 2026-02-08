@@ -23,13 +23,14 @@ class BarChartRenderer extends BaseRenderer<BarData> {
       final barWidth = transformer.transformDimension(thickness.size);
       // align 0 => centered; align < 0 => shift left; align > 0 => shift right
       final barX = centerX - barWidth / 2 + barWidth * thickness.align;
-      final barY = transformer.transformY(bar.dy);
-      final baseBarY = transformer.transformY(transformer.minY);
+      // Bar from (x, y) to (x, fy): y = offset/base, dy = value, fy = y + dy
+      final topY = transformer.transformY(bar.fy);
+      final baseY = transformer.transformY(bar.y);
 
-      final barHeight = (baseBarY - barY).abs();
+      final barHeight = (baseY - topY).abs();
       final rect = Rect.fromLTWH(
         barX,
-        math.min(barY, baseBarY),
+        math.min(topY, baseY),
         barWidth,
         barHeight,
       );
