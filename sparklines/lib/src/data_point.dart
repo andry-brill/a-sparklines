@@ -3,7 +3,7 @@ import 'dart:math' as math;
 import 'interfaces.dart';
 
 /// A single data point with x, y coordinates and optional style
-class DataPoint implements ILerpable<DataPoint> {
+class DataPoint implements ILerpTo<DataPoint> {
 
   final double x;
   final double y;

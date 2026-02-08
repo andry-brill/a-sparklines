@@ -11,8 +11,7 @@ List<ExampleChart> comboCharts() {
             10,
                 (i) => DataPoint(x: i / 9, y: 0.2 + (i % 4) * 0.1),
           ),
-          width: 0.08,
-          color: Colors.green.withValues(alpha: 0.5),
+          thickness: ThicknessData(size: 0.08, color: Colors.green.withValues(alpha: 0.5)),
         ),
         LineData(
           points: List.generate(
@@ -29,8 +28,7 @@ List<ExampleChart> comboCharts() {
             10,
                 (i) => DataPoint(x: i / 9, y: 0.15 + (i % 5) * 0.12),
           ),
-          width: 0.08,
-          color: Colors.orange.withValues(alpha: 0.5),
+          thickness: ThicknessData(size: 0.08, color: Colors.orange.withValues(alpha: 0.5)),
         ),
         LineData(
           points: List.generate(

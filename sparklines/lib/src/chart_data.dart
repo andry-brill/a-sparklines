@@ -10,7 +10,8 @@ import 'renderers/between_line_renderer.dart';
 import 'renderers/pie_chart_renderer.dart';
 
 /// Bar chart data
-class BarData implements ISparklinesData {
+class BarData implements ISparklinesData, IChartBorder, IChartThickness {
+
   static final IChartRenderer defaultRenderer = BarChartRenderer();
 
   @override
@@ -39,12 +40,15 @@ class BarData implements ISparklinesData {
 
   @override
   double get maxY => bars.maxY;
-  final double width;
-  final Color? color;
-  final Gradient? gradient;
-  final BorderSide? border;
-  final BorderRadius? borderRadius;
-  final Color? borderColor;
+
+  @override
+  final ThicknessData thickness;
+
+  @override
+  final ThicknessData? border;
+
+  @override
+  final double? borderRadius;
 
   const BarData({
     this.visible = true,
@@ -53,12 +57,9 @@ class BarData implements ISparklinesData {
     this.layout,
     this.crop,
     required this.bars,
-    required this.width,
-    this.color,
-    this.gradient,
+    this.thickness = const ThicknessData(size: 2.0),
     this.border,
     this.borderRadius,
-    this.borderColor,
   });
 
   BarData copyWith({
@@ -68,13 +69,9 @@ class BarData implements ISparklinesData {
     IChartLayout? layout,
     bool? crop,
     List<DataPoint>? bars,
-    bool? stacked,
-    double? width,
-    Color? color,
-    Gradient? gradient,
-    BorderSide? border,
-    BorderRadius? borderRadius,
-    Color? borderColor,
+    ThicknessData? thickness,
+    ThicknessData? border,
+    double? borderRadius,
   }) {
     return BarData(
       visible: visible ?? this.visible,
@@ -83,12 +80,9 @@ class BarData implements ISparklinesData {
       layout: layout ?? this.layout,
       crop: crop ?? this.crop,
       bars: bars ?? this.bars,
-      width: width ?? this.width,
-      color: color ?? this.color,
-      gradient: gradient ?? this.gradient,
+      thickness: thickness ?? this.thickness,
       border: border ?? this.border,
       borderRadius: borderRadius ?? this.borderRadius,
-      borderColor: borderColor ?? this.borderColor,
     );
   }
 
@@ -99,13 +93,10 @@ class BarData implements ISparklinesData {
     if (rotation != other.rotation) return true;
     if (origin != other.origin) return true;
     if (layout != other.layout) return true;
-    if (width != other.width) return true;
+    if (thickness != other) return true;
     if (bars.length != other.bars.length) return true;
-    if (color != other.color) return true;
-    if (gradient != other.gradient) return true;
     if (border != other.border) return true;
     if (borderRadius != other.borderRadius) return true;
-    if (borderColor != other.borderColor) return true;
 
     // Check if data points changed
     for (int i = 0; i < bars.length; i++) {
@@ -135,21 +126,18 @@ class BarData implements ISparklinesData {
       layout: next.layout,
       crop: next.crop,
       bars: interpolatedBars,
-      width: lerpDouble(width, next.width, t) ?? next.width,
-      color: Color.lerp(color, next.color, t),
-      gradient: Gradient.lerp(gradient, next.gradient, t),
-      border: border != null && next.border != null
-          ? BorderSide.lerp(border!, next.border!, t)
-          : next.border,
-      borderRadius: BorderRadius.lerp(borderRadius, next.borderRadius, t),
-      borderColor: Color.lerp(borderColor, next.borderColor, t),
+      thickness: thickness.lerpTo(next.thickness, t),
+      border: ThicknessData.lerp(border, next.border, t),
+      borderRadius: lerpDouble(borderRadius, next.borderRadius, t) ?? next.borderRadius,
     );
   }
+
+
 }
 
 /// Line chart data
 class LineData implements ISparklinesData {
-  static final IChartRenderer defaultRenderer = LineChartRenderer();
+  static final LineChartRenderer defaultRenderer = LineChartRenderer();
 
   @override
   final bool visible;
@@ -161,8 +149,9 @@ class LineData implements ISparklinesData {
   final IChartLayout? layout;
   @override
   final bool? crop;
+
   @override
-  IChartRenderer get renderer => defaultRenderer;
+  LineChartRenderer get renderer => defaultRenderer;
 
   final List<DataPoint> points;
 
@@ -420,19 +409,19 @@ class PieData implements ISparklinesData {
   @override
   IChartRenderer get renderer => defaultRenderer;
 
-  final List<DataPoint> pies;
+  final List<DataPoint> points;
 
   @override
-  double get minX => pies.minX;
+  double get minX => points.minX;
 
   @override
-  double get maxX => pies.maxX;
+  double get maxX => points.maxX;
 
   @override
-  double get minY => pies.minY;
+  double get minY => points.minY;
 
   @override
-  double get maxY => pies.maxY;
+  double get maxY => points.maxY;
   final double stroke;
   final StrokeAlign strokeAlign;
   final Color? color;
@@ -448,7 +437,7 @@ class PieData implements ISparklinesData {
     this.origin = Offset.zero,
     this.layout,
     this.crop,
-    required this.pies,
+    required this.points,
     this.stroke = double.infinity,
     this.strokeAlign = StrokeAlign.center,
     this.color,
@@ -481,7 +470,7 @@ class PieData implements ISparklinesData {
       origin: origin ?? this.origin,
       layout: layout ?? this.layout,
       crop: crop ?? this.crop,
-      pies: pies ?? this.pies,
+      points: pies ?? this.points,
       stroke: stroke ?? this.stroke,
       strokeAlign: strokeAlign ?? this.strokeAlign,
       color: color ?? this.color,
@@ -500,7 +489,7 @@ class PieData implements ISparklinesData {
     if (rotation != other.rotation) return true;
     if (origin != other.origin) return true;
     if (layout != other.layout) return true;
-    if (pies.length != other.pies.length) return true;
+    if (points.length != other.points.length) return true;
     if (stroke != other.stroke) return true;
     if (strokeAlign != other.strokeAlign) return true;
     if (color != other.color) return true;
@@ -511,8 +500,8 @@ class PieData implements ISparklinesData {
     if (borderColor != other.borderColor) return true;
 
     // Check if data points changed
-    for (int i = 0; i < pies.length; i++) {
-      if (pies[i].x != other.pies[i].x || pies[i].dy != other.pies[i].dy) {
+    for (int i = 0; i < points.length; i++) {
+      if (points[i].x != other.points[i].x || points[i].dy != other.points[i].dy) {
         return true;
       }
     }
@@ -523,12 +512,12 @@ class PieData implements ISparklinesData {
   @override
   ISparklinesData lerpTo(ISparklinesData next, double t) {
     if (next is! PieData) return next;
-    if (pies.length != next.pies.length) return next;
+    if (points.length != next.points.length) return next;
     if (visible != next.visible) return next;
 
     final interpolatedPies = <DataPoint>[];
-    for (int i = 0; i < pies.length; i++) {
-      interpolatedPies.add(pies[i].lerpTo(next.pies[i], t));
+    for (int i = 0; i < points.length; i++) {
+      interpolatedPies.add(points[i].lerpTo(next.points[i], t));
     }
 
     return PieData(
@@ -537,7 +526,7 @@ class PieData implements ISparklinesData {
       origin: Offset.lerp(origin, next.origin, t) ?? next.origin,
       layout: next.layout,
       crop: next.crop,
-      pies: interpolatedPies,
+      points: interpolatedPies,
       stroke: lerpDouble(stroke, next.stroke, t) ?? next.stroke,
       strokeAlign: next.strokeAlign,
       color: Color.lerp(color, next.color, t),

@@ -7,8 +7,6 @@ import 'line_chart_renderer.dart';
 /// Renders area between two lines
 class BetweenLineRenderer extends BaseRenderer<BetweenLineData> {
 
-  final LineChartRenderer _lineRenderer = LineChartRenderer();
-
   @override
   void renderData(
     Canvas canvas,
@@ -19,10 +17,10 @@ class BetweenLineRenderer extends BaseRenderer<BetweenLineData> {
     final paint = Paint();
 
     // Build path from 'from' line
-    final fromPath = _lineRenderer.buildPath(betweenData.from, transformer);
+    final fromPath = betweenData.from.renderer.buildPath(betweenData.from, transformer);
 
     // Build path from 'to' line (reversed)
-    final toPath = _lineRenderer.buildPath(betweenData.to, transformer);
+    final toPath = betweenData.to.renderer.buildPath(betweenData.to, transformer);
     final reversedToPath = _reversePath(toPath);
 
     // Combine paths

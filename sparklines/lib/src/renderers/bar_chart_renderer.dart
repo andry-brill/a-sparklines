@@ -15,10 +15,11 @@ class BarChartRenderer extends BaseRenderer<BarData> {
   ) {
 
     final paint = Paint();
+    final thickness = barData.thickness;
 
     for (final bar in barData.bars) {
 
-      final barWidth = transformer.transformWidth(barData.width);
+      final barWidth = transformer.transformDimension(thickness.size);
       final barX = transformer.transformX(bar.x) - barWidth / 2;
       final barY = transformer.transformY(bar.dy);
       final baseBarY = transformer.transformY(transformer.minY);
@@ -31,22 +32,25 @@ class BarChartRenderer extends BaseRenderer<BarData> {
         barHeight,
       );
 
-      // Apply border radius if specified
+      // Apply border radius if specified (IChartBorder.borderRadius is uniform double)
       RRect? roundedRect;
       if (barData.borderRadius != null) {
+        final uniformRadius = BorderRadius.all(
+          Radius.circular(barData.borderRadius!),
+        );
         final transformedBorderRadius = transformBorderRadius(
-          barData.borderRadius!,
+          uniformRadius,
           transformer,
         );
         roundedRect = transformedBorderRadius.resolve(TextDirection.ltr)
             .toRRect(rect);
       }
 
-      // Set paint properties
-      if (barData.gradient != null) {
-        paint.shader = barData.gradient!.createShader(rect);
+      // Set paint properties from thickness (fill)
+      if (thickness.gradient != null) {
+        paint.shader = thickness.gradient!.createShader(rect);
       } else {
-        paint.color = barData.color ?? Color(0xFF000000);
+        paint.color = thickness.color;
       }
       paint.style = PaintingStyle.fill;
 
@@ -57,12 +61,13 @@ class BarChartRenderer extends BaseRenderer<BarData> {
         canvas.drawRect(rect, paint);
       }
 
-      // Draw border if specified
-      if (barData.border != null || barData.borderColor != null) {
+      // Draw border if specified (IChartBorder)
+      final border = barData.border;
+      if (border != null) {
         paint.style = PaintingStyle.stroke;
-        final borderWidth = barData.border?.width ?? 1.0;
+        final borderWidth = border.size ?? 1.0;
         paint.strokeWidth = transformer.transformDimension(borderWidth);
-        paint.color = barData.borderColor ?? barData.border?.color ?? Colors.black;
+        paint.color = border.color ?? Colors.black;
 
         if (roundedRect != null) {
           canvas.drawRRect(roundedRect, paint);

@@ -3,9 +3,74 @@ import 'dart:ui' show lerpDouble;
 import 'coordinate_transformer.dart';
 
 /// Interface for types that can be interpolated
-abstract class ILerpable<T> {
+abstract class ILerpTo<T> {
   /// Interpolate between this and [next] using interpolation factor [t] (0.0 to 1.0)
   T lerpTo(T next, double t);
+}
+
+class ThicknessData implements ILerpTo<ThicknessData> {
+
+  final double size;
+
+  /// Gradient has higher priority if set then color
+  final Gradient? gradient;
+
+  final Color color;
+
+  final double align;
+
+  const ThicknessData({
+    required this.size,
+    this.color = const Color(0xFF000000),
+    this.gradient,
+    this.align = alignCenter
+  });
+
+  static const double alignInside = -1.0;
+  static const double alignCenter = 0.0;
+  static const double alignOutside = 1.0;
+
+  @override
+  ThicknessData lerpTo(ThicknessData next, double t) {
+    return ThicknessData(
+      size: lerpDouble(size, next.size, t) ?? next.size,
+      color: Color.lerp(color, next.color, t) ?? next.color,
+      gradient: Gradient.lerp(gradient, next.gradient, t) ?? next.gradient,
+      align: lerpDouble(align, next.align, t) ?? next.align,
+    );
+  }
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    if (other is! ThicknessData) return false;
+    return isEquals(this, other);
+  }
+
+  static bool isEquals(ThicknessData? a, ThicknessData? b) {
+    if (a == b) return true;
+    if (a == null || b == null) return false;
+    return a.size == b.size &&
+        a.color == b.color &&
+        a.gradient == b.gradient &&
+        a.align == b.align;
+  }
+
+  static ThicknessData? lerp(ThicknessData? a, ThicknessData? b, double t) {
+    if (a == null && b == null) return null;
+    if (a == null) return b;
+    if (b == null) return a;
+    return a.lerpTo(b, t);
+  }
+}
+
+abstract class IChartThickness {
+  ThicknessData get thickness;
+}
+
+abstract class IChartBorder {
+  ThicknessData? get border;
+  double? get borderRadius;
 }
 
 /// Interface for layout dimensions
@@ -48,10 +113,11 @@ abstract class IChartRenderer {
     CoordinateTransformer transformer,
     ISparklinesData data,
   );
+
 }
 
 /// Base interface for all chart data types
-abstract class ISparklinesData implements ILerpable<ISparklinesData> {
+abstract class ISparklinesData implements ILerpTo<ISparklinesData> {
   /// Whether this chart is visible
   bool get visible;
 
@@ -88,7 +154,7 @@ abstract class ISparklinesData implements ILerpable<ISparklinesData> {
 }
 
 /// Style interface for data points
-abstract class IDataPointStyle implements ILerpable<IDataPointStyle> {}
+abstract class IDataPointStyle implements ILerpTo<IDataPointStyle> {}
 
 /// Circle style for data points
 class CircleDataPointStyle implements IDataPointStyle {

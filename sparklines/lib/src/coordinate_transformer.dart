@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:sparklines/src/data_point.dart';
 import 'interfaces.dart';
 
 /// Transforms data coordinates to screen coordinates
@@ -52,17 +53,10 @@ class CoordinateTransformer implements ILayoutDimensions {
     return layout.transformDy(y, this);
   }
 
-  /// Transform a point from data space to screen space
-  Offset transformPoint(double x, double y) {
-    return Offset(transformX(x), transformY(y));
+  Offset transformPoint(DataPoint p) {
+    return Offset(transformX(p.x), transformY(p.y + p.dy));
   }
 
-  /// Transform a relative width to absolute pixels
-  double transformWidth(double relativeWidth) {
-    return transformDimension(relativeWidth);
-  }
-
-  /// Transform a dimensional value based on layout settings
   double transformDimension(double value) {
     return layout.transformDimension(value, this);
   }

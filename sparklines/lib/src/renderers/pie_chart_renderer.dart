@@ -18,7 +18,7 @@ class PieChartRenderer extends BaseRenderer<PieData> {
     final paint = Paint();
 
     // Calculate total arc length
-    final totalArc = pieData.pies.fold<double>(
+    final totalArc = pieData.points.fold<double>(
       0.0,
       (sum, pie) => sum + pie.dy,
     );
@@ -31,11 +31,11 @@ class PieChartRenderer extends BaseRenderer<PieData> {
     final radius = math.min(centerX, centerY) - 10;
 
     // Render each pie segment
-    double startAngle = pieData.pies.isNotEmpty ? pieData.pies[0].x : 0.0;
+    double startAngle = pieData.points.isNotEmpty ? pieData.points[0].x : 0.0;
     final spaceAngle = pieData.space * math.pi / 180.0; // Convert to radians
 
-    for (int i = 0; i < pieData.pies.length; i++) {
-      final pie = pieData.pies[i];
+    for (int i = 0; i < pieData.points.length; i++) {
+      final pie = pieData.points[i];
       final sweepAngle = (pie.dy / totalArc) * 2 * math.pi - spaceAngle;
 
       if (sweepAngle <= 0) continue;
