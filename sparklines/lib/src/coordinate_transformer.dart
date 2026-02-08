@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:sparklines/src/data_point.dart';
+import 'package:sparklines/src/data/data_point.dart';
 import 'interfaces.dart';
 
 /// Transforms data coordinates to screen coordinates

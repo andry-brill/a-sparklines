@@ -1,6 +1,6 @@
 import 'dart:ui' show lerpDouble;
 import 'dart:math' as math;
-import 'interfaces.dart';
+import '../interfaces.dart';
 
 /// A single data point with x, y coordinates and optional style
 class DataPoint implements ILerpTo<DataPoint> {

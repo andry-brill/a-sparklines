@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import '../coordinate_transformer.dart';
 import '../chart_data.dart';
-import '../data_point.dart';
+import '../data/data_point.dart';
 import '../interfaces.dart';
 import 'base_renderer.dart';
 
