@@ -19,8 +19,10 @@ class BarChartRenderer extends BaseRenderer<BarData> {
 
     for (final bar in barData.bars) {
 
+      final centerX = transformer.transformX(bar.x);
       final barWidth = transformer.transformDimension(thickness.size);
-      final barX = transformer.transformX(bar.x) - barWidth / 2;
+      // align 0 => centered; align < 0 => shift left; align > 0 => shift right
+      final barX = centerX - barWidth / 2 + barWidth * thickness.align;
       final barY = transformer.transformY(bar.dy);
       final baseBarY = transformer.transformY(transformer.minY);
 
@@ -54,20 +56,26 @@ class BarChartRenderer extends BaseRenderer<BarData> {
       final border = barData.border;
       if (border != null) {
 
+        final borderSize = transformer.transformDimension(border.size);
+        // align 0 => same rect; align > 0 => inflate equally (center unchanged); align < 0 => deflate
+        final borderRect = rect.inflate(borderSize * border.align);
+
+        RRect? borderRoundedRect = this.roundedRect(transformer, barData, borderRect);
+
         paint.style = PaintingStyle.stroke;
-        paint.strokeWidth = transformer.transformDimension(border.size);
+        paint.strokeWidth = borderSize;
 
         if (thickness.gradient != null) {
-          paint.shader = thickness.gradient!.createShader(rect);
+          paint.shader = thickness.gradient!.createShader(borderRect);
         } else {
           paint.shader = null;
           paint.color = thickness.color;
         }
 
-        if (roundedRect != null) {
-          canvas.drawRRect(roundedRect, paint);
+        if (borderRoundedRect != null) {
+          canvas.drawRRect(borderRoundedRect, paint);
         } else {
-          canvas.drawRect(rect, paint);
+          canvas.drawRect(borderRect, paint);
         }
       }
     }

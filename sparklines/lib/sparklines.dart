@@ -5,6 +5,7 @@ export 'src/sparklines_chart.dart';
 
 // Data models
 export 'src/data_point.dart';
+export 'src/data_point_stacker.dart';
 export 'src/chart_data.dart';
 
 // Interfaces

@@ -3,7 +3,6 @@ import 'dart:ui' show lerpDouble;
 import 'dart:math' as math;
 import 'data_point.dart';
 import 'interfaces.dart';
-import 'stroke_align.dart';
 import 'renderers/bar_chart_renderer.dart';
 import 'renderers/line_chart_renderer.dart';
 import 'renderers/between_line_renderer.dart';
@@ -93,9 +92,9 @@ class BarData implements ISparklinesData, IChartBorder, IChartThickness {
     if (rotation != other.rotation) return true;
     if (origin != other.origin) return true;
     if (layout != other.layout) return true;
-    if (thickness != other) return true;
+    if (!ThicknessData.isEquals(thickness, other.thickness)) return true;
     if (bars.length != other.bars.length) return true;
-    if (border != other.border) return true;
+    if (!ThicknessData.isEquals(border, other.border)) return true;
     if (borderRadius != other.borderRadius) return true;
 
     // Check if data points changed
