@@ -1,57 +1,21 @@
 
 part of 'main.dart';
 
+
 List<ExampleChart> pieCharts() {
   return [
     ExampleChart(
-      title: 'Simple pie',
+      title: 'Single pie',
       initialCharts: [
         PieData(
-          points: [
-            DataPoint.value(0, 30),
-            DataPoint.value(0, 20),
-            DataPoint.value(0, 25),
-            DataPoint.value(0, 25),
-          ],
-          thickness: ThicknessData(size: double.infinity, color: Colors.purple),
+          points: [DataPoint(x: 100.0, y: 0.0, dy: 50.0)],
+          thickness: ThicknessData(size: pi/4.0, color: Colors.blue),
         ),
       ],
       toggleCharts: [
         PieData(
-          points: [
-            DataPoint.value(0, 40),
-            DataPoint.value(0, 15),
-            DataPoint.value(0, 20),
-            DataPoint.value(0, 25),
-          ],
-          thickness: ThicknessData(size: double.infinity, color: Colors.purple),
-        ),
-      ],
-    ),
-    ExampleChart(
-      title: 'Pie with spacing',
-      initialCharts: [
-        PieData(
-          points: [
-            DataPoint.value(0, 25),
-            DataPoint.value(0, 20),
-            DataPoint.value(0, 30),
-            DataPoint.value(0, 25),
-          ],
-          thickness: ThicknessData(size: double.infinity, color: Colors.blue),
-          space: 2.0,
-        ),
-      ],
-      toggleCharts: [
-        PieData(
-          points: [
-            DataPoint.value(0, 35),
-            DataPoint.value(0, 15),
-            DataPoint.value(0, 25),
-            DataPoint.value(0, 25),
-          ],
-          thickness: ThicknessData(size: double.infinity, color: Colors.blue),
-          space: 2.0,
+          points: [DataPoint(x: 0, y: 100.0, dy: 50.0)],
+          thickness: ThicknessData(size: pi/4.0, color: Colors.blue),
         ),
       ],
     ),
