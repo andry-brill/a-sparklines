@@ -1,7 +1,7 @@
 
 import 'dart:ui';
 
-import 'package:sparklines/src/coordinate_transformer.dart';
+import 'package:sparklines/src/layout/coordinate_transformer.dart';
 import 'package:sparklines/src/data/data_point.dart';
 import 'package:sparklines/src/interfaces.dart';
 

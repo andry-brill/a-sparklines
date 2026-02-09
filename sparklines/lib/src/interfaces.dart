@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:sparklines/src/data/data_point.dart';
 import 'dart:ui' show lerpDouble;
-import 'coordinate_transformer.dart';
+import 'layout/coordinate_transformer.dart';
 
 /// Interface for types that can be interpolated
 abstract class ILerpTo<T> {

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../coordinate_transformer.dart';
+import '../layout/coordinate_transformer.dart';
 import '../data/data_point.dart';
 import '../interfaces.dart';
 

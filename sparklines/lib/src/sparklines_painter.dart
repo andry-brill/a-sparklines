@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:sparklines/src/data/layout_data.dart';
-import 'coordinate_transformer.dart';
+import 'layout/coordinate_transformer.dart';
 import 'interfaces.dart';
 
 /// Custom painter for sparklines charts

@@ -1,6 +1,6 @@
 import 'dart:math';
 
-import 'interfaces.dart';
+import '../interfaces.dart';
 import 'relative_dimension.dart';
 
 

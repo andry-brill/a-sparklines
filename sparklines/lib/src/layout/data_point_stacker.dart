@@ -1,4 +1,4 @@
-import 'data/data_point.dart';
+import '../data/data_point.dart';
 
 /// Stacks datapoints by x, adjusting y so each successive series stacks on top.
 ///

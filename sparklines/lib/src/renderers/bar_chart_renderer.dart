@@ -1,7 +1,7 @@
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:sparklines/src/data/bar_data.dart';
-import 'package:sparklines/src/coordinate_transformer.dart';
+import 'package:sparklines/src/layout/coordinate_transformer.dart';
 import 'chart_renderer.dart';
 
 /// Renders bar charts

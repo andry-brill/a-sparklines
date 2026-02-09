@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:sparklines/src/coordinate_transformer.dart';
+import 'package:sparklines/src/layout/coordinate_transformer.dart';
 import 'package:sparklines/src/data/between_line_data.dart';
 import 'package:sparklines/src/renderers/chart_renderer.dart';
 

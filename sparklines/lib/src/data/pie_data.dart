@@ -52,7 +52,7 @@ class PieData implements ISparklinesData, IChartThickness, IChartBorder {
     this.layout,
     this.crop,
     required this.points,
-    this.thickness = const ThicknessData(size: double.infinity, color: Color(0xFF2196F3)),
+    this.thickness = const ThicknessData(size: double.infinity),
     this.space = 0.0,
     this.border,
     this.borderRadius,

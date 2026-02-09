@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'interfaces.dart';
 import 'sparklines_painter.dart';
-import 'chart_layout.dart';
+import 'layout/chart_layout.dart';
 
 /// Main sparklines chart widget
 class SparklinesChart extends StatefulWidget {
