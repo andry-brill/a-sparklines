@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:sparklines/src/data/data_point.dart';
 import 'dart:ui' show lerpDouble;
 import 'coordinate_transformer.dart';
 
@@ -6,6 +7,10 @@ import 'coordinate_transformer.dart';
 abstract class ILerpTo<T> {
   /// Interpolate between this and [next] using interpolation factor [t] (0.0 to 1.0)
   T lerpTo(T next, double t);
+
+  static L? lerp<L extends ILerpTo<L>>(L? from, L? to, double t) {
+    return from != null && to != null ? from.lerpTo(to, t) : to;
+  }
 }
 
 class ThicknessData implements ILerpTo<ThicknessData> {
@@ -62,6 +67,10 @@ abstract class IChartThickness {
   ThicknessData get thickness;
 }
 
+abstract class IChartDataPointStyle {
+  IDataPointStyle? get pointStyle;
+}
+
 abstract class IChartBorder {
   ThicknessData? get border;
   double? get borderRadius;
@@ -110,6 +119,18 @@ abstract class IChartRenderer {
 
 }
 
+abstract class IDataPointRenderer {
+
+  void render(
+      Canvas canvas,
+      Paint paint,
+      CoordinateTransformer transformer,
+      IDataPointStyle style,
+      DataPoint dataPoint
+  );
+
+}
+
 /// Base interface for all chart data types
 abstract class ISparklinesData implements ILerpTo<ISparklinesData> {
   /// Whether this chart is visible
@@ -148,27 +169,10 @@ abstract class ISparklinesData implements ILerpTo<ISparklinesData> {
 }
 
 /// Style interface for data points
-abstract class IDataPointStyle implements ILerpTo<IDataPointStyle> {}
+abstract class IDataPointStyle implements ILerpTo<IDataPointStyle> {
 
-/// Circle style for data points
-class CircleDataPointStyle implements IDataPointStyle {
-  final double radius;
-  final Color color;
+  IDataPointRenderer get renderer;
 
-  const CircleDataPointStyle({
-    required this.radius,
-    required this.color,
-  });
-
-  @override
-  IDataPointStyle lerpTo(IDataPointStyle next, double t) {
-    if (next is! CircleDataPointStyle) return next;
-
-    return CircleDataPointStyle(
-      radius: lerpDouble(radius, next.radius, t) ?? next.radius,
-      color: Color.lerp(color, next.color, t) ?? next.color,
-    );
-  }
 }
 
 /// Marker interface for line type data

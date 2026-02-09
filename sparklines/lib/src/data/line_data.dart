@@ -5,7 +5,8 @@ import '../interfaces.dart';
 import '../renderers/line_chart_renderer.dart';
 
 /// Line chart data
-class LineData implements ISparklinesData, IChartThickness {
+class LineData implements ISparklinesData, IChartThickness, IChartDataPointStyle {
+
   static final LineChartRenderer defaultRenderer = LineChartRenderer();
 
   @override
@@ -41,9 +42,12 @@ class LineData implements ISparklinesData, IChartThickness {
 
   final Gradient? areaGradient;
   final Color? areaColor;
+
   final ILineTypeData? lineType;
   final bool isStrokeCapRound;
   final bool isStrokeJoinRound;
+
+  @override
   final IDataPointStyle? pointStyle;
 
   const LineData({
@@ -143,9 +147,7 @@ class LineData implements ISparklinesData, IChartThickness {
       lineType: next.lineType,
       isStrokeCapRound: next.isStrokeCapRound,
       isStrokeJoinRound: next.isStrokeJoinRound,
-      pointStyle: pointStyle != null && next.pointStyle != null
-          ? pointStyle!.lerpTo(next.pointStyle!, t)
-          : next.pointStyle,
+      pointStyle: ILerpTo.lerp(pointStyle, next.pointStyle, t),
     );
   }
 }

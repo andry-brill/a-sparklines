@@ -3,9 +3,9 @@ import 'package:sparklines/src/data/line_data.dart';
 import 'package:sparklines/src/coordinate_transformer.dart';
 import 'package:sparklines/src/data/data_point.dart';
 import 'package:sparklines/src/interfaces.dart';
-import 'base_renderer.dart';
+import 'chart_renderer.dart';
 
-class LineChartRenderer extends BaseRenderer<LineData> {
+class LineChartRenderer extends AChartRenderer<LineData> {
 
   @override
   void renderData(
@@ -57,10 +57,7 @@ class LineChartRenderer extends BaseRenderer<LineData> {
 
     canvas.drawPath(path, paint);
 
-    // Draw points if style is specified
-    if (lineData.pointStyle != null) {
-      _drawPoints(canvas, lineData, transformer, paint);
-    }
+    drawDataPoints(canvas, paint, transformer, lineData, lineData.points);
 
   }
 
@@ -234,22 +231,4 @@ class LineChartRenderer extends BaseRenderer<LineData> {
     }
   }
 
-  void _drawPoints(
-    Canvas canvas,
-    LineData lineData,
-    CoordinateTransformer transformer,
-    Paint paint,
-  ) {
-    if (lineData.pointStyle is! CircleDataPointStyle) return;
-
-    final style = lineData.pointStyle as CircleDataPointStyle;
-    paint.style = PaintingStyle.fill;
-    paint.color = style.color;
-
-    for (final point in lineData.points) {
-      final screenPoint = transformer.transformPoint(point);
-      final radius = transformer.transformDimension(style.radius);
-      canvas.drawCircle(screenPoint, radius, paint);
-    }
-  }
 }

@@ -1,12 +1,12 @@
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:sparklines/src/data/pie_data.dart';
-import 'package:sparklines/src/renderers/base_renderer.dart';
+import 'package:sparklines/src/renderers/chart_renderer.dart';
 import 'package:sparklines/src/coordinate_transformer.dart';
 import 'package:sparklines/src/interfaces.dart';
 
 /// Renders pie charts
-class PieChartRenderer extends BaseRenderer<PieData> {
+class PieChartRenderer extends AChartRenderer<PieData> {
 
   @override
   void renderData(

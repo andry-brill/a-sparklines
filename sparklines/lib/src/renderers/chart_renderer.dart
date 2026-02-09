@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import '../coordinate_transformer.dart';
+import '../data/data_point.dart';
 import '../interfaces.dart';
 
-abstract class BaseRenderer<DT extends ISparklinesData> implements IChartRenderer {
+abstract class AChartRenderer<DT extends ISparklinesData> implements IChartRenderer {
 
   @override
   void render(
@@ -47,4 +48,19 @@ abstract class BaseRenderer<DT extends ISparklinesData> implements IChartRendere
     return RRect.fromRectXY(rect, r, r);
   }
 
+  void drawDataPoints(
+      Canvas canvas,
+      Paint paint,
+      CoordinateTransformer transformer,
+      IChartDataPointStyle chart,
+      List<DataPoint> points,
+      ) {
+
+    for (final point in points) {
+      final pointStyle = point.style ?? chart.pointStyle;
+      if (pointStyle != null) {
+        pointStyle.renderer.render(canvas, paint, transformer, pointStyle, point);
+      }
+    }
+  }
 }

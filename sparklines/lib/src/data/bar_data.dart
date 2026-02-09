@@ -5,7 +5,7 @@ import '../interfaces.dart';
 import '../renderers/bar_chart_renderer.dart';
 
 /// Bar chart data
-class BarData implements ISparklinesData, IChartBorder, IChartThickness {
+class BarData implements ISparklinesData, IChartBorder, IChartThickness, IChartDataPointStyle {
 
   static final IChartRenderer defaultRenderer = BarChartRenderer();
 
@@ -45,6 +45,9 @@ class BarData implements ISparklinesData, IChartBorder, IChartThickness {
   @override
   final double? borderRadius;
 
+  @override
+  final IDataPointStyle? pointStyle;
+
   const BarData({
     this.visible = true,
     this.rotation = 0.0,
@@ -55,6 +58,7 @@ class BarData implements ISparklinesData, IChartBorder, IChartThickness {
     this.thickness = const ThicknessData(size: 2.0),
     this.border,
     this.borderRadius,
+    this.pointStyle
   });
 
   BarData copyWith({
@@ -67,6 +71,7 @@ class BarData implements ISparklinesData, IChartBorder, IChartThickness {
     ThicknessData? thickness,
     ThicknessData? border,
     double? borderRadius,
+    IDataPointStyle? pointStyle
   }) {
     return BarData(
       visible: visible ?? this.visible,
@@ -78,6 +83,7 @@ class BarData implements ISparklinesData, IChartBorder, IChartThickness {
       thickness: thickness ?? this.thickness,
       border: border ?? this.border,
       borderRadius: borderRadius ?? this.borderRadius,
+      pointStyle: pointStyle ?? this.pointStyle,
     );
   }
 
@@ -92,6 +98,7 @@ class BarData implements ISparklinesData, IChartBorder, IChartThickness {
     if (bars.length != other.bars.length) return true;
     if (border != other.border) return true;
     if (borderRadius != other.borderRadius) return true;
+    if (pointStyle != other.pointStyle) return true;
 
     for (int i = 0; i < bars.length; i++) {
       if (bars[i] != other.bars[i]) {
@@ -123,6 +130,7 @@ class BarData implements ISparklinesData, IChartBorder, IChartThickness {
       thickness: thickness.lerpTo(next.thickness, t),
       border: ThicknessData.lerp(border, next.border, t),
       borderRadius: lerpDouble(borderRadius, next.borderRadius, t) ?? next.borderRadius,
+      pointStyle: ILerpTo.lerp(pointStyle, next.pointStyle, t),
     );
   }
 }

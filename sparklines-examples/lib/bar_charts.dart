@@ -127,5 +127,12 @@ List<ExampleChart> barCharts() {
         borderRadius: 5,
       ),
     ),
+    barFull.modify(
+      title: 'Data points',
+      modifier: (c) => c.copyWith(
+          borderRadius: 4,
+          pointStyle: CircleDataPointStyle(radius: 3, color: Color(0xFF272727))
+      ),
+    ),
   ];
 }

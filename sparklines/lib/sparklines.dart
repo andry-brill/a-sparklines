@@ -9,6 +9,8 @@ export 'src/data/bar_data.dart';
 export 'src/data/between_line_data.dart';
 export 'src/data/line_data.dart';
 export 'src/data/pie_data.dart';
+export 'src/renderers/data_point_renderer.dart';
+export 'src/renderers/circle_data_point.dart';
 
 // Interfaces
 export 'src/interfaces.dart';

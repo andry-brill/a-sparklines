@@ -2,10 +2,10 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:sparklines/src/data/bar_data.dart';
 import 'package:sparklines/src/coordinate_transformer.dart';
-import 'base_renderer.dart';
+import 'chart_renderer.dart';
 
 /// Renders bar charts
-class BarChartRenderer extends BaseRenderer<BarData> {
+class BarChartRenderer extends AChartRenderer<BarData> {
 
   @override
   void renderData(
@@ -53,7 +53,6 @@ class BarChartRenderer extends BaseRenderer<BarData> {
         canvas.drawRect(rect, paint);
       }
 
-      // Draw border if specified (IChartBorder)
       final border = barData.border;
       if (border != null) {
 
@@ -80,6 +79,8 @@ class BarChartRenderer extends BaseRenderer<BarData> {
         }
       }
     }
+
+    drawDataPoints(canvas, paint, transformer, barData, barData.bars);
 
   }
 
