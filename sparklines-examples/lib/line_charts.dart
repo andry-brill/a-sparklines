@@ -95,12 +95,12 @@ List<ExampleChart> lineCharts() {
   return [
     lineBase.modify(
       title: 'Absolute layout',
-      subtitle: 'Values rendered as is, no transformation',
+      subtitle: 'Raw coordinates with no scaling; chart uses data values directly.',
       modifier: (c) => c,
     ),
     lineBase.modify(
       title: 'Relative finite layout',
-      subtitle: 'Values rendered in specified bounds (mixX-maxX,minY-maxY)',
+      subtitle: 'Chart drawn within explicit bounds (minX–maxX, minY–maxY).',
       modifier: (c) => c.copyWith(layout: RelativeLayout(
         minX: xI(-3),
         minY: yI(-3),
@@ -109,33 +109,34 @@ List<ExampleChart> lineCharts() {
       )),
     ),
     lineBase.modify(
-      title: 'Relative full independent layouts',
-      subtitle: 'Fit all data between min data and max data for each layout. Not aligned.',
+      title: 'Relative full (independent)',
+      subtitle: 'Each line has its own scale; lines are not aligned on the same axes.',
       modifier: (c) => c.copyWith(
           layout: RelativeLayout.full(),
           areaColor: c.thickness.color.withValues(alpha: 0.5)
       ),
     ),
     lineBase.modify(
-      title: 'Relative full shared layout',
-      subtitle: 'Fit all data between shared min data and max data. Aligned.',
+      title: 'Relative full (shared)',
+      subtitle: 'All lines share one scale so values can be compared directly.',
       modifier: (c) => c.copyWith(
           layout: const RelativeLayout.full(),
           areaColor: c.thickness.color.withValues(alpha: 0.5)
       ),
     ),
     lineFull.modify(
-      title: 'Joins rounded',
-      subtitle: 'Stroke cap & join rounded (= true)',
+      title: 'Rounded caps and joins',
+      subtitle: 'Line ends and corners are rounded for a smoother look.',
       modifier: (c) => c.copyWith(isStrokeCapRound: true, isStrokeJoinRound: true),
     ),
     lineFull.modify(
-      title: 'Curved',
-      subtitle: 'Lines rendered as curves, with smoothness=0.4',
+      title: 'Curved lines',
+      subtitle: 'Smooth curves between points (smoothness 0.4).',
       modifier: (c) => c.copyWith(lineType: CurvedLineType(smoothness: 0.4)),
     ),
     lineFull.modify(
-      title: 'Gradient area',
+      title: 'Gradient area fill',
+      subtitle: 'Fill under the line with a vertical gradient from line color to transparent.',
       modifier: (c) => c.copyWith(areaGradient: LinearGradient(
         colors: [c.thickness.color, Colors.white],
         begin: Alignment.topCenter,
@@ -143,16 +144,16 @@ List<ExampleChart> lineCharts() {
       )),
     ),
     lineFull.modify(
-      title: 'Stepped',
-      subtitle: 'Lines rendered as steps, with jump in the middle between data points',
+      title: 'Stepped (mid-point)',
+      subtitle: 'Horizontal then vertical segments; step occurs midway between each pair of points.',
       modifier: (c) => c.copyWith(
           lineType: SteppedLineType.middle(),
           pointStyle: CircleDataPointStyle(radius: 2, color: Color(0xFF272727))
       ),
     ),
     lineFull.modify(
-      title: 'Stepped and rounded',
-      subtitle: 'Jump at end, offset(-20, 10) and rotated 90deg',
+      title: 'Stepped (end) with transform',
+      subtitle: 'Step at end of segment; custom origin, 90° rotation, and rounded joins.',
       modifier: (c) => c.copyWith(
           origin: Offset(-20, 10),
           rotation: pi/2,
@@ -168,8 +169,8 @@ List<ExampleChart> lineCharts() {
       ),
     ),
     ExampleChart<LineData>(
-      title: 'Stacked',
-      subtitle: 'DataPointStacker could be used to build stacked charts',
+      title: 'Stacked lines',
+      subtitle: 'Multiple series stacked vertically using DataPointStacker.',
       modifier: (c) => c.copyWith(
           layout: const RelativeLayout.full(),
           areaColor: c.thickness.color.withValues(alpha: 0.5)
