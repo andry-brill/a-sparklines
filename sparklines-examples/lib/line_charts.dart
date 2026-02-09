@@ -88,8 +88,8 @@ final lineFull = lineBase.modify(
   modifier: (c) => c.copyWith(layout: const RelativeLayout.full()),
 );
 
-final stacker1 = DataPointStacker();
-final stacker2 = DataPointStacker();
+final lineStacker1 = DataPointStacker();
+final lineStacker2 = DataPointStacker();
 
 List<ExampleChart> lineCharts() {
   return [
@@ -177,21 +177,21 @@ List<ExampleChart> lineCharts() {
       ),
       initialCharts: [
         LineData(
-          points: stacker1.stack(blueLine),
+          points: lineStacker1.stack(blueLine),
           thickness: thickness1,
         ),
         LineData(
-          points: stacker1.stack(blueLine),
+          points: lineStacker1.stack(blueLine),
           thickness: thickness2,
         ),
       ].reversed.toList(),
       toggleCharts: [
         LineData(
-          points: stacker2.stack(blueLineMod),
+          points: lineStacker2.stack(blueLineMod),
           thickness: thickness1,
         ),
         LineData(
-          points: stacker2.stack(blueLineMod),
+          points: lineStacker2.stack(blueLineMod),
           thickness: thickness2,
         ),
       ].reversed.toList(),

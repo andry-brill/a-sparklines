@@ -66,11 +66,11 @@ class BarChartRenderer extends BaseRenderer<BarData> {
         paint.style = PaintingStyle.stroke;
         paint.strokeWidth = borderSize;
 
-        if (thickness.gradient != null) {
-          paint.shader = thickness.gradient!.createShader(borderRect);
+        if (border.gradient != null) {
+          paint.shader = border.gradient!.createShader(borderRect);
         } else {
           paint.shader = null;
-          paint.color = thickness.color;
+          paint.color = border.color;
         }
 
         if (borderRoundedRect != null) {

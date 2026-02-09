@@ -27,7 +27,7 @@ class PieChartRenderer extends BaseRenderer<PieData> {
 
     // Calculate center and radius
     final center = transformer.center;
-    final radius = math.min(center.dx, center.dy) - 10;
+    final radius = math.min(center.dx, center.dy);
 
     // Render each pie segment
     double startAngle = pieData.points.isNotEmpty ? pieData.points[0].x : 0.0;
