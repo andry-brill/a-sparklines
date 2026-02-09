@@ -1,9 +1,9 @@
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
+import 'package:sparklines/src/data/pie_data.dart';
 import 'package:sparklines/src/renderers/base_renderer.dart';
-import '../coordinate_transformer.dart';
-import '../chart_data.dart';
-import '../interfaces.dart';
+import 'package:sparklines/src/coordinate_transformer.dart';
+import 'package:sparklines/src/interfaces.dart';
 
 /// Renders pie charts
 class PieChartRenderer extends BaseRenderer<PieData> {
@@ -26,9 +26,8 @@ class PieChartRenderer extends BaseRenderer<PieData> {
     if (totalArc <= 0) return;
 
     // Calculate center and radius
-    final centerX = transformer.width / 2;
-    final centerY = transformer.height / 2;
-    final radius = math.min(centerX, centerY) - 10;
+    final center = transformer.center;
+    final radius = math.min(center.dx, center.dy) - 10;
 
     // Render each pie segment
     double startAngle = pieData.points.isNotEmpty ? pieData.points[0].x : 0.0;

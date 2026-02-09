@@ -92,9 +92,9 @@ class PieData implements ISparklinesData, IChartThickness, IChartBorder {
     if (origin != other.origin) return true;
     if (layout != other.layout) return true;
     if (points.length != other.points.length) return true;
-    if (!ThicknessData.isEquals(thickness, other.thickness)) return true;
+    if (thickness != other.thickness) return true;
     if (space != other.space) return true;
-    if (!ThicknessData.isEquals(border, other.border)) return true;
+    if (border != other.border) return true;
     if (borderRadius != other.borderRadius) return true;
 
     for (int i = 0; i < points.length; i++) {

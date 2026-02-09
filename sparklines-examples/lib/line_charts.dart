@@ -52,28 +52,28 @@ final orangeLineMod = [
   dpI(16, 0),
 ];
 
-final color1 = Colors.blue;
-final color2 = Colors.deepOrange;
+const thickness1 = ThicknessData(size: 4, color: Colors.blue);
+const thickness2 = ThicknessData(size: 4, color: Colors.deepOrange);
 
 final initialCharts = [
   LineData(
     points: blueLine,
-    thickness: ThicknessData(size: 4, color: color1),
+    thickness: thickness1,
   ),
   LineData(
     points: orangeLine,
-    thickness: ThicknessData(size: 4, color: color2),
+    thickness: thickness2,
   ),
 ];
 
 final toggleCharts = [
   LineData(
     points: blueLineMod,
-    thickness: ThicknessData(size: 4, color: color1),
+    thickness: thickness1,
   ),
   LineData(
     points: orangeLineMod,
-    thickness: ThicknessData(size: 4, color: color2),
+    thickness: thickness2,
   ),
 ];
 
@@ -85,8 +85,11 @@ final lineBase = ExampleChart(
 
 final lineFull = lineBase.modify(
   title: 'FULL',
-  modifier: (c) => c.copyWith(layout: RelativeLayout.full()),
+  modifier: (c) => c.copyWith(layout: const RelativeLayout.full()),
 );
+
+final stacker1 = DataPointStacker();
+final stacker2 = DataPointStacker();
 
 List<ExampleChart> lineCharts() {
   return [
@@ -106,9 +109,20 @@ List<ExampleChart> lineCharts() {
       )),
     ),
     lineBase.modify(
-      title: 'Relative full layout',
-      subtitle: 'All values are fit - rendered in bounds between min data and max data',
-      modifier: (c) => c.copyWith(layout: RelativeLayout.full()),
+      title: 'Relative full independent layouts',
+      subtitle: 'Fit all data between min data and max data for each layout. Not aligned.',
+      modifier: (c) => c.copyWith(
+          layout: RelativeLayout.full(),
+          areaColor: c.thickness.color.withValues(alpha: 0.5)
+      ),
+    ),
+    lineBase.modify(
+      title: 'Relative full shared layout',
+      subtitle: 'Fit all data between shared min data and max data. Aligned.',
+      modifier: (c) => c.copyWith(
+          layout: const RelativeLayout.full(),
+          areaColor: c.thickness.color.withValues(alpha: 0.5)
+      ),
     ),
     lineFull.modify(
       title: 'Joins rounded',
@@ -153,6 +167,33 @@ List<ExampleChart> lineCharts() {
           )
       ),
     ),
-
+    ExampleChart<LineData>(
+      title: 'Stacked',
+      subtitle: 'DataPointStacker could be used to build stacked charts',
+      modifier: (c) => c.copyWith(
+          layout: const RelativeLayout.full(),
+          areaColor: c.thickness.color.withValues(alpha: 0.5)
+      ),
+      initialCharts: [
+        LineData(
+          points: stacker1.stack(blueLine),
+          thickness: thickness1,
+        ),
+        LineData(
+          points: stacker1.stack(blueLine),
+          thickness: thickness2,
+        ),
+      ].reversed.toList(),
+      toggleCharts: [
+        LineData(
+          points: stacker2.stack(blueLineMod),
+          thickness: thickness1,
+        ),
+        LineData(
+          points: stacker2.stack(blueLineMod),
+          thickness: thickness2,
+        ),
+      ].reversed.toList(),
+    )
   ];
 }

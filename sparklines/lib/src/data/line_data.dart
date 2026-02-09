@@ -102,7 +102,7 @@ class LineData implements ISparklinesData, IChartThickness {
     if (origin != other.origin) return true;
     if (layout != other.layout) return true;
     if (points.length != other.points.length) return true;
-    if (!ThicknessData.isEquals(thickness, other.thickness)) return true;
+    if (thickness != other.thickness) return true;
     if (areaGradient != other.areaGradient) return true;
     if (areaColor != other.areaColor) return true;
     if (lineType != other.lineType) return true;

@@ -24,7 +24,7 @@ abstract class BaseRenderer<DT extends ISparklinesData> implements IChartRendere
     );
 
     if (data.rotation != 0.0) {
-      final center = Offset(transformer.width / 2, transformer.height / 2);
+      final center = transformer.center;
       canvas.translate(center.dx, center.dy);
       canvas.rotate(data.rotation);
       canvas.translate(-center.dx, -center.dy);
@@ -47,28 +47,4 @@ abstract class BaseRenderer<DT extends ISparklinesData> implements IChartRendere
     return RRect.fromRectXY(rect, r, r);
   }
 
-  /// Transform BorderRadius values based on relativeDimensions
-  BorderRadius transformBorderRadius(
-      BorderRadius borderRadius,
-      CoordinateTransformer transformer,
-      ) {
-    return BorderRadius.only(
-      topLeft: Radius.elliptical(
-        transformer.transformDimension(borderRadius.topLeft.x),
-        transformer.transformDimension(borderRadius.topLeft.y),
-      ),
-      topRight: Radius.elliptical(
-        transformer.transformDimension(borderRadius.topRight.x),
-        transformer.transformDimension(borderRadius.topRight.y),
-      ),
-      bottomLeft: Radius.elliptical(
-        transformer.transformDimension(borderRadius.bottomLeft.x),
-        transformer.transformDimension(borderRadius.bottomLeft.y),
-      ),
-      bottomRight: Radius.elliptical(
-        transformer.transformDimension(borderRadius.bottomRight.x),
-        transformer.transformDimension(borderRadius.bottomRight.y),
-      ),
-    );
-  }
 }

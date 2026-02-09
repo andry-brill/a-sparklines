@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'interfaces.dart';
 import 'relative_dimension.dart';
 
@@ -8,23 +10,23 @@ class AbsoluteLayout implements IChartLayout {
   const AbsoluteLayout();
 
   @override
-  IChartLayout resolve(ILayoutDimensions dimensions) => this;
+  IChartLayout resolve(List<ILayoutData> dimensions) => this;
 
   @override
-  double transformDimension(double value, ILayoutDimensions dimensions) => value;
+  double transformDimension(double value, ILayoutData dimensions) => value;
 
   @override
-  double transformX(double x, ILayoutDimensions dimensions) => x;
+  double transformX(double x, ILayoutData dimensions) => x;
 
   @override
   // Y is inverted to keep math natural for chart data
-  double transformY(double y, ILayoutDimensions dimensions) => dimensions.height - y;
+  double transformY(double y, ILayoutData dimensions) => dimensions.height - y;
 
   @override
-  double transformDx(double x, ILayoutDimensions dimensions) => x;
+  double transformDx(double x, ILayoutData dimensions) => x;
 
   @override
-  double transformDy(double y, ILayoutDimensions dimensions) => y;
+  double transformDy(double y, ILayoutData dimensions) => y;
 
 }
 
@@ -72,15 +74,19 @@ class RelativeLayout implements IChartLayout {
   });
 
   @override
-  IChartLayout resolve(ILayoutDimensions dimensions) {
+  IChartLayout resolve(List<ILayoutData> dimensions) {
+    assert(dimensions.isNotEmpty);
 
-    // Use AbsoluteLayout's bounds if finite, otherwise use dimensions
-    final resolvedMinX = minX.isFinite ? minX : dimensions.minX;
-    final resolvedMaxX = maxX.isFinite ? maxX : dimensions.maxX;
-    final resolvedMinY = minY.isFinite ? minY : dimensions.minY;
-    final resolvedMaxY = maxY.isFinite ? maxY : dimensions.maxY;
+    final effectiveMinX = dimensions.map((d) => d.minX).reduce(min);
+    final effectiveMaxX = dimensions.map((d) => d.maxX).reduce(max);
+    final effectiveMinY = dimensions.map((d) => d.minY).reduce(min);
+    final effectiveMaxY = dimensions.map((d) => d.maxY).reduce(max);
 
-    // Handle case where min == max
+    final resolvedMinX = minX.isFinite ? minX : effectiveMinX;
+    final resolvedMaxX = maxX.isFinite ? maxX : effectiveMaxX;
+    final resolvedMinY = minY.isFinite ? minY : effectiveMinY;
+    final resolvedMaxY = maxY.isFinite ? maxY : effectiveMaxY;
+
     final finalMinX = resolvedMinX == resolvedMaxX ? resolvedMinX - 1.0 : resolvedMinX;
     final finalMaxX = resolvedMinX == resolvedMaxX ? resolvedMaxX + 1.0 : resolvedMaxX;
     final finalMinY = resolvedMinY == resolvedMaxY ? resolvedMinY - 1.0 : resolvedMinY;
@@ -95,22 +101,22 @@ class RelativeLayout implements IChartLayout {
   }
 
   @override
-  double transformX(double x, ILayoutDimensions dimensions) => transformDx(x - minX, dimensions);
+  double transformX(double x, ILayoutData dimensions) => transformDx(x - minX, dimensions);
 
   @override
-  double transformDx(double dx, ILayoutDimensions dimensions) => dx * (dimensions.width / (maxX - minX));
+  double transformDx(double dx, ILayoutData dimensions) => dx * (dimensions.width / (maxX - minX));
 
   @override
-  double transformY(double y, ILayoutDimensions dimensions) {
+  double transformY(double y, ILayoutData dimensions) {
     // Y is inverted to keep math natural for chart data
     return dimensions.height - transformDy(y - minY, dimensions);
   }
 
   @override
-  double transformDy(double dy, ILayoutDimensions dimensions) => dy * (dimensions.height / (maxY - minY));
+  double transformDy(double dy, ILayoutData dimensions) => dy * (dimensions.height / (maxY - minY));
 
   @override
-  double transformDimension(double value, ILayoutDimensions dimensions) {
+  double transformDimension(double value, ILayoutData dimensions) {
     switch (relativeTo) {
       case RelativeDimension.none:
         return value;

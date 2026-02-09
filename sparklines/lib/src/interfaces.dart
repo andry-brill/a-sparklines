@@ -44,16 +44,10 @@ class ThicknessData implements ILerpTo<ThicknessData> {
   bool operator ==(Object other) {
     if (identical(this, other)) return true;
     if (other is! ThicknessData) return false;
-    return isEquals(this, other);
-  }
-
-  static bool isEquals(ThicknessData? a, ThicknessData? b) {
-    if (a == b) return true;
-    if (a == null || b == null) return false;
-    return a.size == b.size &&
-        a.color == b.color &&
-        a.gradient == b.gradient &&
-        a.align == b.align;
+    return size == other.size &&
+        color == other.color &&
+        gradient == other.gradient &&
+        align == other.align;
   }
 
   static ThicknessData? lerp(ThicknessData? a, ThicknessData? b, double t) {
@@ -74,7 +68,7 @@ abstract class IChartBorder {
 }
 
 /// Interface for layout dimensions
-abstract class ILayoutDimensions {
+abstract class ILayoutData {
   double get minX;
   double get maxX;
   double get minY;
@@ -87,22 +81,22 @@ abstract class ILayoutDimensions {
 abstract class IChartLayout {
   /// Resolve layout with actual dimensions (e.g., resolve infinity values)
   /// Returns a resolved layout that can be used for transformation
-  IChartLayout resolve(ILayoutDimensions dimensions);
+  IChartLayout resolve(List<ILayoutData> dimensions);
 
   /// Transform X coordinate from data space to screen space
-  double transformX(double x, ILayoutDimensions dimensions);
+  double transformX(double x, ILayoutData dimensions);
 
   /// Transform Y coordinate from data space to screen space
-  double transformY(double y, ILayoutDimensions dimensions);
+  double transformY(double y, ILayoutData dimensions);
 
   /// Transform delta over X coordinate from data space to screen space
-  double transformDx(double x, ILayoutDimensions dimensions);
+  double transformDx(double x, ILayoutData dimensions);
 
   /// Transform delta over Y coordinate from data space to screen space
-  double transformDy(double y, ILayoutDimensions dimensions);
+  double transformDy(double y, ILayoutData dimensions);
 
   /// Transform a dimensional value based on layout settings
-  double transformDimension(double value, ILayoutDimensions dimensions);
+  double transformDimension(double value, ILayoutData dimensions);
 }
 
 /// Interface for chart renderers

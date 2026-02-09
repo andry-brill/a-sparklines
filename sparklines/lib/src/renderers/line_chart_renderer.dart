@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import '../coordinate_transformer.dart';
-import '../chart_data.dart';
-import '../data/data_point.dart';
-import '../interfaces.dart';
+import 'package:sparklines/src/data/line_data.dart';
+import 'package:sparklines/src/coordinate_transformer.dart';
+import 'package:sparklines/src/data/data_point.dart';
+import 'package:sparklines/src/interfaces.dart';
 import 'base_renderer.dart';
 
 class LineChartRenderer extends BaseRenderer<LineData> {

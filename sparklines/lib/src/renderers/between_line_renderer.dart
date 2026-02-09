@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:sparklines/src/coordinate_transformer.dart';
+import 'package:sparklines/src/data/between_line_data.dart';
 import 'package:sparklines/src/renderers/base_renderer.dart';
-import '../coordinate_transformer.dart';
-import '../chart_data.dart';
 
 /// Renders area between two lines
 class BetweenLineRenderer extends BaseRenderer<BetweenLineData> {

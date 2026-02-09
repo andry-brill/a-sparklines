@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:sparklines/src/data/layout_data.dart';
 import 'coordinate_transformer.dart';
 import 'interfaces.dart';
 
@@ -20,32 +21,49 @@ class SparklinesPainter extends CustomPainter {
     this.oldCharts,
   });
 
+  LayoutData layoutData(ISparklinesData chart) => LayoutData(
+    minX: chart.minX,
+    maxX: chart.maxX,
+    minY: chart.minY,
+    maxY: chart.maxY,
+    width: width,
+    height: height,
+  );
+
   @override
   void paint(Canvas canvas, Size size) {
+
+    final Map<IChartLayout, List<LayoutData>> layouts = {};
+
     for (final chart in charts) {
+
       if (!chart.visible) continue;
 
-      // Get chart's layout or use default
       final chartLayout = chart.layout ?? defaultLayout;
+      final datas = layouts.putIfAbsent(chartLayout, () => []);
+      datas.add(layoutData(chart));
 
-      // Get chart's crop or use default
+    }
+
+    for (final chart in charts) {
+
+      if (!chart.visible) continue;
+
+      final originalLayout = chart.layout ?? defaultLayout;
+      final layoutDatas = layouts[originalLayout]!;
+      final chartLayout = originalLayout.resolve(layoutDatas);
+
       final chartCrop = chart.crop ?? defaultCrop;
 
-      // Create transformer for this chart
       final transformer = CoordinateTransformer(
-        minX: chart.minX,
-        maxX: chart.maxX,
-        minY: chart.minY,
-        maxY: chart.maxY,
-        width: width,
-        height: height,
+        data: layoutData(chart),
         layout: chartLayout,
         crop: chartCrop,
       );
 
-      // Render chart with its own transformer
       chart.renderer.render(canvas, transformer, chart);
     }
+
   }
 
   @override

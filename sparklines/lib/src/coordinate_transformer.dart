@@ -1,59 +1,40 @@
 import 'package:flutter/material.dart';
 import 'package:sparklines/src/data/data_point.dart';
+import 'data/layout_data.dart';
 import 'interfaces.dart';
 
 /// Transforms data coordinates to screen coordinates
-class CoordinateTransformer implements ILayoutDimensions {
+class CoordinateTransformer {
 
-  @override
-  final double minX;
-  @override
-  final double maxX;
-  @override
-  final double minY;
-  @override
-  final double maxY;
-  @override
-  final double width;
-  @override
-  final double height;
-
+  final LayoutData data;
   /// Bounds rect (0, 0, width, height) for shaders and clipping
   final Rect bounds;
+  Offset get center => bounds.center;
 
-  late final IChartLayout layout;
+  final IChartLayout layout;
   final bool crop;
 
   CoordinateTransformer({
-    required this.minX,
-    required this.maxX,
-    required this.minY,
-    required this.maxY,
-    required this.width,
-    required this.height,
-    required IChartLayout layout,
+    required this.data,
+    required this.layout,
     required this.crop,
-  }) : bounds = Rect.fromLTWH(0, 0, width, height) {
-    assert(minX < maxX, 'minX must be less than maxX');
-    assert(minY < maxY, 'minY must be less than maxY');
-    // Resolve layout with this transformer's dimensions
-    this.layout = layout.resolve(this);
-  }
+  }) :
+        bounds = Rect.fromLTWH(0, 0, data.width, data.height);
 
   double transformX(double x) {
-    return layout.transformX(x, this);
+    return layout.transformX(x, data);
   }
 
   double transformDx(double x) {
-    return layout.transformDx(x, this);
+    return layout.transformDx(x, data);
   }
 
   double transformY(double y) {
-    return layout.transformY(y, this);
+    return layout.transformY(y, data);
   }
 
   double transformDy(double y) {
-    return layout.transformDy(y, this);
+    return layout.transformDy(y, data);
   }
 
   Offset transformPoint(DataPoint p) {
@@ -61,7 +42,7 @@ class CoordinateTransformer implements ILayoutDimensions {
   }
 
   double transformDimension(double value) {
-    return layout.transformDimension(value, this);
+    return layout.transformDimension(value, data);
   }
 
 }
