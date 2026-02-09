@@ -122,7 +122,7 @@ List<ExampleChart> lineCharts() {
     ),
     lineFull.modify(
       title: 'Gradient area',
-      modifier: (c) => c.copyWith(gradientArea: LinearGradient(
+      modifier: (c) => c.copyWith(areaGradient: LinearGradient(
         colors: [c.thickness.color, Colors.white],
         begin: Alignment.topCenter,
         end: Alignment.bottomCenter
@@ -146,7 +146,7 @@ List<ExampleChart> lineCharts() {
           isStrokeCapRound: true,
           isStrokeJoinRound: true,
           pointStyle: CircleDataPointStyle(radius: 2, color: Color(0xFF272727)),
-          gradientArea: LinearGradient(
+          areaGradient: LinearGradient(
               colors: [c.thickness.color.withValues(alpha: 0.5), Colors.white.withValues(alpha: 0.0)],
               begin: Alignment.topCenter,
               end: Alignment.bottomCenter

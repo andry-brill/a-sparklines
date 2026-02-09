@@ -39,7 +39,8 @@ class LineData implements ISparklinesData, IChartThickness {
   @override
   final ThicknessData thickness;
 
-  final Gradient? gradientArea;
+  final Gradient? areaGradient;
+  final Color? areaColor;
   final ILineTypeData? lineType;
   final bool isStrokeCapRound;
   final bool isStrokeJoinRound;
@@ -53,7 +54,8 @@ class LineData implements ISparklinesData, IChartThickness {
     this.crop,
     required this.points,
     this.thickness = const ThicknessData(size: 2.0),
-    this.gradientArea,
+    this.areaGradient,
+    this.areaColor,
     this.lineType,
     this.isStrokeCapRound = false,
     this.isStrokeJoinRound = false,
@@ -68,7 +70,8 @@ class LineData implements ISparklinesData, IChartThickness {
     bool? crop,
     List<DataPoint>? points,
     ThicknessData? thickness,
-    Gradient? gradientArea,
+    Gradient? areaGradient,
+    Color? areaColor,
     ILineTypeData? lineType,
     bool? isStrokeCapRound,
     bool? isStrokeJoinRound,
@@ -82,7 +85,8 @@ class LineData implements ISparklinesData, IChartThickness {
       crop: crop ?? this.crop,
       points: points ?? this.points,
       thickness: thickness ?? this.thickness,
-      gradientArea: gradientArea ?? this.gradientArea,
+      areaGradient: areaGradient ?? this.areaGradient,
+      areaColor: areaColor ?? this.areaColor,
       lineType: lineType ?? this.lineType,
       isStrokeCapRound: isStrokeCapRound ?? this.isStrokeCapRound,
       isStrokeJoinRound: isStrokeJoinRound ?? this.isStrokeJoinRound,
@@ -99,7 +103,8 @@ class LineData implements ISparklinesData, IChartThickness {
     if (layout != other.layout) return true;
     if (points.length != other.points.length) return true;
     if (!ThicknessData.isEquals(thickness, other.thickness)) return true;
-    if (gradientArea != other.gradientArea) return true;
+    if (areaGradient != other.areaGradient) return true;
+    if (areaColor != other.areaColor) return true;
     if (lineType != other.lineType) return true;
     if (isStrokeCapRound != other.isStrokeCapRound) return true;
     if (isStrokeJoinRound != other.isStrokeJoinRound) return true;
@@ -133,7 +138,8 @@ class LineData implements ISparklinesData, IChartThickness {
       crop: next.crop,
       points: interpolatedPoints,
       thickness: thickness.lerpTo(next.thickness, t),
-      gradientArea: Gradient.lerp(gradientArea, next.gradientArea, t),
+      areaGradient: Gradient.lerp(areaGradient, next.areaGradient, t),
+      areaColor: Color.lerp(areaColor, next.areaColor, t),
       lineType: next.lineType,
       isStrokeCapRound: next.isStrokeCapRound,
       isStrokeJoinRound: next.isStrokeJoinRound,

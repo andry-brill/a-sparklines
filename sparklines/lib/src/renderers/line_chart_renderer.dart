@@ -18,27 +18,23 @@ class LineChartRenderer extends BaseRenderer<LineData> {
 
     final paint = Paint();
 
-    // Build path based on line type
+    // Build path based on line type (line at fy)
     final path = buildPath(lineData, transformer);
 
-    // Draw area gradient if specified
-    if (lineData.gradientArea != null) {
-      final areaPath = Path.from(path);
-      areaPath.lineTo(
-        transformer.transformX(transformer.maxX),
-        transformer.transformY(transformer.minY),
-      );
-      areaPath.lineTo(
-        transformer.transformX(transformer.minX),
-        transformer.transformY(transformer.minY),
-      );
-      areaPath.close();
-
-      paint.shader = lineData.gradientArea!.createShader(
-        transformer.bounds,
-      );
-      paint.style = PaintingStyle.fill;
-      canvas.drawPath(areaPath, paint);
+    // Draw area fill between line (fy) and baseline (y) when specified
+    final hasAreaFill = lineData.areaGradient != null || lineData.areaColor != null;
+    if (hasAreaFill) {
+      final areaPath = _buildAreaPathBetweenFyAndY(lineData, transformer);
+      if (areaPath != null) {
+        if (lineData.areaGradient != null) {
+          paint.shader = lineData.areaGradient!.createShader(transformer.bounds);
+        } else {
+          paint.shader = null;
+          paint.color = lineData.areaColor!;
+        }
+        paint.style = PaintingStyle.fill;
+        canvas.drawPath(areaPath, paint);
+      }
     }
 
     // Draw line (stroke from IChartThickness)
@@ -68,116 +64,172 @@ class LineChartRenderer extends BaseRenderer<LineData> {
 
   }
 
-  Path buildPath(LineData lineData, CoordinateTransformer transformer) {
-    final path = Path();
+  /// Builds area path between line at [points].fy and baseline at [points].y (like between two lines).
+  Path? _buildAreaPathBetweenFyAndY(LineData lineData, CoordinateTransformer transformer) {
+    final points = lineData.points;
+    if (points.length < 2) return null;
+
+    // Top edge: path along fy (first to last)
+    final topPath = buildPath(lineData, transformer);
+    final areaPath = Path.from(topPath);
+
+    final lastX = transformer.transformX(points.last.x);
+    final lastY = transformer.transformY(points.last.y);
+
+    // Down to baseline at last point
+    areaPath.lineTo(lastX, lastY);
+
+    // Bottom edge: path along y from last to first (reverse)
+    buildPath(lineData, transformer, yOf: (DataPoint p) => p.y, reverse: true, path: areaPath);
+
+    // Close back to first top point (x0, fy0)
+    areaPath.lineTo(transformer.transformX(points.first.x), transformer.transformY(points.first.fy));
+    return areaPath;
+  }
+
+  Path buildPath(LineData lineData, CoordinateTransformer transformer, {double Function(DataPoint)? yOf, bool reverse = false, Path? path}) {
+    final pathOut = path ?? Path();
     final points = lineData.points;
 
-    if (points.isEmpty) return path;
+    if (points.isEmpty) return pathOut;
 
-    // Transform first point
-    final firstPoint = transformer.transformPoint(points[0]);
-    path.moveTo(firstPoint.dx, firstPoint.dy);
+    double screenY(DataPoint p) => transformer.transformY(yOf != null ? yOf(p) : p.fy);
+    Offset pt(DataPoint p) => Offset(transformer.transformX(p.x), screenY(p));
 
-    if (points.length == 1) return path;
+    if (!reverse) {
+      final first = pt(points[0]);
+      pathOut.moveTo(first.dx, first.dy);
+      if (points.length == 1) return pathOut;
+    } else {
+      final last = pt(points.last);
+      pathOut.moveTo(last.dx, last.dy);
+      if (points.length == 1) return pathOut;
+    }
 
     if (lineData.lineType == null) {
-      // Straight lines (non-curved path)
-      for (int i = 1; i < points.length; i++) {
-        final point = transformer.transformPoint(points[i]);
-        path.lineTo(point.dx, point.dy);
+      if (reverse) {
+        for (int i = points.length - 2; i >= 0; i--) {
+          final point = pt(points[i]);
+          pathOut.lineTo(point.dx, point.dy);
+        }
+      } else {
+        for (int i = 1; i < points.length; i++) {
+          final point = pt(points[i]);
+          pathOut.lineTo(point.dx, point.dy);
+        }
       }
     } else if (lineData.lineType is SteppedLineType) {
       final stepData = lineData.lineType as SteppedLineType;
-      _buildStepPath(path, points, transformer, stepData.stepJumpAt);
+      _buildStepPathWithY(pathOut, points, transformer, stepData.stepJumpAt, yOf ?? (p) => p.fy, reverse);
     } else if (lineData.lineType is CurvedLineType) {
       final curveData = lineData.lineType as CurvedLineType;
-      _buildCurvePath(path, points, transformer, curveData.smoothness);
+      _buildCurvePathWithY(pathOut, points, transformer, curveData.smoothness, yOf ?? (p) => p.fy, reverse);
     } else {
-      // Fallback to straight lines for unknown types
-      for (int i = 1; i < points.length; i++) {
-        final point = transformer.transformPoint(points[i]);
-        path.lineTo(point.dx, point.dy);
+      if (reverse) {
+        for (int i = points.length - 2; i >= 0; i--) {
+          final point = pt(points[i]);
+          pathOut.lineTo(point.dx, point.dy);
+        }
+      } else {
+        for (int i = 1; i < points.length; i++) {
+          final point = pt(points[i]);
+          pathOut.lineTo(point.dx, point.dy);
+        }
       }
     }
 
-    return path;
+    return pathOut;
   }
 
-  void _buildStepPath(
+  void _buildStepPathWithY(
     Path path,
     List<DataPoint> points,
     CoordinateTransformer transformer,
     double stepJumpAt,
+    double Function(DataPoint) yOf,
+    bool reverse,
   ) {
-    for (int i = 1; i < points.length; i++) {
-      final prev = points[i - 1];
-      final curr = points[i];
-
-      final prevX = transformer.transformX(prev.x);
-      final currX = transformer.transformX(curr.x);
-      final prevY = transformer.transformY(prev.fy);
-      final currY = transformer.transformY(curr.fy);
-
-      final stepX = prevX + (currX - prevX) * stepJumpAt;
-
-      // Horizontal line to step position
-      path.lineTo(stepX, prevY);
-      // Vertical line to new Y
-      path.lineTo(stepX, currY);
-      // Horizontal line to current X
-      path.lineTo(currX, currY);
+    if (reverse) {
+      for (int i = points.length - 1; i >= 1; i--) {
+        final curr = points[i];
+        final prev = points[i - 1];
+        final currX = transformer.transformX(curr.x);
+        final prevX = transformer.transformX(prev.x);
+        final currY = transformer.transformY(yOf(curr));
+        final prevY = transformer.transformY(yOf(prev));
+        final stepX = prevX + (currX - prevX) * stepJumpAt;
+        path.lineTo(stepX, currY);
+        path.lineTo(stepX, prevY);
+        path.lineTo(prevX, prevY);
+      }
+    } else {
+      for (int i = 1; i < points.length; i++) {
+        final prev = points[i - 1];
+        final curr = points[i];
+        final prevX = transformer.transformX(prev.x);
+        final currX = transformer.transformX(curr.x);
+        final prevY = transformer.transformY(yOf(prev));
+        final currY = transformer.transformY(yOf(curr));
+        final stepX = prevX + (currX - prevX) * stepJumpAt;
+        path.lineTo(stepX, prevY);
+        path.lineTo(stepX, currY);
+        path.lineTo(currX, currY);
+      }
     }
   }
 
-  void _buildCurvePath(
+  void _buildCurvePathWithY(
     Path path,
     List<DataPoint> points,
     CoordinateTransformer transformer,
     double smoothness,
+    double Function(DataPoint) yOf,
+    bool reverse,
   ) {
     if (points.length < 2) return;
 
-    for (int i = 1; i < points.length; i++) {
-      final prev = points[i - 1];
-      final curr = points[i];
+    Offset pt(DataPoint p) => Offset(transformer.transformX(p.x), transformer.transformY(yOf(p)));
 
-      final prevPoint = transformer.transformPoint(prev);
-      final currPoint = transformer.transformPoint(curr);
+    if (reverse) {
+      for (int i = points.length - 1; i >= 1; i--) {
+        final curr = points[i];
+        final prev = points[i - 1];
+        final currPoint = pt(curr);
+        final prevPoint = pt(prev);
+        if (i == points.length - 1) {
+          final controlX = prevPoint.dx + (currPoint.dx - prevPoint.dx) * smoothness;
+          path.quadraticBezierTo(controlX, currPoint.dy, prevPoint.dx, prevPoint.dy);
+        } else if (i == 1) {
+          final controlX = currPoint.dx - (currPoint.dx - prevPoint.dx) * smoothness;
+          path.quadraticBezierTo(controlX, prevPoint.dy, prevPoint.dx, prevPoint.dy);
+        } else {
+          final next = points[i + 1];
+          final nextPoint = pt(next);
+          final controlX1 = currPoint.dx - (currPoint.dx - nextPoint.dx) * smoothness;
+          final controlX2 = prevPoint.dx + (currPoint.dx - prevPoint.dx) * smoothness;
+          path.cubicTo(controlX1, currPoint.dy, controlX2, prevPoint.dy, prevPoint.dx, prevPoint.dy);
+        }
+      }
+    } else {
+      for (int i = 1; i < points.length; i++) {
+        final prev = points[i - 1];
+        final curr = points[i];
+        final prevPoint = pt(prev);
+        final currPoint = pt(curr);
 
-      if (i == 1) {
-        // First segment: use current point as control
-        final controlX = prevPoint.dx + (currPoint.dx - prevPoint.dx) * smoothness;
-        path.quadraticBezierTo(
-          controlX,
-          prevPoint.dy,
-          currPoint.dx,
-          currPoint.dy,
-        );
-      } else if (i == points.length - 1) {
-        // Last segment: use previous point as control
-        final controlX = currPoint.dx - (currPoint.dx - prevPoint.dx) * smoothness;
-        path.quadraticBezierTo(
-          controlX,
-          currPoint.dy,
-          currPoint.dx,
-          currPoint.dy,
-        );
-      } else {
-        // Middle segments: use both points for smooth curve
-        final next = points[i + 1];
-        final nextPoint = transformer.transformPoint(next);
-
-        final controlX1 = prevPoint.dx + (currPoint.dx - prevPoint.dx) * smoothness;
-        final controlX2 = currPoint.dx - (nextPoint.dx - currPoint.dx) * smoothness;
-
-        path.cubicTo(
-          controlX1,
-          prevPoint.dy,
-          controlX2,
-          currPoint.dy,
-          currPoint.dx,
-          currPoint.dy,
-        );
+        if (i == 1) {
+          final controlX = prevPoint.dx + (currPoint.dx - prevPoint.dx) * smoothness;
+          path.quadraticBezierTo(controlX, prevPoint.dy, currPoint.dx, currPoint.dy);
+        } else if (i == points.length - 1) {
+          final controlX = currPoint.dx - (currPoint.dx - prevPoint.dx) * smoothness;
+          path.quadraticBezierTo(controlX, currPoint.dy, currPoint.dx, currPoint.dy);
+        } else {
+          final next = points[i + 1];
+          final nextPoint = pt(next);
+          final controlX1 = prevPoint.dx + (currPoint.dx - prevPoint.dx) * smoothness;
+          final controlX2 = currPoint.dx - (nextPoint.dx - currPoint.dx) * smoothness;
+          path.cubicTo(controlX1, prevPoint.dy, controlX2, currPoint.dy, currPoint.dx, currPoint.dy);
+        }
       }
     }
   }
