@@ -1,6 +1,7 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
+import 'package:vector_math/vector_math_64.dart';
 
 import '../interfaces.dart';
 import 'relative_dimension.dart';
@@ -20,13 +21,15 @@ class AbsoluteLayout implements IChartLayout {
   }
 
   @override
-  Offset centerInDataSpace(ILayoutData dimensions) {
-    return Offset(dimensions.width / 2, dimensions.height / 2);
+  double toScreenLength(double value, ILayoutData dimensions) {
+    return value;
   }
 
   @override
-  double toScreenLength(double value, ILayoutData dimensions, [RelativeDimension relativeTo = RelativeDimension.none]) {
-    return value;
+  Matrix4 pathTransform(Canvas canvas, ILayoutData dimensions) {
+    return Matrix4.identity()
+      ..translateByVector3(Vector3(0.0, dimensions.height, 0.0))
+      ..scaleByVector3(Vector3(1.0, -1.0, 0.0));
   }
 }
 
@@ -97,6 +100,7 @@ class RelativeLayout implements IChartLayout {
       maxX: finalMaxX,
       minY: finalMinY,
       maxY: finalMaxY,
+      relativeTo: relativeTo
     );
   }
 
@@ -109,12 +113,17 @@ class RelativeLayout implements IChartLayout {
   }
 
   @override
-  Offset centerInDataSpace(ILayoutData dimensions) {
-    return Offset((minX + maxX) / 2, (minY + maxY) / 2);
+  Matrix4 pathTransform(Canvas canvas, ILayoutData dimensions) {
+    return Matrix4.identity()
+      ..translateByVector3(Vector3(0.0, dimensions.height, 0.0))
+      ..scaleByVector3(Vector3(1.0, -1.0, 1.0))
+      ..scaleByVector3(Vector3(dimensions.width / (maxX - minX), dimensions.height / (maxY - minY), 1.0))
+      ..translateByVector3(Vector3(-minX, -minY, 0.0))
+    ;
   }
 
   @override
-  double toScreenLength(double value, ILayoutData dimensions, [RelativeDimension relativeTo = RelativeDimension.none]) {
+  double toScreenLength(double value, ILayoutData dimensions) {
     switch (relativeTo) {
       case RelativeDimension.none:
         return value;

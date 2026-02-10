@@ -33,7 +33,6 @@ class PieChartRenderer extends AChartRenderer<PieData> {
 
   @override
   void renderData(
-    Canvas canvas,
     ChartRenderContext context,
     PieData pieData,
   ) {
@@ -67,7 +66,7 @@ class PieChartRenderer extends AChartRenderer<PieData> {
         paint.shader = null;
         paint.color = pieData.thickness.color;
       }
-      canvas.drawPath(path, paint);
+      context.drawPath(path, paint);
 
       final border = pieData.border;
       if (border != null && s.borderSize != null) {
@@ -81,7 +80,7 @@ class PieChartRenderer extends AChartRenderer<PieData> {
           paint.shader = null;
           paint.color = border.color;
         }
-        canvas.drawPath(path, paint);
+        context.drawPath(path, paint);
       }
     }
   }

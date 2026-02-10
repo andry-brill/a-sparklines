@@ -36,14 +36,14 @@ class CircleDataPointStyle implements IDataPointStyle {
 class CircleDataPointRenderer extends ADataPointRenderer<CircleDataPointStyle> {
 
   @override
-  void renderStyle(Canvas canvas, Paint paint, ChartRenderContext context, CircleDataPointStyle style, DataPoint dataPoint) {
+  void renderStyle(Paint paint, ChartRenderContext context, CircleDataPointStyle style, DataPoint dataPoint) {
+
     paint.style = PaintingStyle.fill;
     paint.color = style.color;
     paint.shader = null;
 
-    final point = Offset(dataPoint.x, dataPoint.fy);
     final radius = context.toScreenLength(style.radius);
-    canvas.drawCircle(point, radius, paint);
+    context.drawCircle(dataPoint, radius, paint);
   }
 
 }

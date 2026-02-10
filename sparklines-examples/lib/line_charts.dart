@@ -155,8 +155,52 @@ List<ExampleChart> lineCharts() {
       title: 'Stepped (end) with transform',
       subtitle: 'Step at end of segment; custom origin, 90° rotation, and rounded joins.',
       modifier: (c) => c.copyWith(
-          origin: Offset(-20, 10),
-          rotation: pi/2,
+          // origin: Offset(-20, 10),
+          rotation: ChartRotation.d90,
+          lineType: SteppedLineType.end(),
+          isStrokeCapRound: true,
+          isStrokeJoinRound: true,
+          pointStyle: CircleDataPointStyle(radius: 2, color: Color(0xFF272727)),
+          areaGradient: LinearGradient(
+              colors: [c.thickness.color.withValues(alpha: 0.5), Colors.white.withValues(alpha: 0.0)],
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter
+          )
+      ),
+    ),
+    lineFull.modify(
+      title: 'Stepped (end) with transform',
+      modifier: (c) => c.copyWith(
+          lineType: SteppedLineType.end(),
+          isStrokeCapRound: true,
+          isStrokeJoinRound: true,
+          rotation: ChartRotation.d180,
+          pointStyle: CircleDataPointStyle(radius: 2, color: Color(0xFF272727)),
+          areaGradient: LinearGradient(
+              colors: [c.thickness.color.withValues(alpha: 0.5), Colors.white.withValues(alpha: 0.0)],
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter
+          )
+      ),
+    ),
+    lineFull.modify(
+      title: 'Stepped (end) with transform',
+      modifier: (c) => c.copyWith(
+          lineType: SteppedLineType.end(),
+          isStrokeCapRound: true,
+          isStrokeJoinRound: true,
+          rotation: ChartRotation.d270,
+          pointStyle: CircleDataPointStyle(radius: 2, color: Color(0xFF272727)),
+          areaGradient: LinearGradient(
+              colors: [c.thickness.color.withValues(alpha: 0.5), Colors.white.withValues(alpha: 0.0)],
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter
+          )
+      ),
+    ),
+    lineFull.modify(
+      title: 'Stepped (end) with transform',
+      modifier: (c) => c.copyWith(
           lineType: SteppedLineType.end(),
           isStrokeCapRound: true,
           isStrokeJoinRound: true,

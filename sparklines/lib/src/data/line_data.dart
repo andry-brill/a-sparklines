@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'dart:ui' show lerpDouble;
 import 'data_point.dart';
 import '../interfaces.dart';
 import '../renderers/line_chart_renderer.dart';
@@ -12,7 +11,7 @@ class LineData implements ISparklinesData, IChartThickness, IChartDataPointStyle
   @override
   final bool visible;
   @override
-  final double rotation;
+  final ChartRotation rotation;
   @override
   final Offset origin;
   @override
@@ -52,7 +51,7 @@ class LineData implements ISparklinesData, IChartThickness, IChartDataPointStyle
 
   const LineData({
     this.visible = true,
-    this.rotation = 0.0,
+    this.rotation = ChartRotation.d0,
     this.origin = Offset.zero,
     this.layout,
     this.crop,
@@ -68,7 +67,7 @@ class LineData implements ISparklinesData, IChartThickness, IChartDataPointStyle
 
   LineData copyWith({
     bool? visible,
-    double? rotation,
+    ChartRotation? rotation,
     Offset? origin,
     IChartLayout? layout,
     bool? crop,
@@ -136,7 +135,7 @@ class LineData implements ISparklinesData, IChartThickness, IChartDataPointStyle
 
     return LineData(
       visible: next.visible,
-      rotation: lerpDouble(rotation, next.rotation, t) ?? next.rotation,
+      rotation: next.rotation,
       origin: Offset.lerp(origin, next.origin, t) ?? next.origin,
       layout: next.layout,
       crop: next.crop,

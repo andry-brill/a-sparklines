@@ -6,7 +6,6 @@ import 'package:sparklines/src/renderers/chart_renderer.dart';
 class BetweenLineRenderer extends AChartRenderer<BetweenLineData> {
   @override
   void renderData(
-    Canvas canvas,
     ChartRenderContext context,
     BetweenLineData betweenData,
   ) {
@@ -28,7 +27,7 @@ class BetweenLineRenderer extends AChartRenderer<BetweenLineData> {
     }
 
     paint.style = PaintingStyle.fill;
-    canvas.drawPath(combinedPath, paint);
+    context.drawPath(combinedPath, paint);
   }
 
   Path _reversePath(Path path) {

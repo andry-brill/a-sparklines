@@ -6,14 +6,13 @@ import 'package:sparklines/src/interfaces.dart';
 abstract class ADataPointRenderer<ST extends IDataPointStyle> implements IDataPointRenderer {
   @override
   void render(
-    Canvas canvas,
     Paint paint,
     ChartRenderContext context,
     IDataPointStyle style,
     DataPoint dataPoint,
   ) {
-    renderStyle(canvas, paint, context, style as ST, dataPoint);
+    renderStyle(paint, context, style as ST, dataPoint);
   }
 
-  void renderStyle(Canvas canvas, Paint paint, ChartRenderContext context, ST style, DataPoint dataPoint);
+  void renderStyle(Paint paint, ChartRenderContext context, ST style, DataPoint dataPoint);
 }

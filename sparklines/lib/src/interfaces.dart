@@ -1,7 +1,9 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:sparklines/src/data/data_point.dart';
 import 'dart:ui' show lerpDouble;
-import 'layout/relative_dimension.dart';
+import 'package:vector_math/vector_math_64.dart';
 
 /// Interface for types that can be interpolated
 abstract class ILerpTo<T> {
@@ -76,6 +78,23 @@ abstract class IChartBorder {
   double? get borderRadius;
 }
 
+/// Chart rotation: 0°, 90°, 180°, 270° (clockwise). For d90 and d270 the chart
+/// is laid out with width and height swapped so it fills the bounds when rotated.
+enum ChartRotation {
+
+  d0,
+  d90,
+  d180,
+  d270;
+
+  double get angle => switch (this) {
+    d0 => 0.0,
+    d90 => pi/2,
+    d180 => pi,
+    d270 => 3 * pi / 2
+  };
+}
+
 /// Interface for layout dimensions
 abstract class ILayoutData {
   double get minX;
@@ -88,26 +107,45 @@ abstract class ILayoutData {
 
 /// Context passed to chart renderers (replaces per-point coordinate transformation).
 class ChartRenderContext {
+
+  final Canvas canvas;
+  final Matrix4 pathTransform;
   final IChartLayout layout;
   final ILayoutData dimensions;
-  final bool crop;
 
   const ChartRenderContext({
     required this.layout,
     required this.dimensions,
-    required this.crop,
+    required this.pathTransform,
+    required this.canvas,
   });
 
   /// Bounds rect (0, 0, width, height) for shaders and clipping
   Rect get bounds => Rect.fromLTWH(0, 0, dimensions.width, dimensions.height);
 
-  /// Center in data space (for rotation around chart center)
-  Offset get center => layout.centerInDataSpace(dimensions);
-
   /// Convert a length to screen pixels (for stroke width, radius, etc.).
   /// Use [relativeTo] for values relative to chart width/height (e.g. RelativeLayout).
-  double toScreenLength(double value, [RelativeDimension relativeTo = RelativeDimension.none]) {
-    return layout.toScreenLength(value, dimensions, relativeTo);
+  double toScreenLength(double value) {
+    return layout.toScreenLength(value, dimensions);
+  }
+
+  void drawCircle(DataPoint dataPoint, double radius, Paint paint) {
+    Vector3 point = Vector3(dataPoint.x, dataPoint.fy, 0.0);
+    point = pathTransform.transform3(point);
+    canvas.drawCircle(Offset(point.x, point.y), radius, paint);
+  }
+
+  void drawPath(Path path, Paint paint) {
+    final tPath = path.transform(pathTransform.storage);
+    canvas.drawPath(tPath, paint);
+  }
+
+  void drawRRect(RRect rect, Paint paint) {
+    drawPath(Path()..addRRect(rect), paint);
+  }
+
+  void drawRect(Rect rect, Paint paint) {
+    drawPath(Path()..addRect(rect), paint);
   }
 }
 
@@ -121,11 +159,10 @@ abstract class IChartLayout {
   /// can use data coordinates (e.g. math-oriented Y). Call once before drawing the chart.
   void prepare(Canvas canvas, ILayoutData dimensions);
 
-  /// Point in data space that maps to the visual center of the chart (for rotation).
-  Offset centerInDataSpace(ILayoutData dimensions);
+  Matrix4 pathTransform(Canvas canvas, ILayoutData dimensions);
 
   /// Convert a length to screen pixels (for stroke width, radius, etc.).
-  double toScreenLength(double value, ILayoutData dimensions, [RelativeDimension relativeTo = RelativeDimension.none]);
+  double toScreenLength(double value, ILayoutData dimensions);
 }
 
 /// Interface for chart renderers
@@ -133,7 +170,6 @@ abstract class IChartRenderer {
   /// Render the chart to the canvas. [context.layout.prepare] is called before this;
   /// draw using data coordinates.
   void render(
-    Canvas canvas,
     ChartRenderContext context,
     ISparklinesData data,
   );
@@ -141,7 +177,6 @@ abstract class IChartRenderer {
 
 abstract class IDataPointRenderer {
   void render(
-    Canvas canvas,
     Paint paint,
     ChartRenderContext context,
     IDataPointStyle style,
@@ -154,8 +189,8 @@ abstract class ISparklinesData implements ILerpTo<ISparklinesData> {
   /// Whether this chart is visible
   bool get visible;
 
-  /// Rotation in radians
-  double get rotation;
+  /// Rotation (d90/d270 use swapped dimensions so chart fills bounds)
+  ChartRotation get rotation;
 
   /// Origin offset for positioning
   Offset get origin;

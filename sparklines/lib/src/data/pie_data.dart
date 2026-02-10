@@ -22,7 +22,7 @@ class PieData implements ISparklinesData, IChartThickness, IChartBorder {
   @override
   final bool visible;
   @override
-  final double rotation;
+  final ChartRotation rotation;
   @override
   final Offset origin;
   @override
@@ -92,7 +92,7 @@ class PieData implements ISparklinesData, IChartThickness, IChartBorder {
 
   const PieData({
     this.visible = true,
-    this.rotation = 0.0,
+    this.rotation = ChartRotation.d0,
     this.origin = Offset.zero,
     this.layout,
     this.crop,
@@ -105,7 +105,7 @@ class PieData implements ISparklinesData, IChartThickness, IChartBorder {
 
   PieData copyWith({
     bool? visible,
-    double? rotation,
+    ChartRotation? rotation,
     Offset? origin,
     IChartLayout? layout,
     bool? crop,
@@ -164,7 +164,7 @@ class PieData implements ISparklinesData, IChartThickness, IChartBorder {
 
     return PieData(
       visible: next.visible,
-      rotation: lerpDouble(rotation, next.rotation, t) ?? next.rotation,
+      rotation: next.rotation,
       origin: Offset.lerp(origin, next.origin, t) ?? next.origin,
       layout: next.layout,
       crop: next.crop,

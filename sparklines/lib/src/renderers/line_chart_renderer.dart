@@ -5,9 +5,9 @@ import 'package:sparklines/src/interfaces.dart';
 import 'chart_renderer.dart';
 
 class LineChartRenderer extends AChartRenderer<LineData> {
+
   @override
   void renderData(
-    Canvas canvas,
     ChartRenderContext context,
     LineData lineData,
   ) {
@@ -28,7 +28,7 @@ class LineChartRenderer extends AChartRenderer<LineData> {
           paint.color = lineData.areaColor!;
         }
         paint.style = PaintingStyle.fill;
-        canvas.drawPath(areaPath, paint);
+        context.drawPath(areaPath, paint);
       }
     }
 
@@ -45,9 +45,9 @@ class LineChartRenderer extends AChartRenderer<LineData> {
       paint.color = thickness.color;
     }
 
-    canvas.drawPath(path, paint);
+    context.drawPath(path, paint);
 
-    drawDataPoints(canvas, paint, context, lineData, lineData.points);
+    drawDataPoints(paint, context, lineData, lineData.points);
   }
 
   Path? _buildAreaPathBetweenFyAndY(LineData lineData, ChartRenderContext context) {

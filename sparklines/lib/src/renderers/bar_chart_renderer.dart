@@ -8,7 +8,6 @@ import 'chart_renderer.dart';
 class BarChartRenderer extends AChartRenderer<BarData> {
   @override
   void renderData(
-    Canvas canvas,
     ChartRenderContext context,
     BarData barData,
   ) {
@@ -43,9 +42,9 @@ class BarChartRenderer extends AChartRenderer<BarData> {
 
       // Draw bar
       if (roundedRect != null) {
-        canvas.drawRRect(roundedRect, paint);
+        context.drawRRect(roundedRect, paint);
       } else {
-        canvas.drawRect(rect, paint);
+        context.drawRect(rect, paint);
       }
 
       final border = barData.border;
@@ -66,14 +65,14 @@ class BarChartRenderer extends AChartRenderer<BarData> {
         }
 
         if (borderRoundedRect != null) {
-          canvas.drawRRect(borderRoundedRect, paint);
+          context.drawRRect(borderRoundedRect, paint);
         } else {
-          canvas.drawRect(borderRect, paint);
+          context.drawRect(borderRect, paint);
         }
       }
     }
 
-    drawDataPoints(canvas, paint, context, barData, barData.bars);
+    drawDataPoints(paint, context, barData, barData.bars);
 
   }
 

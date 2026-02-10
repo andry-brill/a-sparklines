@@ -12,7 +12,7 @@ class BarData implements ISparklinesData, IChartBorder, IChartThickness, IChartD
   @override
   final bool visible;
   @override
-  final double rotation;
+  final ChartRotation rotation;
   @override
   final Offset origin;
   @override
@@ -50,7 +50,7 @@ class BarData implements ISparklinesData, IChartBorder, IChartThickness, IChartD
 
   const BarData({
     this.visible = true,
-    this.rotation = 0.0,
+    this.rotation = ChartRotation.d0,
     this.origin = Offset.zero,
     this.layout,
     this.crop,
@@ -63,7 +63,7 @@ class BarData implements ISparklinesData, IChartBorder, IChartThickness, IChartD
 
   BarData copyWith({
     bool? visible,
-    double? rotation,
+    ChartRotation? rotation,
     Offset? origin,
     IChartLayout? layout,
     bool? crop,
@@ -122,7 +122,7 @@ class BarData implements ISparklinesData, IChartBorder, IChartThickness, IChartD
 
     return BarData(
       visible: next.visible,
-      rotation: lerpDouble(rotation, next.rotation, t) ?? next.rotation,
+      rotation: next.rotation,
       origin: Offset.lerp(origin, next.origin, t) ?? next.origin,
       layout: next.layout,
       crop: next.crop,
