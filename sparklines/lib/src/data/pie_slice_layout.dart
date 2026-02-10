@@ -1,6 +1,8 @@
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
+import 'package:sparklines/src/layout/coordinate_transformer.dart';
 import 'data_point.dart';
+import '../interfaces.dart';
 
 /// Result of computing layout for a single pie slice (angle order, radii, space).
 class PieSliceLayout {
@@ -30,28 +32,58 @@ class PieSliceLayout {
 /// - [sweepRadians]: total sweep of the pie in radians (e.g. 2*pi for full circle).
 /// - [align]: 0 = (sweep/2) on each side of axis ray; !=0 splits left/right (ThicknessData.align).
 /// - space = uniform linear gap between slices; gap_rad = space / maxOuterRadius.
+///
+/// When [layout] and [dimensions] are provided, raw values (points, space, sweepRadians, align)
+/// are transformed via the layout before running the algorithm; the result is in screen space
+/// and [spaceOffset] is the absolute center in screen coordinates. When omitted (default),
+/// no transformation is applied and the result is in data space.
 List<PieSliceLayout> computePieSliceLayout(
   List<DataPoint> points,
   double space,
   double sweepRadians,
-  double align,
-) {
+  double align, {
+  CoordinateTransformer? transformer,
+}) {
   if (points.isEmpty) return [];
 
-  final total = points.fold<double>(0.0, (s, p) => s + p.dy);
+  final List<DataPoint> workPoints;
+  final double workSpace;
+  final double workSweep;
+  final double workAlign;
+
+  Offset origin = Offset(0, 0);
+
+  if (transformer != null) {
+    workPoints = points
+        .map((p) => DataPoint(
+              x: transformer.transformX(p.x),
+              y: transformer.transformY(p.y),
+              dy: transformer.transformDy(p.dy),
+            ))
+        .toList();
+    workSpace = transformer.transformDimension(space);
+    workSweep = sweepRadians; // angles unchanged
+    workAlign = align; // ratio unchanged
+    origin = Offset(transformer.transformX(origin.dx), transformer.transformY(origin.dy));
+  } else {
+    workPoints = points;
+    workSpace = space;
+    workSweep = sweepRadians;
+    workAlign = align;
+  }
+
+  final total = workPoints.fold<double>(0.0, (s, p) => s + p.dy);
   if (total <= 0) return [];
 
-  final size = sweepRadians.isFinite && sweepRadians > 0
-      ? sweepRadians
-      : 2 * math.pi;
+  final size = workSweep.isFinite && workSweep > 0 ? workSweep : 2 * math.pi;
 
   final indexed = <int, DataPoint>{};
   final angles = <int, double>{};
   final innerR = <int, double>{};
   final outerR = <int, double>{};
 
-  for (int i = 0; i < points.length; i++) {
-    final p = points[i];
+  for (int i = 0; i < workPoints.length; i++) {
+    final p = workPoints[i];
     final r = math.sqrt(p.x * p.x + p.y * p.y);
     angles[i] = math.atan2(p.y, p.x);
     innerR[i] = r;
@@ -59,23 +91,24 @@ List<PieSliceLayout> computePieSliceLayout(
     indexed[i] = p;
   }
 
-  final order = List<int>.from(List.generate(points.length, (i) => i));
+  final order = List<int>.from(List.generate(workPoints.length, (i) => i));
   order.sort((a, b) => angles[a]!.compareTo(angles[b]!));
 
   final maxOuter = order.map((i) => outerR[i]!).reduce(math.max);
-  final gapRad = maxOuter > 0 && space > 0 ? space / maxOuter : 0.0;
+  final gapRad = maxOuter > 0 && workSpace > 0 ? workSpace / maxOuter : 0.0;
 
   final n = order.length;
   final totalSweepAvailable = math.max(0.0, size - n * gapRad);
 
   final axis = angles[order[0]]!;
-  final leftSweep = (1.0 - align) * (size / 2);
-  final rightSweep = (1.0 + align) * (size / 2);
+  final leftSweep = (1.0 - workAlign) * (size / 2);
+  final rightSweep = (1.0 + workAlign) * (size / 2);
   final startAnglePie = axis - leftSweep;
   final endAnglePie = axis + rightSweep;
 
   double startAngle = startAnglePie + gapRad / 2;
   final result = <PieSliceLayout>[];
+  final halfSpace = workSpace / 2;
 
   for (int k = 0; k < order.length; k++) {
     final i = order[k];
@@ -90,7 +123,6 @@ List<PieSliceLayout> computePieSliceLayout(
     final endAngle = startAngle + effectiveSweep;
     final theta1 = startAngle;
     final theta2 = endAngle;
-    final halfSpace = space / 2;
     final ox = halfSpace * (math.sin(theta2) - math.sin(theta1));
     final oy = halfSpace * (math.cos(theta1) - math.cos(theta2));
 

@@ -1,9 +1,30 @@
-import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:sparklines/src/data/pie_data.dart';
 import 'package:sparklines/src/data/pie_slice_layout.dart';
 import 'package:sparklines/src/renderers/chart_renderer.dart';
 import 'package:sparklines/src/layout/coordinate_transformer.dart';
+import 'package:sparklines/src/layout/arc_builder.dart';
+
+/// Screen-space pie slice: center and radii/dimensions already in pixel coordinates.
+class _ScreenPieSlice {
+  final Offset center;
+  final double innerRadius;
+  final double outerRadius;
+  final double startAngle;
+  final double endAngle;
+  final double cornerRadius;
+  final double? borderSize;
+
+  const _ScreenPieSlice({
+    required this.center,
+    required this.innerRadius,
+    required this.outerRadius,
+    required this.startAngle,
+    required this.endAngle,
+    required this.cornerRadius,
+    this.borderSize,
+  });
+}
 
 /// Renders pie charts. Slices are like bars: axis is the ray from origin
 /// through (x,y); dy is extent along that ray. Space is uniform gap between
@@ -21,34 +42,27 @@ class PieChartRenderer extends AChartRenderer<PieData> {
       pieData.space,
       pieData.thickness.size,
       pieData.thickness.align,
+      transformer: transformer,
     );
     if (layout.isEmpty) return;
 
+    final screenSlices = _toScreenSlices(
+      layout,
+      transformer,
+      pieData.borderRadius,
+      pieData.border?.size,
+    );
+
     final paint = Paint();
 
-    for (final s in layout) {
-      final path = _sectorPath(
-        transformer,
-        s.startAngle,
-        s.endAngle,
-        s.innerRadius,
-        s.outerRadius,
-        s.spaceOffset,
-        pieData.borderRadius != null && pieData.borderRadius! > 0
-            ? transformer.transformDimension(pieData.borderRadius!)
-            : null,
-      );
+    for (final s in screenSlices) {
+      final path = _sectorPath2(s);
       if (path == null) continue;
 
-      // Fill from thickness (gradient takes priority over color)
       paint.style = PaintingStyle.fill;
       if (pieData.thickness.gradient != null) {
-        final cx = transformer.transformX(s.spaceOffset.dx);
-        final cy = transformer.transformY(s.spaceOffset.dy);
-        final rx = (transformer.transformX(s.spaceOffset.dx + s.outerRadius) - cx).abs();
-        final ry = (transformer.transformY(s.spaceOffset.dy + s.outerRadius) - cy).abs();
         paint.shader = pieData.thickness.gradient!.createShader(
-          Rect.fromCircle(center: Offset(cx, cy), radius: math.max(rx, ry)),
+          Rect.fromCircle(center: s.center, radius: s.outerRadius),
         );
       } else {
         paint.shader = null;
@@ -56,19 +70,13 @@ class PieChartRenderer extends AChartRenderer<PieData> {
       }
       canvas.drawPath(path, paint);
 
-      // Border (same idea as bars: stroke around piece)
       final border = pieData.border;
-      if (border != null) {
-        final borderSize = transformer.transformDimension(border.size);
+      if (border != null && s.borderSize != null) {
         paint.style = PaintingStyle.stroke;
-        paint.strokeWidth = borderSize;
+        paint.strokeWidth = s.borderSize!;
         if (border.gradient != null) {
-          final cx = transformer.transformX(s.spaceOffset.dx);
-          final cy = transformer.transformY(s.spaceOffset.dy);
-          final rx = (transformer.transformX(s.spaceOffset.dx + s.outerRadius) - cx).abs();
-          final ry = (transformer.transformY(s.spaceOffset.dy + s.outerRadius) - cy).abs();
           paint.shader = border.gradient!.createShader(
-            Rect.fromCircle(center: Offset(cx, cy), radius: math.max(rx, ry)),
+            Rect.fromCircle(center: s.center, radius: s.outerRadius),
           );
         } else {
           paint.shader = null;
@@ -79,141 +87,193 @@ class PieChartRenderer extends AChartRenderer<PieData> {
     }
   }
 
-  /// Builds sector path in screen coordinates. Returns null if sector is degenerate.
-  Path? _sectorPath(
+  /// Builds screen slice from layout (already in screen space when from renderer).
+  /// Only cornerRadius and borderSize are transformed here.
+  static _ScreenPieSlice _toScreenSlice(
+    PieSliceLayout s,
     CoordinateTransformer transformer,
-    double startAngle,
-    double endAngle,
-    double innerRadius,
-    double outerRadius,
-    Offset spaceOffset,
-    double? cornerRadiusScreen,
+    double cornerRadius,
+    double? borderSize,
   ) {
-    final sweep = endAngle - startAngle;
-    if (sweep <= 0 || outerRadius <= 0) return null;
+    return _ScreenPieSlice(
+      center: s.spaceOffset,
+      innerRadius: s.innerRadius,
+      outerRadius: s.outerRadius,
+      startAngle: s.startAngle,
+      endAngle: s.endAngle,
+      cornerRadius: cornerRadius,
+      borderSize: borderSize != null ? transformer.transformDimension(borderSize) : null,
+    );
+  }
 
-    double tx(double dx) => transformer.transformX(spaceOffset.dx + dx);
-    double ty(double dy) => transformer.transformY(spaceOffset.dy + dy);
-    final cx = tx(0), cy = ty(0);
-    final screenOuterW = 2 * (tx(outerRadius) - cx).abs();
-    final screenOuterH = 2 * (ty(outerRadius) - cy).abs();
-    final screenInnerW = innerRadius > 0 ? 2 * (tx(innerRadius) - cx).abs() : 0.0;
-    final screenInnerH = innerRadius > 0 ? 2 * (ty(innerRadius) - cy).abs() : 0.0;
+  static List<_ScreenPieSlice> _toScreenSlices(
+    List<PieSliceLayout> layout,
+    CoordinateTransformer transformer,
+    double? borderRadius,
+    double? borderSize,
+  ) {
+    final cornerRadius = (borderRadius != null && borderRadius > 0)
+        ? transformer.transformDimension(borderRadius)
+        : 0.0;
+    return layout
+        .map((s) => _toScreenSlice(s, transformer, cornerRadius, borderSize))
+        .toList();
+  }
 
-    final path = Path();
-
-    if (innerRadius <= 0) {
-      // Full sector (center to outer arc)
-      if (cornerRadiusScreen != null && cornerRadiusScreen > 0) {
-        _appendRoundedSectorToPath(
-          path, tx, ty, cx, cy, outerRadius, startAngle, endAngle,
-          math.min(cornerRadiusScreen, screenOuterW / 4),
-        );
-      } else {
-        path.moveTo(cx, cy);
-        path.arcTo(
-          Rect.fromCenter(center: Offset(cx, cy), width: screenOuterW, height: screenOuterH),
-          startAngle,
-          sweep,
-          false,
-        );
-        path.close();
-      }
-    } else {
-      // Annular sector
-      if (cornerRadiusScreen != null && cornerRadiusScreen > 0) {
-        _appendRoundedAnnularSectorToPath(
-          path, cx, cy, screenInnerW, screenInnerH, screenOuterW, screenOuterH,
-          startAngle, endAngle,
-          math.min(cornerRadiusScreen, screenOuterW / 4),
-        );
-      } else {
-        path.moveTo(
-          cx + (screenOuterW / 2) * math.cos(startAngle),
-          cy - (screenOuterH / 2) * math.sin(startAngle),
-        );
-        path.arcTo(
-          Rect.fromCenter(center: Offset(cx, cy), width: screenOuterW, height: screenOuterH),
-          startAngle,
-          sweep,
-          false,
-        );
-        path.arcTo(
-          Rect.fromCenter(center: Offset(cx, cy), width: screenInnerW, height: screenInnerH),
-          endAngle,
-          -sweep,
-          false,
-        );
-        path.close();
-      }
+  /// Builds sector path in screen coordinates from an already-transformed slice.
+  /// Uses [ArcBuilder] and applies [ArcBuilder.build] then shifts by slice center.
+  Path? _sectorPath2(_ScreenPieSlice s) {
+    if (s.outerRadius <= 0 || (s.endAngle - s.startAngle).abs() <= 0) {
+      return null;
     }
-
-    return path;
-  }
-
-  void _appendRoundedSectorToPath(
-    Path path,
-    double Function(double) tx,
-    double Function(double) ty,
-    double cx,
-    double cy,
-    double outerR,
-    double startAngle,
-    double endAngle,
-    double cornerRadius,
-  ) {
-    final startX = tx(outerR * math.cos(startAngle));
-    final startY = ty(outerR * math.sin(startAngle));
-    final endX = tx(outerR * math.cos(endAngle));
-    final endY = ty(outerR * math.sin(endAngle));
-    path.moveTo(cx, cy);
-    final cr = math.min(cornerRadius, outerR * 0.5);
-    final innerStartX = tx((outerR - cr) * math.cos(startAngle));
-    final innerStartY = ty((outerR - cr) * math.sin(startAngle));
-    path.lineTo(innerStartX, innerStartY);
-    path.quadraticBezierTo(startX, startY, startX, startY);
-    final screenOuterW = 2 * (tx(outerR) - cx).abs();
-    final screenOuterH = 2 * (ty(outerR) - cy).abs();
-    path.arcTo(
-      Rect.fromCenter(center: Offset(cx, cy), width: screenOuterW, height: screenOuterH),
-      startAngle,
-      endAngle - startAngle,
-      false,
+    final arc = ArcBuilder(
+      innerRadius: s.innerRadius,
+      outerRadius: s.outerRadius,
+      startAngle: s.startAngle,
+      endAngle: s.endAngle,
+      padAngle: 0.0,
+      cornerRadius: s.cornerRadius,
+      padRadius: null,
     );
-    final innerEndX = tx((outerR - cr) * math.cos(endAngle));
-    final innerEndY = ty((outerR - cr) * math.sin(endAngle));
-    path.quadraticBezierTo(endX, endY, innerEndX, innerEndY);
-    path.close();
+    final path = arc.build();
+    return path.shift(s.center);
   }
-
-  void _appendRoundedAnnularSectorToPath(
-    Path path,
-    double cx,
-    double cy,
-    double screenInnerW,
-    double screenInnerH,
-    double screenOuterW,
-    double screenOuterH,
-    double startAngle,
-    double endAngle,
-    double cornerRadius,
-  ) {
-    final sweep = endAngle - startAngle;
-    final startOutX = cx + (screenOuterW / 2) * math.cos(startAngle);
-    final startOutY = cy - (screenOuterH / 2) * math.sin(startAngle);
-    path.moveTo(startOutX, startOutY);
-    path.arcTo(
-      Rect.fromCenter(center: Offset(cx, cy), width: screenOuterW, height: screenOuterH),
-      startAngle,
-      sweep,
-      false,
-    );
-    path.arcTo(
-      Rect.fromCenter(center: Offset(cx, cy), width: screenInnerW, height: screenInnerH),
-      endAngle,
-      -sweep,
-      false,
-    );
-    path.close();
-  }
+  //
+  // /// Builds sector path in screen coordinates. Returns null if sector is degenerate.
+  // Path? _sectorPath(
+  //   CoordinateTransformer transformer,
+  //   double startAngle,
+  //   double endAngle,
+  //   double innerRadius,
+  //   double outerRadius,
+  //   Offset spaceOffset,
+  //   double? cornerRadiusScreen,
+  // ) {
+  //   final sweep = endAngle - startAngle;
+  //   if (sweep <= 0 || outerRadius <= 0) return null;
+  //
+  //   double tx(double dx) => transformer.transformX(spaceOffset.dx + dx);
+  //   double ty(double dy) => transformer.transformY(spaceOffset.dy + dy);
+  //   final cx = tx(0), cy = ty(0);
+  //   final screenOuterW = 2 * (tx(outerRadius) - cx).abs();
+  //   final screenOuterH = 2 * (ty(outerRadius) - cy).abs();
+  //   final screenInnerW = innerRadius > 0 ? 2 * (tx(innerRadius) - cx).abs() : 0.0;
+  //   final screenInnerH = innerRadius > 0 ? 2 * (ty(innerRadius) - cy).abs() : 0.0;
+  //
+  //   final path = Path();
+  //
+  //   if (innerRadius <= 0) {
+  //     // Full sector (center to outer arc)
+  //     if (cornerRadiusScreen != null && cornerRadiusScreen > 0) {
+  //       _appendRoundedSectorToPath(
+  //         path, tx, ty, cx, cy, outerRadius, startAngle, endAngle,
+  //         math.min(cornerRadiusScreen, screenOuterW / 4),
+  //       );
+  //     } else {
+  //       path.moveTo(cx, cy);
+  //       path.arcTo(
+  //         Rect.fromCenter(center: Offset(cx, cy), width: screenOuterW, height: screenOuterH),
+  //         startAngle,
+  //         sweep,
+  //         false,
+  //       );
+  //       path.close();
+  //     }
+  //   } else {
+  //     // Annular sector
+  //     if (cornerRadiusScreen != null && cornerRadiusScreen > 0) {
+  //       _appendRoundedAnnularSectorToPath(
+  //         path, cx, cy, screenInnerW, screenInnerH, screenOuterW, screenOuterH,
+  //         startAngle, endAngle,
+  //         math.min(cornerRadiusScreen, screenOuterW / 4),
+  //       );
+  //     } else {
+  //       path.moveTo(
+  //         cx + (screenOuterW / 2) * math.cos(startAngle),
+  //         cy - (screenOuterH / 2) * math.sin(startAngle),
+  //       );
+  //       path.arcTo(
+  //         Rect.fromCenter(center: Offset(cx, cy), width: screenOuterW, height: screenOuterH),
+  //         startAngle,
+  //         sweep,
+  //         false,
+  //       );
+  //       path.arcTo(
+  //         Rect.fromCenter(center: Offset(cx, cy), width: screenInnerW, height: screenInnerH),
+  //         endAngle,
+  //         -sweep,
+  //         false,
+  //       );
+  //       path.close();
+  //     }
+  //   }
+  //
+  //   return path;
+  // }
+  //
+  // void _appendRoundedSectorToPath(
+  //   Path path,
+  //   double Function(double) tx,
+  //   double Function(double) ty,
+  //   double cx,
+  //   double cy,
+  //   double outerR,
+  //   double startAngle,
+  //   double endAngle,
+  //   double cornerRadius,
+  // ) {
+  //   final startX = tx(outerR * math.cos(startAngle));
+  //   final startY = ty(outerR * math.sin(startAngle));
+  //   final endX = tx(outerR * math.cos(endAngle));
+  //   final endY = ty(outerR * math.sin(endAngle));
+  //   path.moveTo(cx, cy);
+  //   final cr = math.min(cornerRadius, outerR * 0.5);
+  //   final innerStartX = tx((outerR - cr) * math.cos(startAngle));
+  //   final innerStartY = ty((outerR - cr) * math.sin(startAngle));
+  //   path.lineTo(innerStartX, innerStartY);
+  //   path.quadraticBezierTo(startX, startY, startX, startY);
+  //   final screenOuterW = 2 * (tx(outerR) - cx).abs();
+  //   final screenOuterH = 2 * (ty(outerR) - cy).abs();
+  //   path.arcTo(
+  //     Rect.fromCenter(center: Offset(cx, cy), width: screenOuterW, height: screenOuterH),
+  //     startAngle,
+  //     endAngle - startAngle,
+  //     false,
+  //   );
+  //   final innerEndX = tx((outerR - cr) * math.cos(endAngle));
+  //   final innerEndY = ty((outerR - cr) * math.sin(endAngle));
+  //   path.quadraticBezierTo(endX, endY, innerEndX, innerEndY);
+  //   path.close();
+  // }
+  //
+  // void _appendRoundedAnnularSectorToPath(
+  //   Path path,
+  //   double cx,
+  //   double cy,
+  //   double screenInnerW,
+  //   double screenInnerH,
+  //   double screenOuterW,
+  //   double screenOuterH,
+  //   double startAngle,
+  //   double endAngle,
+  //   double cornerRadius,
+  // ) {
+  //   final sweep = endAngle - startAngle;
+  //   final startOutX = cx + (screenOuterW / 2) * math.cos(startAngle);
+  //   final startOutY = cy - (screenOuterH / 2) * math.sin(startAngle);
+  //   path.moveTo(startOutX, startOutY);
+  //   path.arcTo(
+  //     Rect.fromCenter(center: Offset(cx, cy), width: screenOuterW, height: screenOuterH),
+  //     startAngle,
+  //     sweep,
+  //     false,
+  //   );
+  //   path.arcTo(
+  //     Rect.fromCenter(center: Offset(cx, cy), width: screenInnerW, height: screenInnerH),
+  //     endAngle,
+  //     -sweep,
+  //     false,
+  //   );
+  //   path.close();
+  // }
 }
