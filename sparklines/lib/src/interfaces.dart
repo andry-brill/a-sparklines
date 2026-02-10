@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:sparklines/src/data/data_point.dart';
 import 'dart:ui' show lerpDouble;
-import 'layout/coordinate_transformer.dart';
+import 'layout/relative_dimension.dart';
 
 /// Interface for types that can be interpolated
 abstract class ILerpTo<T> {
@@ -86,49 +86,67 @@ abstract class ILayoutData {
   double get height;
 }
 
-/// Chart layout interface for defining coordinate transformation
+/// Context passed to chart renderers (replaces per-point coordinate transformation).
+class ChartRenderContext {
+  final IChartLayout layout;
+  final ILayoutData dimensions;
+  final bool crop;
+
+  const ChartRenderContext({
+    required this.layout,
+    required this.dimensions,
+    required this.crop,
+  });
+
+  /// Bounds rect (0, 0, width, height) for shaders and clipping
+  Rect get bounds => Rect.fromLTWH(0, 0, dimensions.width, dimensions.height);
+
+  /// Center in data space (for rotation around chart center)
+  Offset get center => layout.centerInDataSpace(dimensions);
+
+  /// Convert a length to screen pixels (for stroke width, radius, etc.).
+  /// Use [relativeTo] for values relative to chart width/height (e.g. RelativeLayout).
+  double toScreenLength(double value, [RelativeDimension relativeTo = RelativeDimension.none]) {
+    return layout.toScreenLength(value, dimensions, relativeTo);
+  }
+}
+
+/// Chart layout interface: applies canvas transformation so drawing uses data coordinates.
 abstract class IChartLayout {
-  /// Resolve layout with actual dimensions (e.g., resolve infinity values)
-  /// Returns a resolved layout that can be used for transformation
+  /// Resolve layout with actual dimensions (e.g., resolve infinity values).
+  /// Returns a resolved layout that can be used for [prepare].
   IChartLayout resolve(List<ILayoutData> dimensions);
 
-  /// Transform X coordinate from data space to screen space
-  double transformX(double x, ILayoutData dimensions);
+  /// Apply coordinate transformation to [canvas] so that subsequent drawing
+  /// can use data coordinates (e.g. math-oriented Y). Call once before drawing the chart.
+  void prepare(Canvas canvas, ILayoutData dimensions);
 
-  /// Transform Y coordinate from data space to screen space
-  double transformY(double y, ILayoutData dimensions);
+  /// Point in data space that maps to the visual center of the chart (for rotation).
+  Offset centerInDataSpace(ILayoutData dimensions);
 
-  /// Transform delta over X coordinate from data space to screen space
-  double transformDx(double x, ILayoutData dimensions);
-
-  /// Transform delta over Y coordinate from data space to screen space
-  double transformDy(double y, ILayoutData dimensions);
-
-  /// Transform a dimensional value based on layout settings
-  double transformDimension(double value, ILayoutData dimensions);
+  /// Convert a length to screen pixels (for stroke width, radius, etc.).
+  double toScreenLength(double value, ILayoutData dimensions, [RelativeDimension relativeTo = RelativeDimension.none]);
 }
 
 /// Interface for chart renderers
 abstract class IChartRenderer {
-  /// Render the chart to the canvas
+  /// Render the chart to the canvas. [context.layout.prepare] is called before this;
+  /// draw using data coordinates.
   void render(
     Canvas canvas,
-    CoordinateTransformer transformer,
+    ChartRenderContext context,
     ISparklinesData data,
   );
-
 }
 
 abstract class IDataPointRenderer {
-
   void render(
-      Canvas canvas,
-      Paint paint,
-      CoordinateTransformer transformer,
-      IDataPointStyle style,
-      DataPoint dataPoint
+    Canvas canvas,
+    Paint paint,
+    ChartRenderContext context,
+    IDataPointStyle style,
+    DataPoint dataPoint,
   );
-
 }
 
 /// Base interface for all chart data types

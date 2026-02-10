@@ -1,6 +1,5 @@
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
-import 'package:sparklines/src/layout/coordinate_transformer.dart';
 import 'data_point.dart';
 import '../interfaces.dart';
 
@@ -33,44 +32,21 @@ class PieSliceLayout {
 /// - [align]: 0 = (sweep/2) on each side of axis ray; !=0 splits left/right (ThicknessData.align).
 /// - space = uniform linear gap between slices; gap_rad = space / maxOuterRadius.
 ///
-/// When [layout] and [dimensions] are provided, raw values (points, space, sweepRadians, align)
-/// are transformed via the layout before running the algorithm; the result is in screen space
-/// and [spaceOffset] is the absolute center in screen coordinates. When omitted (default),
-/// no transformation is applied and the result is in data space.
+/// Layout is computed in data space. Call after [IChartLayout.prepare] so drawing
+/// uses the same coordinates; use [ChartRenderContext.toScreenLength] for pixel
+/// dimensions (e.g. border size).
 List<PieSliceLayout> computePieSliceLayout(
   List<DataPoint> points,
   double space,
   double sweepRadians,
-  double align, {
-  CoordinateTransformer? transformer,
-}) {
+  double align,
+) {
   if (points.isEmpty) return [];
 
-  final List<DataPoint> workPoints;
-  final double workSpace;
-  final double workSweep;
-  final double workAlign;
-
-  Offset origin = Offset(0, 0);
-
-  if (transformer != null) {
-    workPoints = points
-        .map((p) => DataPoint(
-              x: transformer.transformX(p.x),
-              y: transformer.transformY(p.y),
-              dy: transformer.transformDy(p.dy),
-            ))
-        .toList();
-    workSpace = transformer.transformDimension(space);
-    workSweep = sweepRadians; // angles unchanged
-    workAlign = align; // ratio unchanged
-    origin = Offset(transformer.transformX(origin.dx), transformer.transformY(origin.dy));
-  } else {
-    workPoints = points;
-    workSpace = space;
-    workSweep = sweepRadians;
-    workAlign = align;
-  }
+  final workPoints = points;
+  final workSpace = space;
+  final workSweep = sweepRadians;
+  final workAlign = align;
 
   final total = workPoints.fold<double>(0.0, (s, p) => s + p.dy);
   if (total <= 0) return [];

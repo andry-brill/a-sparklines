@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:sparklines/src/data/layout_data.dart';
-import 'layout/coordinate_transformer.dart';
 import 'interfaces.dart';
 
 /// Custom painter for sparklines charts
@@ -52,16 +51,16 @@ class SparklinesPainter extends CustomPainter {
       final originalLayout = chart.layout ?? defaultLayout;
       final layoutDatas = layouts[originalLayout]!;
       final chartLayout = originalLayout.resolve(layoutDatas);
-
       final chartCrop = chart.crop ?? defaultCrop;
-
-      final transformer = CoordinateTransformer(
-        data: layoutData(chart),
+      final context = ChartRenderContext(
         layout: chartLayout,
+        dimensions: layoutData(chart),
         crop: chartCrop,
       );
 
-      chart.renderer.render(canvas, transformer, chart);
+      canvas.save();
+      chart.renderer.render(canvas, context, chart);
+      canvas.restore();
     }
 
   }

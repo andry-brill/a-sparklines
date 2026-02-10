@@ -1,31 +1,26 @@
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:sparklines/src/data/bar_data.dart';
-import 'package:sparklines/src/layout/coordinate_transformer.dart';
+import 'package:sparklines/src/interfaces.dart';
 import 'chart_renderer.dart';
 
 /// Renders bar charts
 class BarChartRenderer extends AChartRenderer<BarData> {
-
   @override
   void renderData(
     Canvas canvas,
-    CoordinateTransformer transformer,
+    ChartRenderContext context,
     BarData barData,
   ) {
-
     final paint = Paint();
     final thickness = barData.thickness;
 
     for (final bar in barData.bars) {
-
-      final centerX = transformer.transformX(bar.x);
-      final barWidth = transformer.transformDimension(thickness.size);
-      // align 0 => centered; align < 0 => shift left; align > 0 => shift right
+      final centerX = bar.x;
+      final barWidth = context.toScreenLength(thickness.size);
       final barX = centerX - barWidth / 2 + barWidth * thickness.align;
-      // Bar from (x, y) to (x, fy): y = offset/base, dy = value, fy = y + dy
-      final topY = transformer.transformY(bar.fy);
-      final baseY = transformer.transformY(bar.y);
+      final topY = bar.fy;
+      final baseY = bar.y;
 
       final barHeight = (baseY - topY).abs();
       final rect = Rect.fromLTWH(
@@ -35,7 +30,7 @@ class BarChartRenderer extends AChartRenderer<BarData> {
         barHeight,
       );
 
-      RRect? roundedRect = this.roundedRect(transformer, barData, rect);
+      RRect? roundedRect = this.roundedRect(context, barData, rect);
 
       paint.style = PaintingStyle.fill;
 
@@ -55,12 +50,10 @@ class BarChartRenderer extends AChartRenderer<BarData> {
 
       final border = barData.border;
       if (border != null) {
-
-        final borderSize = transformer.transformDimension(border.size);
-        // align 0 => same rect; align > 0 => inflate equally (center unchanged); align < 0 => deflate
+        final borderSize = context.toScreenLength(border.size);
         final borderRect = rect.inflate(borderSize * border.align);
 
-        RRect? borderRoundedRect = this.roundedRect(transformer, barData, borderRect);
+        RRect? borderRoundedRect = this.roundedRect(context, barData, borderRect);
 
         paint.style = PaintingStyle.stroke;
         paint.strokeWidth = borderSize;
@@ -80,7 +73,7 @@ class BarChartRenderer extends AChartRenderer<BarData> {
       }
     }
 
-    drawDataPoints(canvas, paint, transformer, barData, barData.bars);
+    drawDataPoints(canvas, paint, context, barData, barData.bars);
 
   }
 

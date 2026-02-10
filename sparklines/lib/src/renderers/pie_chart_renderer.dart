@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:sparklines/src/data/pie_data.dart';
 import 'package:sparklines/src/data/pie_slice_layout.dart';
 import 'package:sparklines/src/renderers/chart_renderer.dart';
-import 'package:sparklines/src/layout/coordinate_transformer.dart';
 import 'package:sparklines/src/layout/arc_builder.dart';
+import 'package:sparklines/src/interfaces.dart';
 
 /// Screen-space pie slice: center and radii/dimensions already in pixel coordinates.
 class _ScreenPieSlice {
@@ -34,7 +34,7 @@ class PieChartRenderer extends AChartRenderer<PieData> {
   @override
   void renderData(
     Canvas canvas,
-    CoordinateTransformer transformer,
+    ChartRenderContext context,
     PieData pieData,
   ) {
     final layout = computePieSliceLayout(
@@ -42,13 +42,12 @@ class PieChartRenderer extends AChartRenderer<PieData> {
       pieData.space,
       pieData.thickness.size,
       pieData.thickness.align,
-      transformer: transformer,
     );
     if (layout.isEmpty) return;
 
     final screenSlices = _toScreenSlices(
       layout,
-      transformer,
+      context,
       pieData.borderRadius,
       pieData.border?.size,
     );
@@ -87,13 +86,12 @@ class PieChartRenderer extends AChartRenderer<PieData> {
     }
   }
 
-  /// Builds screen slice from layout (already in screen space when from renderer).
-  /// Only cornerRadius and borderSize are transformed here.
+  /// Layout is in data space; only cornerRadius and borderSize are converted to pixels.
   static _ScreenPieSlice _toScreenSlice(
     PieSliceLayout s,
-    CoordinateTransformer transformer,
-    double cornerRadius,
-    double? borderSize,
+    ChartRenderContext context,
+    double cornerRadiusPx,
+    double? borderSizePx,
   ) {
     return _ScreenPieSlice(
       center: s.spaceOffset,
@@ -101,22 +99,23 @@ class PieChartRenderer extends AChartRenderer<PieData> {
       outerRadius: s.outerRadius,
       startAngle: s.startAngle,
       endAngle: s.endAngle,
-      cornerRadius: cornerRadius,
-      borderSize: borderSize != null ? transformer.transformDimension(borderSize) : null,
+      cornerRadius: cornerRadiusPx,
+      borderSize: borderSizePx,
     );
   }
 
   static List<_ScreenPieSlice> _toScreenSlices(
     List<PieSliceLayout> layout,
-    CoordinateTransformer transformer,
+    ChartRenderContext context,
     double? borderRadius,
     double? borderSize,
   ) {
-    final cornerRadius = (borderRadius != null && borderRadius > 0)
-        ? transformer.transformDimension(borderRadius)
+    final cornerRadiusPx = (borderRadius != null && borderRadius > 0)
+        ? context.toScreenLength(borderRadius)
         : 0.0;
+    final borderSizePx = borderSize != null ? context.toScreenLength(borderSize) : null;
     return layout
-        .map((s) => _toScreenSlice(s, transformer, cornerRadius, borderSize))
+        .map((s) => _toScreenSlice(s, context, cornerRadiusPx, borderSizePx))
         .toList();
   }
 

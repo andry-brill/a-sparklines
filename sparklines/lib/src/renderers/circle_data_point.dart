@@ -1,7 +1,5 @@
-
 import 'dart:ui';
 
-import 'package:sparklines/src/layout/coordinate_transformer.dart';
 import 'package:sparklines/src/data/data_point.dart';
 import 'package:sparklines/src/interfaces.dart';
 import 'package:sparklines/src/renderers/data_point_renderer.dart';
@@ -38,16 +36,14 @@ class CircleDataPointStyle implements IDataPointStyle {
 class CircleDataPointRenderer extends ADataPointRenderer<CircleDataPointStyle> {
 
   @override
-  void renderStyle(Canvas canvas, Paint paint, CoordinateTransformer transformer, CircleDataPointStyle style, DataPoint dataPoint) {
-
+  void renderStyle(Canvas canvas, Paint paint, ChartRenderContext context, CircleDataPointStyle style, DataPoint dataPoint) {
     paint.style = PaintingStyle.fill;
     paint.color = style.color;
     paint.shader = null;
 
-    final screenPoint = transformer.transformPoint(dataPoint);
-    final radius = transformer.transformDimension(style.radius);
-    canvas.drawCircle(screenPoint, radius, paint);
-
+    final point = Offset(dataPoint.x, dataPoint.fy);
+    final radius = context.toScreenLength(style.radius);
+    canvas.drawCircle(point, radius, paint);
   }
 
 }

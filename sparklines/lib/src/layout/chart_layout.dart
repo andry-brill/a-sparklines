@@ -1,33 +1,33 @@
 import 'dart:math';
 
+import 'package:flutter/material.dart';
+
 import '../interfaces.dart';
 import 'relative_dimension.dart';
 
-
-/// No transformations at all, returning values as is
+/// Math-oriented coordinates: origin at bottom-left, Y up.
+/// Prepares canvas by offsetting by height and scaling (1, -1).
 class AbsoluteLayout implements IChartLayout {
-
   const AbsoluteLayout();
 
   @override
   IChartLayout resolve(List<ILayoutData> dimensions) => this;
 
   @override
-  double transformDimension(double value, ILayoutData dimensions) => value;
+  void prepare(Canvas canvas, ILayoutData dimensions) {
+    canvas.translate(0, dimensions.height);
+    canvas.scale(1, -1);
+  }
 
   @override
-  double transformX(double x, ILayoutData dimensions) => x;
+  Offset centerInDataSpace(ILayoutData dimensions) {
+    return Offset(dimensions.width / 2, dimensions.height / 2);
+  }
 
   @override
-  // Y is inverted to keep math natural for chart data
-  double transformY(double y, ILayoutData dimensions) => dimensions.height - y;
-
-  @override
-  double transformDx(double x, ILayoutData dimensions) => x;
-
-  @override
-  double transformDy(double y, ILayoutData dimensions) => y;
-
+  double toScreenLength(double value, ILayoutData dimensions, [RelativeDimension relativeTo = RelativeDimension.none]) {
+    return value;
+  }
 }
 
 /// Relative transformation to explicit bounds
@@ -101,43 +101,31 @@ class RelativeLayout implements IChartLayout {
   }
 
   @override
-  double transformX(double x, ILayoutData dimensions) => transformDx(x - minX, dimensions);
-
-  @override
-  double transformDx(double dx, ILayoutData dimensions) => dx * (dimensions.width / (maxX - minX));
-
-  @override
-  double transformY(double y, ILayoutData dimensions) {
-    // Y is inverted to keep math natural for chart data
-    return dimensions.height - transformDy(y - minY, dimensions);
+  void prepare(Canvas canvas, ILayoutData dimensions) {
+    canvas.translate(0, dimensions.height);
+    canvas.scale(1, -1);
+    canvas.scale(dimensions.width / (maxX - minX), dimensions.height / (maxY - minY));
+    canvas.translate(-minX, -minY);
   }
 
   @override
-  double transformDy(double dy, ILayoutData dimensions) => dy * (dimensions.height / (maxY - minY));
+  Offset centerInDataSpace(ILayoutData dimensions) {
+    return Offset((minX + maxX) / 2, (minY + maxY) / 2);
+  }
 
   @override
-  double transformDimension(double value, ILayoutData dimensions) {
+  double toScreenLength(double value, ILayoutData dimensions, [RelativeDimension relativeTo = RelativeDimension.none]) {
     switch (relativeTo) {
       case RelativeDimension.none:
         return value;
       case RelativeDimension.width:
-
-        if (value == double.negativeInfinity) {
-          value = dimensions.minX;
-        } else if (value == double.infinity) {
-          value = dimensions.maxX;
-        }
-
-        return transformDx(value, dimensions);
+        if (value == double.negativeInfinity) return 0;
+        if (value == double.infinity) return dimensions.width;
+        return value * (dimensions.width / (maxX - minX));
       case RelativeDimension.height:
-
-        if (value == double.negativeInfinity) {
-          value = dimensions.minY;
-        } else if (value == double.infinity) {
-          value = dimensions.maxY;
-        }
-
-        return transformDy(value, dimensions);
+        if (value == double.negativeInfinity) return 0;
+        if (value == double.infinity) return dimensions.height;
+        return value * (dimensions.height / (maxY - minY));
     }
   }
 }

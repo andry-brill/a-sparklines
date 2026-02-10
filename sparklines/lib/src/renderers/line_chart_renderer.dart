@@ -1,33 +1,28 @@
 import 'package:flutter/material.dart';
 import 'package:sparklines/src/data/line_data.dart';
-import 'package:sparklines/src/layout/coordinate_transformer.dart';
 import 'package:sparklines/src/data/data_point.dart';
 import 'package:sparklines/src/interfaces.dart';
 import 'chart_renderer.dart';
 
 class LineChartRenderer extends AChartRenderer<LineData> {
-
   @override
   void renderData(
     Canvas canvas,
-    CoordinateTransformer transformer,
+    ChartRenderContext context,
     LineData lineData,
   ) {
-
     if (lineData.points.length < 2) return;
 
     final paint = Paint();
 
-    // Build path based on line type (line at fy)
-    final path = buildPath(lineData, transformer);
+    final path = buildPath(lineData, context);
 
-    // Draw area fill between line (fy) and baseline (y) when specified
     final hasAreaFill = lineData.areaGradient != null || lineData.areaColor != null;
     if (hasAreaFill) {
-      final areaPath = _buildAreaPathBetweenFyAndY(lineData, transformer);
+      final areaPath = _buildAreaPathBetweenFyAndY(lineData, context);
       if (areaPath != null) {
         if (lineData.areaGradient != null) {
-          paint.shader = lineData.areaGradient!.createShader(transformer.bounds);
+          paint.shader = lineData.areaGradient!.createShader(context.bounds);
         } else {
           paint.shader = null;
           paint.color = lineData.areaColor!;
@@ -37,19 +32,14 @@ class LineChartRenderer extends AChartRenderer<LineData> {
       }
     }
 
-    // Draw line (stroke from IChartThickness)
     final thickness = lineData.thickness;
     paint.style = PaintingStyle.stroke;
-    paint.strokeWidth = transformer.transformDimension(thickness.size);
-    paint.strokeCap = lineData.isStrokeCapRound
-        ? StrokeCap.round
-        : StrokeCap.butt;
-    paint.strokeJoin = lineData.isStrokeJoinRound
-        ? StrokeJoin.round
-        : StrokeJoin.miter;
+    paint.strokeWidth = context.toScreenLength(thickness.size);
+    paint.strokeCap = lineData.isStrokeCapRound ? StrokeCap.round : StrokeCap.butt;
+    paint.strokeJoin = lineData.isStrokeJoinRound ? StrokeJoin.round : StrokeJoin.miter;
 
     if (thickness.gradient != null) {
-      paint.shader = thickness.gradient!.createShader(transformer.bounds);
+      paint.shader = thickness.gradient!.createShader(context.bounds);
     } else {
       paint.shader = null;
       paint.color = thickness.color;
@@ -57,41 +47,34 @@ class LineChartRenderer extends AChartRenderer<LineData> {
 
     canvas.drawPath(path, paint);
 
-    drawDataPoints(canvas, paint, transformer, lineData, lineData.points);
-
+    drawDataPoints(canvas, paint, context, lineData, lineData.points);
   }
 
-  /// Builds area path between line at [points].fy and baseline at [points].y (like between two lines).
-  Path? _buildAreaPathBetweenFyAndY(LineData lineData, CoordinateTransformer transformer) {
+  Path? _buildAreaPathBetweenFyAndY(LineData lineData, ChartRenderContext context) {
     final points = lineData.points;
     if (points.length < 2) return null;
 
-    // Top edge: path along fy (first to last)
-    final topPath = buildPath(lineData, transformer);
+    final topPath = buildPath(lineData, context);
     final areaPath = Path.from(topPath);
 
-    final lastX = transformer.transformX(points.last.x);
-    final lastY = transformer.transformY(points.last.y);
+    final last = points.last;
+    areaPath.lineTo(last.x, last.y);
 
-    // Down to baseline at last point
-    areaPath.lineTo(lastX, lastY);
+    buildPath(lineData, context, yOf: (DataPoint p) => p.y, reverse: true, path: areaPath);
 
-    // Bottom edge: path along y from last to first (reverse)
-    buildPath(lineData, transformer, yOf: (DataPoint p) => p.y, reverse: true, path: areaPath);
-
-    // Close back to first top point (x0, fy0)
-    areaPath.lineTo(transformer.transformX(points.first.x), transformer.transformY(points.first.fy));
+    final first = points.first;
+    areaPath.lineTo(first.x, first.fy);
     return areaPath;
   }
 
-  Path buildPath(LineData lineData, CoordinateTransformer transformer, {double Function(DataPoint)? yOf, bool reverse = false, Path? path}) {
+  Path buildPath(LineData lineData, ChartRenderContext context, {double Function(DataPoint)? yOf, bool reverse = false, Path? path}) {
     final pathOut = path ?? Path();
     final points = lineData.points;
 
     if (points.isEmpty) return pathOut;
 
-    double screenY(DataPoint p) => transformer.transformY(yOf != null ? yOf(p) : p.fy);
-    Offset pt(DataPoint p) => Offset(transformer.transformX(p.x), screenY(p));
+    double yVal(DataPoint p) => yOf != null ? yOf(p) : p.fy;
+    Offset pt(DataPoint p) => Offset(p.x, yVal(p));
 
     if (!reverse) {
       final first = pt(points[0]);
@@ -117,10 +100,10 @@ class LineChartRenderer extends AChartRenderer<LineData> {
       }
     } else if (lineData.lineType is SteppedLineType) {
       final stepData = lineData.lineType as SteppedLineType;
-      _buildStepPathWithY(pathOut, points, transformer, stepData.stepJumpAt, yOf ?? (p) => p.fy, reverse);
+      _buildStepPathWithY(pathOut, points, stepData.stepJumpAt, yOf ?? (p) => p.fy, reverse);
     } else if (lineData.lineType is CurvedLineType) {
       final curveData = lineData.lineType as CurvedLineType;
-      _buildCurvePathWithY(pathOut, points, transformer, curveData.smoothness, yOf ?? (p) => p.fy, reverse);
+      _buildCurvePathWithY(pathOut, points, curveData.smoothness, yOf ?? (p) => p.fy, reverse);
     } else {
       if (reverse) {
         for (int i = points.length - 2; i >= 0; i--) {
@@ -141,7 +124,6 @@ class LineChartRenderer extends AChartRenderer<LineData> {
   void _buildStepPathWithY(
     Path path,
     List<DataPoint> points,
-    CoordinateTransformer transformer,
     double stepJumpAt,
     double Function(DataPoint) yOf,
     bool reverse,
@@ -150,27 +132,19 @@ class LineChartRenderer extends AChartRenderer<LineData> {
       for (int i = points.length - 1; i >= 1; i--) {
         final curr = points[i];
         final prev = points[i - 1];
-        final currX = transformer.transformX(curr.x);
-        final prevX = transformer.transformX(prev.x);
-        final currY = transformer.transformY(yOf(curr));
-        final prevY = transformer.transformY(yOf(prev));
-        final stepX = prevX + (currX - prevX) * stepJumpAt;
-        path.lineTo(stepX, currY);
-        path.lineTo(stepX, prevY);
-        path.lineTo(prevX, prevY);
+        final stepX = prev.x + (curr.x - prev.x) * stepJumpAt;
+        path.lineTo(stepX, yOf(curr));
+        path.lineTo(stepX, yOf(prev));
+        path.lineTo(prev.x, yOf(prev));
       }
     } else {
       for (int i = 1; i < points.length; i++) {
         final prev = points[i - 1];
         final curr = points[i];
-        final prevX = transformer.transformX(prev.x);
-        final currX = transformer.transformX(curr.x);
-        final prevY = transformer.transformY(yOf(prev));
-        final currY = transformer.transformY(yOf(curr));
-        final stepX = prevX + (currX - prevX) * stepJumpAt;
-        path.lineTo(stepX, prevY);
-        path.lineTo(stepX, currY);
-        path.lineTo(currX, currY);
+        final stepX = prev.x + (curr.x - prev.x) * stepJumpAt;
+        path.lineTo(stepX, yOf(prev));
+        path.lineTo(stepX, yOf(curr));
+        path.lineTo(curr.x, yOf(curr));
       }
     }
   }
@@ -178,14 +152,13 @@ class LineChartRenderer extends AChartRenderer<LineData> {
   void _buildCurvePathWithY(
     Path path,
     List<DataPoint> points,
-    CoordinateTransformer transformer,
     double smoothness,
     double Function(DataPoint) yOf,
     bool reverse,
   ) {
     if (points.length < 2) return;
 
-    Offset pt(DataPoint p) => Offset(transformer.transformX(p.x), transformer.transformY(yOf(p)));
+    Offset pt(DataPoint p) => Offset(p.x, yOf(p));
 
     if (reverse) {
       for (int i = points.length - 1; i >= 1; i--) {

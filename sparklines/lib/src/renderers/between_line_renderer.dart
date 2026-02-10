@@ -1,44 +1,34 @@
 import 'package:flutter/material.dart';
-import 'package:sparklines/src/layout/coordinate_transformer.dart';
 import 'package:sparklines/src/data/between_line_data.dart';
+import 'package:sparklines/src/interfaces.dart';
 import 'package:sparklines/src/renderers/chart_renderer.dart';
-
 /// Renders area between two lines
 class BetweenLineRenderer extends AChartRenderer<BetweenLineData> {
-
   @override
   void renderData(
     Canvas canvas,
-    CoordinateTransformer transformer,
+    ChartRenderContext context,
     BetweenLineData betweenData,
   ) {
-
     final paint = Paint();
 
-    // Build path from 'from' line
-    final fromPath = betweenData.from.renderer.buildPath(betweenData.from, transformer);
-
-    // Build path from 'to' line (reversed)
-    final toPath = betweenData.to.renderer.buildPath(betweenData.to, transformer);
+    final fromPath = betweenData.from.renderer.buildPath(betweenData.from, context);
+    final toPath = betweenData.to.renderer.buildPath(betweenData.to, context);
     final reversedToPath = _reversePath(toPath);
 
-    // Combine paths
     final combinedPath = Path.from(fromPath);
     combinedPath.addPath(reversedToPath, Offset.zero);
     combinedPath.close();
 
-    // Fill the area
     if (betweenData.gradient != null) {
-      paint.shader = betweenData.gradient!.createShader(
-        transformer.bounds,
-      );
+      paint.shader = betweenData.gradient!.createShader(context.bounds);
     } else {
+      paint.shader = null;
       paint.color = betweenData.color ?? Colors.blue.withValues(alpha: 0.3);
     }
 
     paint.style = PaintingStyle.fill;
     canvas.drawPath(combinedPath, paint);
-
   }
 
   Path _reversePath(Path path) {
