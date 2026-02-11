@@ -29,13 +29,13 @@ class PieSliceLayout {
     final t = (align + 1) / 2;
     final r = innerRadius + (outerRadius - innerRadius) * t.clamp(0.0, 1.0);
 
-    double minX = 0.0, maxX = 0.0, minY = 0.0, maxY = 0.0;
+    double? minX, maxX, minY, maxY;
 
     void add(double x, double y) {
-      minX = math.min(minX, x);
-      maxX = math.max(maxX, x);
-      minY = math.min(minY, y);
-      maxY = math.max(maxY, y);
+      minX = math.min(minX ?? x, x);
+      maxX = math.max(maxX ?? x, x);
+      minY = math.min(minY ?? y, y);
+      maxY = math.max(maxY ?? y, y);
     }
 
     add(r * math.cos(startAngle), r * math.sin(startAngle));
@@ -60,7 +60,43 @@ class PieSliceLayout {
       if (crosses(3 * math.pi / 2)) add(0, -r);
     }
 
-    return Rect.fromLTRB(minX, minY, maxX, maxY).shift(offset);
+    return Rect.fromLTRB(minX!, minY!, maxX!, maxY!).shift(offset);
+  }
+
+  /// Builds a simple arc path from [startAngle] to [endAngle].
+  /// [align]: -1 = innerRadius, 0 = mid-radius, 1 = outerRadius.
+  /// [origin] is the arc center (default layout origin).
+  Path arcPath({
+    Offset origin = const Offset(0, 0),
+    double align = 0.0,
+  }) {
+
+    final t = (align + 1) / 2;
+    final r = innerRadius + (outerRadius - innerRadius) * t.clamp(0.0, 1.0);
+
+    final path = Path();
+    final center = origin + offset;
+
+    if (r.abs() < 1e-10) {
+      path.moveTo(center.dx, center.dy);
+      return path;
+    }
+
+    final sweep = endAngle - startAngle;
+
+    path.moveTo(
+      center.dx + r * math.cos(startAngle),
+      center.dy + r * math.sin(startAngle),
+    );
+
+    path.arcTo(
+      Rect.fromCircle(center: center, radius: r),
+      startAngle,
+      sweep,
+      false,
+    );
+
+    return path;
   }
 }
 
@@ -75,7 +111,7 @@ List<PieSliceLayout> computePieLayouts(
   double thickness,
   double thicknessAlign,
 ) {
-  return points.where((point) => point.x <= 0 || thickness <= 0).map((point) {
+  return points.where((point) => point.x > 0 && thickness > 0).map((point) {
 
     // align: 0 = sweep/2 each side; -1 = all "left"; +1 = all "right" (same as bar)
     final halfThicknessLeft = thickness * (1 + thicknessAlign) / 2;

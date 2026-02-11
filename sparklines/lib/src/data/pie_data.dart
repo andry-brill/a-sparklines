@@ -16,7 +16,7 @@ import '../renderers/pie_chart_renderer.dart';
 /// [thickness.size] = total sweep of the pie in radians (e.g. 2*pi for full circle).
 /// [thickness.align]: 0 = (size/2) on each side of axis ray; !=0 splits left/right.
 /// [space] is uniform linear gap between slices. Border and borderRadius like bars.
-class PieData implements ISparklinesData, IChartThickness, IChartBorder {
+class PieData implements ISparklinesData, IChartThickness, IChartBorder, IChartDataPointStyle {
   static final IChartRenderer defaultRenderer = PieChartRenderer();
 
   @override
@@ -68,6 +68,8 @@ class PieData implements ISparklinesData, IChartThickness, IChartBorder {
       }
     }
 
+    print('bounds >>> ${_bounds}');
+
     return _bounds!;
   }
 
@@ -83,6 +85,9 @@ class PieData implements ISparklinesData, IChartThickness, IChartBorder {
   @override
   double get maxY => bounds.bottom;
 
+  @override
+  final IDataPointStyle? pointStyle;
+
   PieData({
     this.visible = true,
     this.rotation = ChartRotation.d0,
@@ -94,6 +99,7 @@ class PieData implements ISparklinesData, IChartThickness, IChartBorder {
     this.space = 0.0,
     this.border,
     this.borderRadius,
+    this.pointStyle,
   });
 
   PieData copyWith({
@@ -168,4 +174,5 @@ class PieData implements ISparklinesData, IChartThickness, IChartBorder {
       borderRadius: lerpDouble(borderRadius, next.borderRadius, t) ?? next.borderRadius,
     );
   }
+
 }

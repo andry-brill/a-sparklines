@@ -129,6 +129,7 @@ class _MyHomePageState extends State<MyHomePage>
   void initState() {
     super.initState();
     _tabController = TabController(
+      initialIndex: 2,
       length: examples.length,
       vsync: this,
     );
