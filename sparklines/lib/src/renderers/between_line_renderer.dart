@@ -2,8 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:sparklines/src/data/between_line_data.dart';
 import 'package:sparklines/src/interfaces.dart';
 import 'package:sparklines/src/renderers/chart_renderer.dart';
+
 /// Renders area between two lines
 class BetweenLineRenderer extends AChartRenderer<BetweenLineData> {
+
   @override
   void renderData(
     ChartRenderContext context,
@@ -19,11 +21,11 @@ class BetweenLineRenderer extends AChartRenderer<BetweenLineData> {
     combinedPath.addPath(reversedToPath, Offset.zero);
     combinedPath.close();
 
-    if (betweenData.gradient != null) {
-      paint.shader = betweenData.gradient!.createShader(context.bounds);
+    if (betweenData.areaGradient != null) {
+      paint.shader = betweenData.areaGradient!.createShader(context.bounds);
     } else {
       paint.shader = null;
-      paint.color = betweenData.color ?? Colors.blue.withValues(alpha: 0.3);
+      paint.color = betweenData.areaColor;
     }
 
     paint.style = PaintingStyle.fill;

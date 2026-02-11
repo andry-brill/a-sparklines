@@ -35,8 +35,9 @@ class BetweenLineData implements ISparklinesData {
 
   @override
   double get maxY => math.max(from.maxY, to.maxY);
-  final Color? color;
-  final Gradient? gradient;
+
+  final Color areaColor;
+  final Gradient? areaGradient;
 
   const BetweenLineData({
     this.visible = true,
@@ -46,8 +47,8 @@ class BetweenLineData implements ISparklinesData {
     this.crop,
     required this.from,
     required this.to,
-    this.color,
-    this.gradient,
+    this.areaColor = const Color(0xFF000000),
+    this.areaGradient,
   });
 
   BetweenLineData copyWith({
@@ -69,8 +70,8 @@ class BetweenLineData implements ISparklinesData {
       crop: crop ?? this.crop,
       from: from ?? this.from,
       to: to ?? this.to,
-      color: color ?? this.color,
-      gradient: gradient ?? this.gradient,
+      areaColor: color ?? this.areaColor,
+      areaGradient: gradient ?? this.areaGradient,
     );
   }
 
@@ -81,8 +82,8 @@ class BetweenLineData implements ISparklinesData {
     if (rotation != other.rotation) return true;
     if (origin != other.origin) return true;
     if (layout != other.layout) return true;
-    if (color != other.color) return true;
-    if (gradient != other.gradient) return true;
+    if (areaColor != other.areaColor) return true;
+    if (areaGradient != other.areaGradient) return true;
 
     if (from.shouldRepaint(other.from) || to.shouldRepaint(other.to)) {
       return true;
@@ -104,8 +105,8 @@ class BetweenLineData implements ISparklinesData {
       crop: next.crop,
       from: from.lerpTo(next.from, t) as LineData,
       to: to.lerpTo(next.to, t) as LineData,
-      color: Color.lerp(color, next.color, t),
-      gradient: Gradient.lerp(gradient, next.gradient, t),
+      areaColor: Color.lerp(areaColor, next.areaColor, t)!,
+      areaGradient: Gradient.lerp(areaGradient, next.areaGradient, t),
     );
   }
 }
