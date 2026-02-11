@@ -81,13 +81,10 @@ class SparklinesPainter extends CustomPainter {
         }
       }
 
-      // Rotation and dimension swap (d90/d270) are applied by the painter before calling render.
-      // chartLayout.prepare(canvas, dimensions);
-
       final context = ChartRenderContext(
         layout: chartLayout,
         dimensions: dimensions,
-        pathTransform: chartLayout.pathTransform(canvas, dimensions),
+        pathTransform: chartLayout.pathTransform(dimensions),
         canvas: canvas
       );
 

@@ -129,10 +129,14 @@ class ChartRenderContext {
     return layout.toScreenLength(value, dimensions);
   }
 
-  void drawCircle(DataPoint dataPoint, double radius, Paint paint) {
+  Offset transform(DataPoint dataPoint) {
     Vector3 point = Vector3(dataPoint.x, dataPoint.fy, 0.0);
     point = pathTransform.transform3(point);
-    canvas.drawCircle(Offset(point.x, point.y), radius, paint);
+    return Offset(point.x, point.y);
+  }
+  
+  void drawCircle(DataPoint dataPoint, double radius, Paint paint) {
+    canvas.drawCircle(transform(dataPoint), radius, paint);
   }
 
   void drawPath(Path path, Paint paint) {
@@ -152,14 +156,9 @@ class ChartRenderContext {
 /// Chart layout interface: applies canvas transformation so drawing uses data coordinates.
 abstract class IChartLayout {
   /// Resolve layout with actual dimensions (e.g., resolve infinity values).
-  /// Returns a resolved layout that can be used for [prepare].
   IChartLayout resolve(List<ILayoutData> dimensions);
 
-  /// Apply coordinate transformation to [canvas] so that subsequent drawing
-  /// can use data coordinates (e.g. math-oriented Y). Call once before drawing the chart.
-  void prepare(Canvas canvas, ILayoutData dimensions);
-
-  Matrix4 pathTransform(Canvas canvas, ILayoutData dimensions);
+  Matrix4 pathTransform(ILayoutData dimensions);
 
   /// Convert a length to screen pixels (for stroke width, radius, etc.).
   double toScreenLength(double value, ILayoutData dimensions);
@@ -167,8 +166,6 @@ abstract class IChartLayout {
 
 /// Interface for chart renderers
 abstract class IChartRenderer {
-  /// Render the chart to the canvas. [context.layout.prepare] is called before this;
-  /// draw using data coordinates.
   void render(
     ChartRenderContext context,
     ISparklinesData data,

@@ -1,7 +1,6 @@
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'data_point.dart';
-import '../interfaces.dart';
 
 /// Result of computing layout for a single pie slice (angle order, radii, space).
 class PieSliceLayout {
@@ -32,9 +31,7 @@ class PieSliceLayout {
 /// - [align]: 0 = (sweep/2) on each side of axis ray; !=0 splits left/right (ThicknessData.align).
 /// - space = uniform linear gap between slices; gap_rad = space / maxOuterRadius.
 ///
-/// Layout is computed in data space. Call after [IChartLayout.prepare] so drawing
-/// uses the same coordinates; use [ChartRenderContext.toScreenLength] for pixel
-/// dimensions (e.g. border size).
+/// Layout is computed in data space.
 List<PieSliceLayout> computePieSliceLayout(
   List<DataPoint> points,
   double space,

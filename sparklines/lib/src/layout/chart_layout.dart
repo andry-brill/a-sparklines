@@ -15,18 +15,12 @@ class AbsoluteLayout implements IChartLayout {
   IChartLayout resolve(List<ILayoutData> dimensions) => this;
 
   @override
-  void prepare(Canvas canvas, ILayoutData dimensions) {
-    canvas.translate(0, dimensions.height);
-    canvas.scale(1, -1);
-  }
-
-  @override
   double toScreenLength(double value, ILayoutData dimensions) {
     return value;
   }
 
   @override
-  Matrix4 pathTransform(Canvas canvas, ILayoutData dimensions) {
+  Matrix4 pathTransform(ILayoutData dimensions) {
     return Matrix4.identity()
       ..translateByVector3(Vector3(0.0, dimensions.height, 0.0))
       ..scaleByVector3(Vector3(1.0, -1.0, 0.0));
@@ -105,15 +99,7 @@ class RelativeLayout implements IChartLayout {
   }
 
   @override
-  void prepare(Canvas canvas, ILayoutData dimensions) {
-    canvas.translate(0, dimensions.height);
-    canvas.scale(1, -1);
-    canvas.scale(dimensions.width / (maxX - minX), dimensions.height / (maxY - minY));
-    canvas.translate(-minX, -minY);
-  }
-
-  @override
-  Matrix4 pathTransform(Canvas canvas, ILayoutData dimensions) {
+  Matrix4 pathTransform(ILayoutData dimensions) {
     return Matrix4.identity()
       ..translateByVector3(Vector3(0.0, dimensions.height, 0.0))
       ..scaleByVector3(Vector3(1.0, -1.0, 1.0))
