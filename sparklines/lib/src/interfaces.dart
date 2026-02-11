@@ -130,11 +130,15 @@ class ChartRenderContext {
   }
 
   Offset transform(DataPoint dataPoint) {
-    Vector3 point = Vector3(dataPoint.x, dataPoint.fy, 0.0);
-    point = pathTransform.transform3(point);
+    final point = pathTransform.transform3(Vector3(dataPoint.x, dataPoint.fy, 0.0));
     return Offset(point.x, point.y);
   }
-  
+
+  Offset transformXY(double x, double y) {
+    final point = pathTransform.transform3(Vector3(x, y, 0.0));
+    return Offset(point.x, point.y);
+  }
+
   void drawCircle(DataPoint dataPoint, double radius, Paint paint) {
     canvas.drawCircle(transform(dataPoint), radius, paint);
   }
@@ -144,13 +148,6 @@ class ChartRenderContext {
     canvas.drawPath(tPath, paint);
   }
 
-  void drawRRect(RRect rect, Paint paint) {
-    drawPath(Path()..addRRect(rect), paint);
-  }
-
-  void drawRect(Rect rect, Paint paint) {
-    drawPath(Path()..addRect(rect), paint);
-  }
 }
 
 /// Chart layout interface: applies canvas transformation so drawing uses data coordinates.
