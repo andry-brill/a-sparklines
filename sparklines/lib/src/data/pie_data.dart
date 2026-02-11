@@ -44,53 +44,46 @@ class PieData implements ISparklinesData, IChartThickness, IChartBorder {
   @override
   final double? borderRadius;
 
-  /// Bounds from pie geometry: angles, dy along rays, and space offsets.
-  Rect get _localBounds {
-    final layout = computePieSliceLayout(
+  Rect? _bounds;
+
+  Rect get bounds {
+
+    if (_bounds != null) return _bounds!;
+
+    final layouts = computePieLayouts(
       points,
       space,
       thickness.size,
       thickness.align,
     );
-    if (layout.isEmpty) return Rect.fromLTRB(0, 0, 1, 1);
-    double minX = double.infinity, maxX = double.negativeInfinity;
-    double minY = double.infinity, maxY = double.negativeInfinity;
-    for (final s in layout) {
-      sectorBounds(
-        s.startAngle,
-        s.endAngle,
-        s.innerRadius,
-        s.outerRadius,
-        s.spaceOffset,
-        (mnx, mxx, mny, mxy) {
-          minX = math.min(minX, mnx);
-          maxX = math.max(maxX, mxx);
-          minY = math.min(minY, mny);
-          maxY = math.max(maxY, mxy);
-        },
-      );
+
+    if (layouts.isEmpty) return _bounds = Rect.fromLTRB(0, 0, 1, 1);
+    if (layouts.length == 1) return _bounds = layouts.first.arcBounds();
+
+    for (var layout in layouts) {
+      if (_bounds == null) {
+        _bounds = layout.arcBounds();
+      } else {
+        _bounds = _bounds!.expandToInclude(layout.arcBounds());
+      }
     }
-    return Rect.fromLTRB(
-      minX.isFinite ? minX : 0,
-      minY.isFinite ? minY : 0,
-      maxX.isFinite ? maxX : 1,
-      maxY.isFinite ? maxY : 1,
-    );
+
+    return _bounds!;
   }
 
   @override
-  double get minX => _localBounds.left;
+  double get minX => bounds.left;
 
   @override
-  double get maxX => _localBounds.right;
+  double get maxX => bounds.right;
 
   @override
-  double get minY => _localBounds.top;
+  double get minY => bounds.top;
 
   @override
-  double get maxY => _localBounds.bottom;
+  double get maxY => bounds.bottom;
 
-  const PieData({
+  PieData({
     this.visible = true,
     this.rotation = ChartRotation.d0,
     this.origin = Offset.zero,

@@ -36,7 +36,7 @@ class PieChartRenderer extends AChartRenderer<PieData> {
     ChartRenderContext context,
     PieData pieData,
   ) {
-    final layout = computePieSliceLayout(
+    final layout = computePieLayouts(
       pieData.points,
       pieData.space,
       pieData.thickness.size,
@@ -93,7 +93,7 @@ class PieChartRenderer extends AChartRenderer<PieData> {
     double? borderSizePx,
   ) {
     return _ScreenPieSlice(
-      center: s.spaceOffset,
+      center: s.offset,
       innerRadius: s.innerRadius,
       outerRadius: s.outerRadius,
       startAngle: s.startAngle,
