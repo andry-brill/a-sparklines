@@ -43,9 +43,13 @@ class PieChartRenderer extends AChartRenderer<PieData> {
       final align = thickness.align;
 
       Path arc = layout.arcPath();
+      final originAxis = toArcPoints(arc);
+
       arc = arc.transform(context.pathTransform.storage);
 
       final axis = toArcPoints(arc);
+      print('Origin axis: $originAxis & after transform $axis');
+
       final pieLayout = resolveArcLayout(screenThickness, align, axis);
 
       Path piePath = buildPiePath(pieData.borderRadius, context, pieLayout);
