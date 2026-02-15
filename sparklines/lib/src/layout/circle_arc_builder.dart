@@ -3,21 +3,8 @@ import 'dart:ui';
 
 const _epsilon = 0.001;
 
-/// Port of d3-shape’s `arc` geometry.
-///
-/// This is a low-level geometry helper that builds a [Path] in local
-/// “math” coordinates (x to the right, y up, angles in radians, 0 on +X).
-///
-/// It mirrors the behaviour of d3’s arc generator, including:
-/// - inner / outer radius
-/// - padAngle / padRadius
-/// - rounded corners (cornerRadius)
-///
-/// To draw in Flutter, either:
-/// - transform the path with a matrix, or
-/// - build paths directly in screen space by offsetting the coordinates
-///   before adding them to the [Path] (see [_lineTo] / [_arcPolyline]).
-class ArcBuilder {
+class CircleArcBuilder {
+
   double innerRadius;
   double outerRadius;
   double startAngle;
@@ -26,7 +13,7 @@ class ArcBuilder {
   double cornerRadius;
   double? padRadius;
 
-  ArcBuilder({
+  CircleArcBuilder({
     this.innerRadius = 0.0,
     this.outerRadius = 0.0,
     this.startAngle = 0.0,

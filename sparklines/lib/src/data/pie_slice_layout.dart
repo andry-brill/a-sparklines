@@ -2,6 +2,60 @@ import 'dart:math' as math;
 import 'dart:math';
 import 'package:flutter/material.dart';
 import 'data_point.dart';
+import 'package:vector_math/vector_math_64.dart';
+
+class CircleArc {
+
+  final double startAngle;
+  final double endAngle;
+  final double radius;
+  final Offset center;
+
+  const CircleArc({required this.startAngle, required this.endAngle, required this.radius, required this.center});
+
+  EllipseArc transform(Matrix4 transform) => transformArc(this, transform);
+
+  static EllipseArc transformArc(CircleArc arc, Matrix4 transform) {
+    final Vector3 c = transform.transform3(
+      Vector3(arc.center.dx, arc.center.dy, 0),
+    );
+
+    // Transform basis vectors scaled by radius
+    final Vector3 vx = transform.transform3(
+      Vector3(arc.center.dx + arc.radius, arc.center.dy, 0),
+    );
+
+    final Vector3 vy = transform.transform3(
+      Vector3(arc.center.dx, arc.center.dy + arc.radius, 0),
+    );
+
+    // Axis vectors are relative to center
+    final Offset center = Offset(c.x, c.y);
+
+    final Offset axisX = Offset(vx.x - c.x, vx.y - c.y);
+    final Offset axisY = Offset(vy.x - c.x, vy.y - c.y);
+
+    return EllipseArc(
+      center: center,
+      axisX: axisX,
+      axisY: axisY,
+      startAngle: arc.startAngle,
+      endAngle: arc.endAngle,
+    );
+  }
+}
+
+class EllipseArc {
+
+  final double startAngle;
+  final double endAngle;
+  final Offset axisX;   // transformed (radius, 0)
+  final Offset axisY;   // transformed (0, radius)
+  final Offset center;
+
+  const EllipseArc({required this.startAngle, required this.endAngle, required this.axisX, required this.axisY, required this.center});
+
+}
 
 /// Result of computing layout for a single pie slice (angle order, radii, space).
 class PieSliceLayout {
@@ -21,6 +75,12 @@ class PieSliceLayout {
     required this.offset,
     required this.point,
   });
+
+  CircleArc toArc({ double align = 0.0 }) {
+    final t = (align + 1) / 2;
+    final r = innerRadius + (outerRadius - innerRadius) * t.clamp(0.0, 1.0);
+    return CircleArc(startAngle: startAngle, endAngle: endAngle, radius: r, center: offset);
+  }
 
   /// Bounds of the arc at radius interpolated by [align].
   /// [align]: -1 = innerRadius, 0 = mid-radius, 1 = outerRadius.
@@ -66,28 +126,30 @@ class PieSliceLayout {
   /// Builds a simple arc path from [startAngle] to [endAngle].
   /// [align]: -1 = innerRadius, 0 = mid-radius, 1 = outerRadius.
   /// [origin] is the arc center (default layout origin).
-  Path arcPath({
-    Offset origin = const Offset(0, 0),
+  Path? arcPath({
     double align = 0.0,
+    String? debug
   }) {
 
     final t = (align + 1) / 2;
     final r = innerRadius + (outerRadius - innerRadius) * t.clamp(0.0, 1.0);
 
     final path = Path();
-    final center = origin + offset;
+    final center = offset;
 
     if (r.abs() < 1e-10) {
-      path.moveTo(center.dx, center.dy);
-      return path;
+      return null;
     }
 
     final sweep = endAngle - startAngle;
+    final startX = center.dx + r * math.cos(startAngle);
+    final startY = center.dy + r * math.sin(startAngle);
 
-    path.moveTo(
-      center.dx + r * math.cos(startAngle),
-      center.dy + r * math.sin(startAngle),
-    );
+    path.moveTo(startX, startY);
+
+    if (debug != null) {
+      debugPrint('$debug from: ($startX, $startY)');
+    }
 
     path.arcTo(
       Rect.fromCircle(center: center, radius: r),
@@ -102,7 +164,7 @@ class PieSliceLayout {
 
 /// Computes slice layout for pie chart.
 /// - Each point (x,y) defines arc, where r = x, startAngle = y - dy, deltaAngle = dy, (y + dy = fy = endAngle)
-///   - making sure that point is in center on arc
+///   - mid point (x=10, y=0rad) == (x=10, y=0)
 /// - innerRadius = x - thicknessAlignedLeft, outerRadius = x + thicknessAlignedRight based on thicknessAlign.
 /// - space = uniform linear gap between slices, must be set as spaceOffset (aligned with "angle" of axis-ray)
 List<PieSliceLayout> computePieLayouts(
@@ -110,6 +172,7 @@ List<PieSliceLayout> computePieLayouts(
   double space,
   double thickness,
   double thicknessAlign,
+  String? debug
 ) {
   return points.where((point) => point.x > 0 && thickness > 0).map((point) {
 

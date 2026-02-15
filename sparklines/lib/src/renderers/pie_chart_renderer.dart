@@ -1,20 +1,11 @@
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
+import 'package:sparklines/sparklines.dart';
 import 'package:vector_math/vector_math_64.dart';
-import 'package:sparklines/src/data/pie_data.dart';
 import 'package:sparklines/src/data/pie_slice_layout.dart';
-import 'package:sparklines/src/interfaces.dart';
-import 'package:sparklines/src/layout/arc_builder.dart';
+import 'package:sparklines/src/layout/circle_arc_builder.dart';
 import 'package:sparklines/src/renderers/chart_renderer.dart';
 
-/// Screen-space arc layout: center, radii, and angles derived from transformed axis.
-typedef _ScreenArcLayout = ({
-  Offset center,
-  double innerRadius,
-  double outerRadius,
-  double startAngle,
-  double endAngle,
-});
 
 /// Renders pie charts.
 /// Arc axis (center arc at mid-radius) is transformed to screen space; thickness
@@ -32,25 +23,37 @@ class PieChartRenderer extends AChartRenderer<PieData> {
       pieData.space,
       pieData.thickness.size,
       pieData.thickness.align,
+      pieData.debug
     );
 
     final paint = Paint();
     final thickness = pieData.thickness;
+    final debug = pieData.debug;
 
     for (final layout in layouts) {
+
+      Path? arc = layout.arcPath(debug: debug);
+      if (arc == null) continue;
+
       final arcThickness = layout.outerRadius - layout.innerRadius;
       final screenThickness = context.toScreenLength(arcThickness);
       final align = thickness.align;
 
-      Path arc = layout.arcPath();
       final originAxis = toArcPoints(arc);
 
       arc = arc.transform(context.pathTransform.storage);
 
       final axis = toArcPoints(arc);
-      print('Origin axis: $originAxis & after transform $axis');
+      if (debug != null) {
+        debugPrint('$debug Origin axis: $originAxis & after transform $axis');
+      }
 
-      final pieLayout = resolveArcLayout(screenThickness, align, axis);
+      final pieLayout = resolveArcLayout(screenThickness, align, axis, layout.point);
+      if (debug != null) {
+        debugPrint('$debug pieLayoutOrigin: ${layout.offset} ${layout.startAngle} ${layout.endAngle} ${layout.innerRadius} ${layout.outerRadius}');
+        debugPrint('$debug pieLayout: ${pieLayout.offset} ${pieLayout.startAngle} ${pieLayout.endAngle} ${pieLayout.innerRadius} ${pieLayout.outerRadius}');
+
+      }
 
       Path piePath = buildPiePath(pieData.borderRadius, context, pieLayout);
 
@@ -69,13 +72,16 @@ class PieChartRenderer extends AChartRenderer<PieData> {
       final border = pieData.border;
       if (border != null) {
         final borderSize = context.toScreenLength(border.size);
-        final borderLayout = (
-          center: pieLayout.center,
+
+        final borderLayout = PieSliceLayout(
+          offset: pieLayout.offset,
           innerRadius: pieLayout.innerRadius - borderSize * border.align,
           outerRadius: pieLayout.outerRadius + borderSize * border.align,
           startAngle: pieLayout.startAngle,
           endAngle: pieLayout.endAngle,
+          point: pieLayout.point
         );
+
         Path pieBorderPath = buildPiePath(pieData.borderRadius, context, borderLayout);
 
         paint.style = PaintingStyle.stroke;
@@ -96,10 +102,11 @@ class PieChartRenderer extends AChartRenderer<PieData> {
   }
 
   /// Resolves center, radii, and angles from transformed axis arc points.
-  _ScreenArcLayout resolveArcLayout(
+  PieSliceLayout resolveArcLayout(
     double thickness,
     double align,
     (Offset, Offset, Offset) axisArcPoints,
+    DataPoint point
   ) {
     final (start, mid, end) = axisArcPoints;
 
@@ -119,26 +126,27 @@ class PieChartRenderer extends AChartRenderer<PieData> {
       end.dx - center.dx,
     );
 
-    return (
-      center: center,
+    return PieSliceLayout(
+      offset: center,
       innerRadius: math.max(0, radius - b),
       outerRadius: radius + a,
       startAngle: startAngle,
       endAngle: endAngle,
+      point: DataPoint(x: mid.dx, dy: mid.dy, style: point.style)
     );
   }
 
-  /// Builds filled arc path using [ArcBuilder] with uniform thickness in screen space.
+  /// Builds filled arc path using [CircleArcBuilder] with uniform thickness in screen space.
   Path buildPiePath(
     double? borderRadius,
     ChartRenderContext context,
-    _ScreenArcLayout layout,
+    PieSliceLayout layout,
   ) {
     final cornerRadius = borderRadius != null
         ? context.toScreenLength(borderRadius)
         : 0.0;
 
-    final arcBuilder = ArcBuilder(
+    final arcBuilder = CircleArcBuilder(
       innerRadius: layout.innerRadius,
       outerRadius: layout.outerRadius,
       startAngle: layout.startAngle,
@@ -149,8 +157,7 @@ class PieChartRenderer extends AChartRenderer<PieData> {
 
     // ArcBuilder uses math coords (y up); flip y for screen (y down)
     final path = arcBuilder.build();
-    return path//.transform(arcBuilderAlign.storage)
-        .shift(layout.center);
+    return path; // .transform(arcBuilderAlign.storage).shift(layout.offset);
   }
 
   static final arcBuilderAlign = Matrix4.identity()..scaleByVector3(Vector3(1.0, -1.0, 1.0));
