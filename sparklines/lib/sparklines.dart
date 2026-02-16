@@ -11,4 +11,4 @@ export 'src/renderers/circle_data_point.dart';
 export 'src/interfaces.dart';
 export 'src/layout/chart_layout.dart';
 export 'src/layout/relative_dimension.dart';
-export 'src/layout/data_point_stacker.dart';
+export 'src/data/helpers/data_point_stacker.dart';

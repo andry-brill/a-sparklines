@@ -2,11 +2,11 @@ import 'package:flutter/material.dart';
 import 'dart:ui' show lerpDouble;
 import 'dart:math' as math;
 import 'data_point.dart';
-import 'pie_slice_layout.dart';
+import 'pie_slice_data.dart';
 import '../interfaces.dart';
 import '../renderers/pie_chart_renderer.dart';
 
-/// Pie chart data.
+
 class PieData implements ISparklinesData, IChartThickness, IChartBorder, IChartDataPointStyle {
   static final IChartRenderer defaultRenderer = PieChartRenderer();
 
@@ -23,6 +23,7 @@ class PieData implements ISparklinesData, IChartThickness, IChartBorder, IChartD
   @override
   IChartRenderer get renderer => defaultRenderer;
 
+  /// Each point (x,y) defines arc, where radius = x, startAngle = y - dy, endAngle = y + dy
   final List<DataPoint> points;
 
   @override
@@ -42,7 +43,7 @@ class PieData implements ISparklinesData, IChartThickness, IChartBorder, IChartD
 
     if (_bounds != null) return _bounds!;
 
-    final layouts = computePieLayouts(
+    final layouts = computePies(
       points,
       space,
       thickness.size,

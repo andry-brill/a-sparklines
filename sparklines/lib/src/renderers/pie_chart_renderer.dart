@@ -1,7 +1,7 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:sparklines/sparklines.dart';
-import 'package:sparklines/src/data/pie_slice_layout.dart';
+import 'package:sparklines/src/data/pie_slice_data.dart';
 import 'package:sparklines/src/renderers/chart_renderer.dart';
 
 
@@ -17,7 +17,7 @@ class PieChartRenderer extends AChartRenderer<PieData> {
         ? context.toScreenLength(pieData.borderRadius!)
         : 0.0;
 
-    final layouts = computePieLayouts(
+    final layouts = computePies(
       pieData.points,
       pieData.space,
       pieData.thickness.size,
@@ -49,7 +49,7 @@ class PieChartRenderer extends AChartRenderer<PieData> {
       if (border != null) {
         final borderSize = context.toScreenLength(border.size);
 
-        final borderLayout = PieSliceLayout(
+        final borderLayout = PieSliceData(
           offset: layout.offset,
           innerRadius: max(0, layout.innerRadius - borderSize * border.align),
           outerRadius: layout.outerRadius + borderSize * border.align,

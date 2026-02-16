@@ -1,11 +1,10 @@
-import 'dart:math' as math;
 import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:sparklines/src/layout/circle_arc_builder.dart';
 import 'data_point.dart';
 
 /// Result of computing layout for a single pie slice (angle order, radii, space).
-class PieSliceLayout {
+class PieSliceData {
 
   final double startAngle;
   final double endAngle;
@@ -16,7 +15,7 @@ class PieSliceLayout {
 
   final DataPoint point;
 
-  const PieSliceLayout({
+  const PieSliceData({
     required this.startAngle,
     required this.endAngle,
     required this.innerRadius,
@@ -53,7 +52,7 @@ class PieSliceLayout {
 ///   - mid point (x=10, y=0rad) == (x=10, y=0)
 /// - innerRadius = x - thicknessAlignedLeft, outerRadius = x + thicknessAlignedRight based on thicknessAlign.
 /// - space = uniform linear gap between slices, must be set as spaceOffset (aligned with "angle" of axis-ray)
-List<PieSliceLayout> computePieLayouts(
+List<PieSliceData> computePies(
   List<DataPoint> points,
   double space,
   double thickness,
@@ -75,11 +74,11 @@ List<PieSliceLayout> computePieLayouts(
 
     final spaceHalf = space / 2;
     final spaceOffset = Offset(
-      spaceHalf * math.cos(angle),
-      spaceHalf * math.sin(angle),
+      spaceHalf * cos(angle),
+      spaceHalf * sin(angle),
     );
 
-    return PieSliceLayout(
+    return PieSliceData(
       startAngle: startAngle,
       endAngle: endAngle,
       innerRadius: innerRadius,
