@@ -7,15 +7,6 @@ import '../interfaces.dart';
 import '../renderers/pie_chart_renderer.dart';
 
 /// Pie chart data.
-///
-/// Pies are treated like bars with a different axis: the main vector aligns
-/// with the ray from (0,0) through each data point (x,y). [DataPoint.dy] is
-/// the distance along that ray from (x,y) (radial extent). (x,y) must not be
-/// (0,0) so the ray is defined. Origin is applied by the common renderer.
-///
-/// [thickness.size] = total sweep of the pie in radians (e.g. 2*pi for full circle).
-/// [thickness.align]: 0 = (size/2) on each side of axis ray; !=0 splits left/right.
-/// [space] is uniform linear gap between slices. Border and borderRadius like bars.
 class PieData implements ISparklinesData, IChartThickness, IChartBorder, IChartDataPointStyle {
   static final IChartRenderer defaultRenderer = PieChartRenderer();
 
@@ -41,6 +32,7 @@ class PieData implements ISparklinesData, IChartThickness, IChartBorder, IChartD
 
   @override
   final ThicknessData? border;
+
   @override
   final double? borderRadius;
 
@@ -55,17 +47,17 @@ class PieData implements ISparklinesData, IChartThickness, IChartBorder, IChartD
       space,
       thickness.size,
       thickness.align,
-      debug
+      borderRadius ?? 0.0
     );
 
     if (layouts.isEmpty) return _bounds = Rect.fromLTRB(0, 0, 1, 1);
-    if (layouts.length == 1) return _bounds = layouts.first.arcBounds();
+    if (layouts.length == 1) return _bounds = layouts.first.toPath().getBounds();
 
     for (var layout in layouts) {
       if (_bounds == null) {
-        _bounds = layout.arcBounds();
+        _bounds = layout.toPath().getBounds();
       } else {
-        _bounds = _bounds!.expandToInclude(layout.arcBounds());
+        _bounds = _bounds!.expandToInclude(layout.toPath().getBounds());
       }
     }
 

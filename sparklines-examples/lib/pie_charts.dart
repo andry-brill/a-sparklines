@@ -16,7 +16,7 @@ List<ExampleChart> pieCharts() {
       ],
       toggleCharts: [
         PieData(
-          points: [DataPoint(x: 75.0, y: -pi/4.0, dy: pi/8.0)],
+          points: [DataPoint(x: 72.0, y: -pi/4.0, dy: pi/8.0)],
           thickness: ThicknessData(size: 30, color: Colors.deepOrange),
         ),
       ],
