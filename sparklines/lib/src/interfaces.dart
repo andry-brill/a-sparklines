@@ -1,6 +1,7 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
+import 'package:sparklines/sparklines.dart';
 import 'package:sparklines/src/data/data_point.dart';
 import 'dart:ui' show lerpDouble;
 import 'package:vector_math/vector_math_64.dart';
@@ -244,177 +245,19 @@ abstract class ISparklinesData implements ILerpTo<ISparklinesData> {
 
 /// Style interface for data points
 abstract class IDataPointStyle implements ILerpTo<IDataPointStyle> {
-
   IDataPointRenderer get renderer;
+}
 
+/// Interface for line type renderers (path building + stroke rendering)
+abstract class ILineTypeRenderer {
+  Path toPath(ILineTypeData lineType, List<DataPoint> points, {bool useFy = true, bool reverse = false, Path? path});
+  void render(ChartRenderContext context, LineData lineData);
 }
 
 /// Marker interface for line type data
 abstract class ILineTypeData {
-
-
   bool get isStrokeCapRound;
   bool get isStrokeJoinRound;
-  Path toPath(List<DataPoint> points, {bool useFy = true, bool reverse = false, Path? path});
-
-  static void moveToStart(Path path, List<DataPoint> points, bool useFy, bool reverse) {
-
-    if (!reverse) {
-      final first = points[0];
-      path.moveTo(first.x, first.getYorFY(useFy));
-    } else {
-      final last = points.last;
-      path.moveTo(last.x, last.getYorFY(useFy));
-    }
-
-  }
+  ILineTypeRenderer get renderer;
 }
 
-/// Step line type data
-class SteppedLineType implements ILineTypeData {
-
-  /// 0.0 → previous point, 1.0 → next point
-  final double stepJumpAt;
-
-  @override
-  final bool isStrokeCapRound;
-  @override
-  final bool isStrokeJoinRound;
-
-  const SteppedLineType({this.stepJumpAt = 0.5, this.isStrokeCapRound = false, this.isStrokeJoinRound = false});
-  const SteppedLineType.start({this.isStrokeCapRound = false, this.isStrokeJoinRound = false}) : stepJumpAt = 0.0;
-  const SteppedLineType.middle({this.isStrokeCapRound = false, this.isStrokeJoinRound = false}) : stepJumpAt = 0.5;
-  const SteppedLineType.end({this.isStrokeCapRound = false, this.isStrokeJoinRound = false}) : stepJumpAt = 1.0;
-
-  @override
-  Path toPath(List<DataPoint> points, {bool useFy = true, bool reverse = false, Path? path}) {
-
-    final pathOut = path ?? Path();
-    if (points.isEmpty) return pathOut;
-
-    ILineTypeData.moveToStart(pathOut, points, useFy, reverse);
-    if (points.length == 1) return pathOut;
-
-    if (reverse) {
-      for (int i = points.length - 1; i >= 1; i--) {
-        final curr = points[i];
-        final prev = points[i - 1];
-        final stepX = prev.x + (curr.x - prev.x) * stepJumpAt;
-        pathOut.lineTo(stepX, curr.getYorFY(useFy));
-        pathOut.lineTo(stepX, prev.getYorFY(useFy));
-        pathOut.lineTo(prev.x, prev.getYorFY(useFy));
-      }
-    } else {
-      for (int i = 1; i < points.length; i++) {
-        final prev = points[i - 1];
-        final curr = points[i];
-        final stepX = prev.x + (curr.x - prev.x) * stepJumpAt;
-        pathOut.lineTo(stepX, prev.getYorFY(useFy));
-        pathOut.lineTo(stepX, curr.getYorFY(useFy));
-        pathOut.lineTo(curr.x, curr.getYorFY(useFy));
-      }
-    }
-
-    return pathOut;
-  }
-
-
-
-}
-
-class CurvedLineType implements ILineTypeData {
-
-  /// Curve smoothness (0.0 to 1.0)
-  final double smoothness;
-
-  @override
-  final bool isStrokeCapRound;
-  @override
-  final bool isStrokeJoinRound;
-
-  const CurvedLineType({this.smoothness = 0.35, this.isStrokeCapRound = false, this.isStrokeJoinRound = false});
-
-  @override
-  Path toPath(List<DataPoint> points, {bool useFy = true, bool reverse = false, Path? path}) {
-
-    final pathOut = path ?? Path();
-    if (points.isEmpty) return pathOut;
-
-    ILineTypeData.moveToStart(pathOut, points, useFy, reverse);
-    if (points.length == 1) return pathOut;
-
-    if (reverse) {
-      for (int i = points.length - 1; i >= 1; i--) {
-        final curr = points[i];
-        final prev = points[i - 1];
-        if (i == points.length - 1) {
-          final controlX = prev.x + (curr.x - prev.x) * smoothness;
-          pathOut.quadraticBezierTo(controlX, curr.getYorFY(useFy), prev.x, prev.getYorFY(useFy));
-        } else if (i == 1) {
-          final controlX = curr.x - (curr.x - prev.x) * smoothness;
-          pathOut.quadraticBezierTo(controlX, prev.getYorFY(useFy), prev.x, prev.getYorFY(useFy));
-        } else {
-          final next = points[i + 1];
-          final controlX1 = curr.x - (curr.x - next.x) * smoothness;
-          final controlX2 = prev.x + (curr.x - prev.x) * smoothness;
-          pathOut.cubicTo(controlX1, curr.getYorFY(useFy), controlX2, prev.getYorFY(useFy), prev.x, prev.getYorFY(useFy));
-        }
-      }
-    } else {
-      for (int i = 1; i < points.length; i++) {
-        final prev = points[i - 1];
-        final curr = points[i];
-
-        if (i == 1) {
-          final controlX = prev.x + (curr.x - prev.x) * smoothness;
-          pathOut.quadraticBezierTo(controlX, prev.getYorFY(useFy), curr.x, curr.getYorFY(useFy));
-        } else if (i == points.length - 1) {
-          final controlX = curr.x - (curr.x - prev.x) * smoothness;
-          pathOut.quadraticBezierTo(controlX, curr.getYorFY(useFy), curr.x, curr.getYorFY(useFy));
-        } else {
-          final next = points[i + 1];
-          final controlX1 = prev.x + (curr.x - prev.x) * smoothness;
-          final controlX2 = curr.x - (next.x - curr.x) * smoothness;
-          pathOut.cubicTo(controlX1, prev.getYorFY(useFy), controlX2, curr.getYorFY(useFy), curr.x, curr.getYorFY(useFy));
-        }
-      }
-    }
-
-    return pathOut;
-
-  }
-}
-
-class LinearLineType implements ILineTypeData {
-
-  @override
-  final bool isStrokeCapRound;
-  @override
-  final bool isStrokeJoinRound;
-
-  const LinearLineType({this.isStrokeCapRound = false, this.isStrokeJoinRound = false});
-
-  @override
-  Path toPath(List<DataPoint> points, {bool useFy = true, bool reverse = false, Path? path}) {
-
-    final pathOut = path ?? Path();
-    if (points.isEmpty) return pathOut;
-
-    ILineTypeData.moveToStart(pathOut, points, useFy, reverse);
-    if (points.length == 1) return pathOut;
-
-    if (reverse) {
-      for (int i = points.length - 2; i >= 0; i--) {
-        final point = points[i];
-        pathOut.lineTo(point.x, point.getYorFY(useFy));
-      }
-    } else {
-      for (int i = 1; i < points.length; i++) {
-        final point = points[i];
-        pathOut.lineTo(point.x, point.getYorFY(useFy));
-      }
-    }
-
-    return pathOut;
-  }
-}

@@ -127,7 +127,7 @@ List<ExampleChart> lineCharts() {
     lineFull.modify(
       title: 'Rounded caps and joins',
       subtitle: 'Line ends and corners are rounded for a smoother look.',
-      modifier: (c) => c.copyWith(isStrokeCapRound: true, isStrokeJoinRound: true),
+      modifier: (c) => c.copyWith(lineType: LinearLineType(isStrokeCapRound: true, isStrokeJoinRound: true)),
     ),
     lineFull.modify(
       title: 'Curved lines',
@@ -157,9 +157,7 @@ List<ExampleChart> lineCharts() {
       modifier: (c) => c.copyWith(
           // origin: Offset(-20, 10),
           rotation: ChartRotation.d90,
-          lineType: SteppedLineType.end(),
-          isStrokeCapRound: true,
-          isStrokeJoinRound: true,
+          lineType: SteppedLineType.end(isStrokeCapRound: true, isStrokeJoinRound: true),
           pointStyle: CircleDataPointStyle(radius: 2, color: Color(0xFF272727)),
           areaGradient: LinearGradient(
               colors: [c.thickness.color.withValues(alpha: 0.5), Colors.white.withValues(alpha: 0.0)],
@@ -171,9 +169,7 @@ List<ExampleChart> lineCharts() {
     lineFull.modify(
       title: 'Stepped (end) with transform',
       modifier: (c) => c.copyWith(
-          lineType: SteppedLineType.end(),
-          isStrokeCapRound: true,
-          isStrokeJoinRound: true,
+          lineType: SteppedLineType.end(isStrokeCapRound: true, isStrokeJoinRound: true),
           rotation: ChartRotation.d180,
           pointStyle: CircleDataPointStyle(radius: 2, color: Color(0xFF272727)),
           areaGradient: LinearGradient(
@@ -186,9 +182,7 @@ List<ExampleChart> lineCharts() {
     lineFull.modify(
       title: 'Stepped (end) with transform',
       modifier: (c) => c.copyWith(
-          lineType: SteppedLineType.end(),
-          isStrokeCapRound: true,
-          isStrokeJoinRound: true,
+          lineType: SteppedLineType.end(isStrokeCapRound: true, isStrokeJoinRound: true),
           rotation: ChartRotation.d270,
           pointStyle: CircleDataPointStyle(radius: 2, color: Color(0xFF272727)),
           areaGradient: LinearGradient(
@@ -201,9 +195,7 @@ List<ExampleChart> lineCharts() {
     lineFull.modify(
       title: 'Stepped (end) with transform',
       modifier: (c) => c.copyWith(
-          lineType: SteppedLineType.end(),
-          isStrokeCapRound: true,
-          isStrokeJoinRound: true,
+          lineType: SteppedLineType.end(isStrokeCapRound: true, isStrokeJoinRound: true),
           pointStyle: CircleDataPointStyle(radius: 2, color: Color(0xFF272727)),
           areaGradient: LinearGradient(
               colors: [c.thickness.color.withValues(alpha: 0.5), Colors.white.withValues(alpha: 0.0)],

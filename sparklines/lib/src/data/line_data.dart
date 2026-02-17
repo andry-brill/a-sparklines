@@ -2,8 +2,9 @@ import 'package:flutter/material.dart';
 import 'data_point.dart';
 import '../interfaces.dart';
 import '../renderers/line_chart_renderer.dart';
+import '../renderers/line_type_renderer.dart';
 
-/// Line chart data
+
 class LineData implements ISparklinesData, IChartThickness, IChartDataPointStyle {
 
   static final LineChartRenderer defaultRenderer = LineChartRenderer();
@@ -57,7 +58,7 @@ class LineData implements ISparklinesData, IChartThickness, IChartDataPointStyle
     this.thickness = const ThicknessData(size: 2.0),
     this.areaGradient,
     this.areaColor,
-    this.lineType = const LinearLineType(),
+    this.lineType = const LinearLineData(),
     this.pointStyle,
   });
 
@@ -137,4 +138,60 @@ class LineData implements ISparklinesData, IChartThickness, IChartDataPointStyle
       pointStyle: ILerpTo.lerp(pointStyle, next.pointStyle, t),
     );
   }
+}
+
+
+class LinearLineData implements ILineTypeData {
+
+  @override
+  final bool isStrokeCapRound;
+  @override
+  final bool isStrokeJoinRound;
+
+  static const LinearLineRenderer _renderer = LinearLineRenderer();
+
+  const LinearLineData({this.isStrokeCapRound = false, this.isStrokeJoinRound = false});
+
+  @override
+  ILineTypeRenderer get renderer => _renderer;
+}
+
+class SteppedLineData implements ILineTypeData {
+
+  /// 0.0 → previous point, 1.0 → next point
+  final double stepJumpAt;
+
+  @override
+  final bool isStrokeCapRound;
+  @override
+  final bool isStrokeJoinRound;
+
+  static const SteppedLineRenderer _renderer = SteppedLineRenderer();
+
+  const SteppedLineData({this.stepJumpAt = 0.5, this.isStrokeCapRound = false, this.isStrokeJoinRound = false});
+  const SteppedLineData.start({this.isStrokeCapRound = false, this.isStrokeJoinRound = false}) : stepJumpAt = 0.0;
+  const SteppedLineData.middle({this.isStrokeCapRound = false, this.isStrokeJoinRound = false}) : stepJumpAt = 0.5;
+  const SteppedLineData.end({this.isStrokeCapRound = false, this.isStrokeJoinRound = false}) : stepJumpAt = 1.0;
+
+  @override
+  ILineTypeRenderer get renderer => _renderer;
+}
+
+class CurvedLineData implements ILineTypeData {
+
+  /// Curve smoothness (0.0 to 1.0)
+  final double smoothness;
+
+  @override
+  final bool isStrokeCapRound;
+  @override
+  final bool isStrokeJoinRound;
+
+  static const CurvedLineRenderer _renderer = CurvedLineRenderer();
+
+  const CurvedLineData({this.smoothness = 0.35, this.isStrokeCapRound = false, this.isStrokeJoinRound = false});
+
+  @override
+  ILineTypeRenderer get renderer => _renderer;
+
 }
