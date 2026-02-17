@@ -129,7 +129,7 @@ class _MyHomePageState extends State<MyHomePage>
   void initState() {
     super.initState();
     _tabController = TabController(
-      initialIndex: 2,
+      initialIndex: 0,
       length: examples.length,
       vsync: this,
     );
@@ -316,7 +316,7 @@ class _MyHomePageState extends State<MyHomePage>
       children: [
         const SizedBox(height: 24),
         Text(chart.title, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-        if (chart.subtitle != null) Text(chart.subtitle!, style: const TextStyle(fontSize: 16)),
+        if (chart.subtitle != null) ConstrainedBox(constraints: BoxConstraints(maxWidth: gridWidth * 3), child: Text(chart.subtitle!, softWrap: true, style: const TextStyle(fontSize: 16))),
         const SizedBox(height: 16),
           Wrap(
           spacing: 24,

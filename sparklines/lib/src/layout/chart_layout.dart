@@ -37,9 +37,9 @@ class RelativeLayout implements IChartLayout {
   final RelativeDimension relativeTo;
 
   const RelativeLayout({
-    required this.minX,
+    this.minX = 0,
     required this.maxX,
-    required this.minY,
+    this.minY = 0,
     required this.maxY,
     this.relativeTo = RelativeDimension.none,
   });

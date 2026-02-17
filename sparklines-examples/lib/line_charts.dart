@@ -127,12 +127,12 @@ List<ExampleChart> lineCharts() {
     lineFull.modify(
       title: 'Rounded caps and joins',
       subtitle: 'Line ends and corners are rounded for a smoother look.',
-      modifier: (c) => c.copyWith(lineType: LinearLineType(isStrokeCapRound: true, isStrokeJoinRound: true)),
+      modifier: (c) => c.copyWith(lineType: LinearLineData(isStrokeCapRound: true, isStrokeJoinRound: true)),
     ),
     lineFull.modify(
       title: 'Curved lines',
       subtitle: 'Smooth curves between points (smoothness 0.4).',
-      modifier: (c) => c.copyWith(lineType: CurvedLineType(smoothness: 0.4)),
+      modifier: (c) => c.copyWith(lineType: CurvedLineData(smoothness: 0.4)),
     ),
     lineFull.modify(
       title: 'Gradient area fill',
@@ -147,7 +147,7 @@ List<ExampleChart> lineCharts() {
       title: 'Stepped (mid-point)',
       subtitle: 'Horizontal then vertical segments; step occurs midway between each pair of points.',
       modifier: (c) => c.copyWith(
-          lineType: SteppedLineType.middle(),
+          lineType: const SteppedLineData.middle(),
           pointStyle: CircleDataPointStyle(radius: 2, color: Color(0xFF272727))
       ),
     ),
@@ -157,7 +157,7 @@ List<ExampleChart> lineCharts() {
       modifier: (c) => c.copyWith(
           // origin: Offset(-20, 10),
           rotation: ChartRotation.d90,
-          lineType: SteppedLineType.end(isStrokeCapRound: true, isStrokeJoinRound: true),
+          lineType: const SteppedLineData.end(isStrokeCapRound: true, isStrokeJoinRound: true),
           pointStyle: CircleDataPointStyle(radius: 2, color: Color(0xFF272727)),
           areaGradient: LinearGradient(
               colors: [c.thickness.color.withValues(alpha: 0.5), Colors.white.withValues(alpha: 0.0)],
@@ -169,7 +169,7 @@ List<ExampleChart> lineCharts() {
     lineFull.modify(
       title: 'Stepped (end) with transform',
       modifier: (c) => c.copyWith(
-          lineType: SteppedLineType.end(isStrokeCapRound: true, isStrokeJoinRound: true),
+          lineType: const SteppedLineData.end(isStrokeCapRound: true, isStrokeJoinRound: true),
           rotation: ChartRotation.d180,
           pointStyle: CircleDataPointStyle(radius: 2, color: Color(0xFF272727)),
           areaGradient: LinearGradient(
@@ -182,7 +182,7 @@ List<ExampleChart> lineCharts() {
     lineFull.modify(
       title: 'Stepped (end) with transform',
       modifier: (c) => c.copyWith(
-          lineType: SteppedLineType.end(isStrokeCapRound: true, isStrokeJoinRound: true),
+          lineType: const SteppedLineData.end(isStrokeCapRound: true, isStrokeJoinRound: true),
           rotation: ChartRotation.d270,
           pointStyle: CircleDataPointStyle(radius: 2, color: Color(0xFF272727)),
           areaGradient: LinearGradient(
@@ -195,7 +195,7 @@ List<ExampleChart> lineCharts() {
     lineFull.modify(
       title: 'Stepped (end) with transform',
       modifier: (c) => c.copyWith(
-          lineType: SteppedLineType.end(isStrokeCapRound: true, isStrokeJoinRound: true),
+          lineType: const SteppedLineData.end(isStrokeCapRound: true, isStrokeJoinRound: true),
           pointStyle: CircleDataPointStyle(radius: 2, color: Color(0xFF272727)),
           areaGradient: LinearGradient(
               colors: [c.thickness.color.withValues(alpha: 0.5), Colors.white.withValues(alpha: 0.0)],
@@ -231,6 +231,99 @@ List<ExampleChart> lineCharts() {
           thickness: thickness2,
         ),
       ].reversed.toList(),
+    ),
+    ExampleChart<LineData>(
+      title: 'Stepped dynamic thickness',
+      modifier: (c) => c.copyWith(
+        layout: const RelativeLayout(maxX: 150, maxY: 150),
+        lineType: const SteppedLineData.middle(),
+      ),
+      initialCharts: [
+        LineData(
+          points: [
+            DataPoint(x: xI(0), dy: yI(4), thickness: ThicknessOverride(size: 8)),
+            DataPoint(x: xI(2), dy: yI(8), thickness: ThicknessOverride(size: 24)),
+            DataPoint(x: xI(6), dy: yI(2), thickness: ThicknessOverride(size: 16)),
+            DataPoint(x: xI(8), dy: yI(5), thickness: ThicknessOverride(size: 24)),
+            DataPoint(x: xI(10), dy: yI(7), thickness: ThicknessOverride(size: 8)),
+          ],
+          thickness: thickness1,
+        ),
+      ],
+      toggleCharts: [
+        LineData(
+          points: [
+            DataPoint(x: xI(0), dy: yI(8), thickness: ThicknessOverride(size: 16)),
+            DataPoint(x: xI(2), dy: yI(4), thickness: ThicknessOverride(size: 8)),
+            DataPoint(x: xI(6), dy: yI(1), thickness: ThicknessOverride(size: 24)),
+            DataPoint(x: xI(8), dy: yI(2), thickness: ThicknessOverride(size: 8)),
+            DataPoint(x: xI(10), dy: yI(9), thickness: ThicknessOverride(size: 16)),
+          ],
+          thickness: thickness1,
+        ),
+      ],
+    ),
+    ExampleChart<LineData>(
+      title: 'Stepped dynamic thickness',
+      modifier: (c) => c.copyWith(
+        layout: const RelativeLayout(maxX: 150, maxY: 150),
+        lineType: const SteppedLineData.middle(isStrokeJoinRound: true, isStrokeCapRound: true),
+      ),
+      initialCharts: [
+        LineData(
+          points: [
+            DataPoint(x: xI(0), dy: yI(4), thickness: ThicknessOverride(size: 8)),
+            DataPoint(x: xI(2), dy: yI(8), thickness: ThicknessOverride(size: 24)),
+            DataPoint(x: xI(6), dy: yI(2), thickness: ThicknessOverride(size: 16)),
+            DataPoint(x: xI(8), dy: yI(5), thickness: ThicknessOverride(size: 24)),
+            DataPoint(x: xI(10), dy: yI(7), thickness: ThicknessOverride(size: 8)),
+          ],
+          thickness: thickness1,
+        ),
+      ],
+      toggleCharts: [
+        LineData(
+          points: [
+            DataPoint(x: xI(0), dy: yI(8), thickness: ThicknessOverride(size: 16)),
+            DataPoint(x: xI(2), dy: yI(4), thickness: ThicknessOverride(size: 8)),
+            DataPoint(x: xI(6), dy: yI(1), thickness: ThicknessOverride(size: 24)),
+            DataPoint(x: xI(8), dy: yI(2), thickness: ThicknessOverride(size: 8)),
+            DataPoint(x: xI(10), dy: yI(9), thickness: ThicknessOverride(size: 16)),
+          ],
+          thickness: thickness1,
+        ),
+      ],
+    ),
+    ExampleChart<LineData>(
+      title: 'Stepped dynamic thickness',
+      modifier: (c) => c.copyWith(
+        layout: const RelativeLayout(maxX: 150, maxY: 150),
+        lineType: const SteppedLineData.middle(isStrokeJoinRound: true, isStrokeCapRound: true),
+      ),
+      initialCharts: [
+        LineData(
+          points: [
+            DataPoint(x: xI(0), dy: yI(4), thickness: ThicknessOverride(size: 8, color: Colors.pink)),
+            DataPoint(x: xI(2), dy: yI(8), thickness: ThicknessOverride(size: 24, color: Colors.purpleAccent)),
+            DataPoint(x: xI(6), dy: yI(2), thickness: ThicknessOverride(size: 16, color: Colors.pink)),
+            DataPoint(x: xI(8), dy: yI(5), thickness: ThicknessOverride(size: 24, color: Colors.purpleAccent)),
+            DataPoint(x: xI(10), dy: yI(7), thickness: ThicknessOverride(size: 8, color: Colors.pink)),
+          ],
+          thickness: thickness1,
+        ),
+      ],
+      toggleCharts: [
+        LineData(
+          points: [
+            DataPoint(x: xI(0), dy: yI(4), thickness: ThicknessOverride(size: 8, color: Colors.pink)),
+            DataPoint(x: xI(2), dy: yI(8), thickness: ThicknessOverride(size: 24, color: Colors.purpleAccent)),
+            DataPoint(x: xI(6), dy: yI(2), thickness: ThicknessOverride(size: 16, color: Colors.pink)),
+            DataPoint(x: xI(8), dy: yI(5), thickness: ThicknessOverride(size: 24, color: Colors.purpleAccent)),
+            DataPoint(x: xI(10), dy: yI(7), thickness: ThicknessOverride(size: 8, color: Colors.pink)),
+          ],
+          thickness: thickness1,
+        ),
+      ],
     )
   ];
 }
