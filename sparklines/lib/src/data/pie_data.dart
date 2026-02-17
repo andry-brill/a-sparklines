@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'dart:ui' show lerpDouble;
-import 'dart:math' as math;
 import 'data_point.dart';
 import 'pie_slice_data.dart';
 import '../interfaces.dart';
@@ -20,6 +19,7 @@ class PieData implements ISparklinesData, IChartThickness, IChartBorder, IChartD
   final IChartLayout? layout;
   @override
   final bool? crop;
+
   @override
   IChartRenderer get renderer => defaultRenderer;
 
@@ -62,8 +62,6 @@ class PieData implements ISparklinesData, IChartThickness, IChartBorder, IChartD
       }
     }
 
-    print('bounds >>> ${_bounds}');
-
     return _bounds!;
   }
 
@@ -91,7 +89,7 @@ class PieData implements ISparklinesData, IChartThickness, IChartBorder, IChartD
     this.layout,
     this.crop,
     required this.points,
-    this.thickness = const ThicknessData(size: math.pi),
+    this.thickness = const ThicknessData(size: 2.0),
     this.space = 0.0,
     this.border,
     this.borderRadius,
@@ -169,7 +167,7 @@ class PieData implements ISparklinesData, IChartThickness, IChartBorder, IChartD
       points: interpolatedPies,
       thickness: thickness.lerpTo(next.thickness, t),
       space: lerpDouble(space, next.space, t) ?? next.space,
-      border: ThicknessData.lerp(border, next.border, t),
+      border: ILerpTo.lerp(border, next.border, t),
       borderRadius: lerpDouble(borderRadius, next.borderRadius, t) ?? next.borderRadius,
       debug: next.debug
     );

@@ -13,54 +13,22 @@ class BetweenLineRenderer extends AChartRenderer<BetweenLineData> {
   ) {
     final paint = Paint();
 
-    final fromPath = betweenData.from.renderer.buildPath(betweenData.from, context);
-    final toPath = betweenData.to.renderer.buildPath(betweenData.to, context);
-    final reversedToPath = _reversePath(toPath);
-
-    final combinedPath = Path.from(fromPath);
-    combinedPath.addPath(reversedToPath, Offset.zero);
+    final combinedPath = betweenData.from.lineType.toPath(betweenData.from.points);
+    betweenData.to.lineType.toPath(betweenData.to.points, reverse: true, path: combinedPath);
     combinedPath.close();
 
+    final tPath = combinedPath.transform(context.pathTransform.storage);
+
     if (betweenData.areaGradient != null) {
-      paint.shader = betweenData.areaGradient!.createShader(context.bounds);
+      paint.shader = betweenData.areaGradient!.createShader(tPath.getBounds());
     } else {
       paint.shader = null;
       paint.color = betweenData.areaColor;
     }
 
     paint.style = PaintingStyle.fill;
-    context.drawPath(combinedPath, paint);
+
+    context.canvas.drawPath(tPath, paint);
   }
 
-  Path _reversePath(Path path) {
-    // Build reversed path by sampling points along the path
-    final reversed = Path();
-    final metrics = path.computeMetrics();
-
-    for (final metric in metrics) {
-      if (metric.length == 0) continue;
-
-      // Sample points along the path
-      final sampleCount = (metric.length / 2).ceil().clamp(10, 100);
-      final points = <Offset>[];
-
-      for (int i = 0; i <= sampleCount; i++) {
-        final t = i / sampleCount;
-        final tangent = metric.getTangentForOffset(metric.length * t);
-        if (tangent != null) {
-          points.add(tangent.position);
-        }
-      }
-
-      // Build reversed path
-      if (points.isNotEmpty) {
-        reversed.moveTo(points.last.dx, points.last.dy);
-        for (int i = points.length - 2; i >= 0; i--) {
-          reversed.lineTo(points[i].dx, points[i].dy);
-        }
-      }
-    }
-
-    return reversed;
-  }
 }

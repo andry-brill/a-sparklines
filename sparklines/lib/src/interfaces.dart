@@ -15,6 +15,39 @@ abstract class ILerpTo<T> {
   }
 }
 
+
+class ThicknessOverride implements ILerpTo<ThicknessOverride> {
+
+  final double? size;
+  final Gradient? gradient;
+  final Color? color;
+
+  const ThicknessOverride({
+    this.size,
+    this.color,
+    this.gradient,
+  });
+
+  @override
+  ThicknessOverride lerpTo(ThicknessOverride next, double t) {
+    return ThicknessOverride(
+      size: lerpDouble(size, next.size, t),
+      color: Color.lerp(color, next.color, t),
+      gradient: Gradient.lerp(gradient, next.gradient, t),
+    );
+  }
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    if (other is! ThicknessData) return false;
+    return size == other.size &&
+        color == other.color &&
+        gradient == other.gradient;
+  }
+
+}
+
 class ThicknessData implements ILerpTo<ThicknessData> {
 
   final double size;
@@ -57,12 +90,6 @@ class ThicknessData implements ILerpTo<ThicknessData> {
         align == other.align;
   }
 
-  static ThicknessData? lerp(ThicknessData? a, ThicknessData? b, double t) {
-    if (a == null && b == null) return null;
-    if (a == null) return b;
-    if (b == null) return a;
-    return a.lerpTo(b, t);
-  }
 }
 
 abstract class IChartThickness {
@@ -223,7 +250,25 @@ abstract class IDataPointStyle implements ILerpTo<IDataPointStyle> {
 }
 
 /// Marker interface for line type data
-abstract class ILineTypeData {}
+abstract class ILineTypeData {
+
+
+  bool get isStrokeCapRound;
+  bool get isStrokeJoinRound;
+  Path toPath(List<DataPoint> points, {bool useFy = true, bool reverse = false, Path? path});
+
+  static void moveToStart(Path path, List<DataPoint> points, bool useFy, bool reverse) {
+
+    if (!reverse) {
+      final first = points[0];
+      path.moveTo(first.x, first.getYorFY(useFy));
+    } else {
+      final last = points.last;
+      path.moveTo(last.x, last.getYorFY(useFy));
+    }
+
+  }
+}
 
 /// Step line type data
 class SteppedLineType implements ILineTypeData {
@@ -231,10 +276,50 @@ class SteppedLineType implements ILineTypeData {
   /// 0.0 → previous point, 1.0 → next point
   final double stepJumpAt;
 
-  const SteppedLineType({this.stepJumpAt = 0.5});
-  const SteppedLineType.start() : stepJumpAt = 0.0;
-  const SteppedLineType.middle() : stepJumpAt = 0.5;
-  const SteppedLineType.end() : stepJumpAt = 1.0;
+  @override
+  final bool isStrokeCapRound;
+  @override
+  final bool isStrokeJoinRound;
+
+  const SteppedLineType({this.stepJumpAt = 0.5, this.isStrokeCapRound = false, this.isStrokeJoinRound = false});
+  const SteppedLineType.start({this.isStrokeCapRound = false, this.isStrokeJoinRound = false}) : stepJumpAt = 0.0;
+  const SteppedLineType.middle({this.isStrokeCapRound = false, this.isStrokeJoinRound = false}) : stepJumpAt = 0.5;
+  const SteppedLineType.end({this.isStrokeCapRound = false, this.isStrokeJoinRound = false}) : stepJumpAt = 1.0;
+
+  @override
+  Path toPath(List<DataPoint> points, {bool useFy = true, bool reverse = false, Path? path}) {
+
+    final pathOut = path ?? Path();
+    if (points.isEmpty) return pathOut;
+
+    ILineTypeData.moveToStart(pathOut, points, useFy, reverse);
+    if (points.length == 1) return pathOut;
+
+    if (reverse) {
+      for (int i = points.length - 1; i >= 1; i--) {
+        final curr = points[i];
+        final prev = points[i - 1];
+        final stepX = prev.x + (curr.x - prev.x) * stepJumpAt;
+        pathOut.lineTo(stepX, curr.getYorFY(useFy));
+        pathOut.lineTo(stepX, prev.getYorFY(useFy));
+        pathOut.lineTo(prev.x, prev.getYorFY(useFy));
+      }
+    } else {
+      for (int i = 1; i < points.length; i++) {
+        final prev = points[i - 1];
+        final curr = points[i];
+        final stepX = prev.x + (curr.x - prev.x) * stepJumpAt;
+        pathOut.lineTo(stepX, prev.getYorFY(useFy));
+        pathOut.lineTo(stepX, curr.getYorFY(useFy));
+        pathOut.lineTo(curr.x, curr.getYorFY(useFy));
+      }
+    }
+
+    return pathOut;
+  }
+
+
+
 }
 
 class CurvedLineType implements ILineTypeData {
@@ -242,5 +327,94 @@ class CurvedLineType implements ILineTypeData {
   /// Curve smoothness (0.0 to 1.0)
   final double smoothness;
 
-  const CurvedLineType({this.smoothness = 0.35});
+  @override
+  final bool isStrokeCapRound;
+  @override
+  final bool isStrokeJoinRound;
+
+  const CurvedLineType({this.smoothness = 0.35, this.isStrokeCapRound = false, this.isStrokeJoinRound = false});
+
+  @override
+  Path toPath(List<DataPoint> points, {bool useFy = true, bool reverse = false, Path? path}) {
+
+    final pathOut = path ?? Path();
+    if (points.isEmpty) return pathOut;
+
+    ILineTypeData.moveToStart(pathOut, points, useFy, reverse);
+    if (points.length == 1) return pathOut;
+
+    if (reverse) {
+      for (int i = points.length - 1; i >= 1; i--) {
+        final curr = points[i];
+        final prev = points[i - 1];
+        if (i == points.length - 1) {
+          final controlX = prev.x + (curr.x - prev.x) * smoothness;
+          pathOut.quadraticBezierTo(controlX, curr.getYorFY(useFy), prev.x, prev.getYorFY(useFy));
+        } else if (i == 1) {
+          final controlX = curr.x - (curr.x - prev.x) * smoothness;
+          pathOut.quadraticBezierTo(controlX, prev.getYorFY(useFy), prev.x, prev.getYorFY(useFy));
+        } else {
+          final next = points[i + 1];
+          final controlX1 = curr.x - (curr.x - next.x) * smoothness;
+          final controlX2 = prev.x + (curr.x - prev.x) * smoothness;
+          pathOut.cubicTo(controlX1, curr.getYorFY(useFy), controlX2, prev.getYorFY(useFy), prev.x, prev.getYorFY(useFy));
+        }
+      }
+    } else {
+      for (int i = 1; i < points.length; i++) {
+        final prev = points[i - 1];
+        final curr = points[i];
+
+        if (i == 1) {
+          final controlX = prev.x + (curr.x - prev.x) * smoothness;
+          pathOut.quadraticBezierTo(controlX, prev.getYorFY(useFy), curr.x, curr.getYorFY(useFy));
+        } else if (i == points.length - 1) {
+          final controlX = curr.x - (curr.x - prev.x) * smoothness;
+          pathOut.quadraticBezierTo(controlX, curr.getYorFY(useFy), curr.x, curr.getYorFY(useFy));
+        } else {
+          final next = points[i + 1];
+          final controlX1 = prev.x + (curr.x - prev.x) * smoothness;
+          final controlX2 = curr.x - (next.x - curr.x) * smoothness;
+          pathOut.cubicTo(controlX1, prev.getYorFY(useFy), controlX2, curr.getYorFY(useFy), curr.x, curr.getYorFY(useFy));
+        }
+      }
+    }
+
+    return pathOut;
+
+  }
+}
+
+class LinearLineType implements ILineTypeData {
+
+  @override
+  final bool isStrokeCapRound;
+  @override
+  final bool isStrokeJoinRound;
+
+  const LinearLineType({this.isStrokeCapRound = false, this.isStrokeJoinRound = false});
+
+  @override
+  Path toPath(List<DataPoint> points, {bool useFy = true, bool reverse = false, Path? path}) {
+
+    final pathOut = path ?? Path();
+    if (points.isEmpty) return pathOut;
+
+    ILineTypeData.moveToStart(pathOut, points, useFy, reverse);
+    if (points.length == 1) return pathOut;
+
+    if (reverse) {
+      for (int i = points.length - 2; i >= 0; i--) {
+        final point = points[i];
+        pathOut.lineTo(point.x, point.getYorFY(useFy));
+      }
+    } else {
+      for (int i = 1; i < points.length; i++) {
+        final point = points[i];
+        pathOut.lineTo(point.x, point.getYorFY(useFy));
+      }
+    }
+
+    return pathOut;
+  }
 }

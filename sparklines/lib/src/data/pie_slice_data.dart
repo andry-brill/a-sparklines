@@ -47,7 +47,8 @@ class PieSliceData {
   }
 }
 
-/// Computes slice layout for pie chart.
+/// TODO move to  startAngle = y, endAngle = y + dy, - stack will work fine
+/// Computes slice layout for pie, chart.
 /// - Each point (x,y) defines arc, where r = x, startAngle = y - dy, deltaAngle = dy, (y + dy = fy = endAngle)
 ///   - mid point (x=10, y=0rad) == (x=10, y=0)
 /// - innerRadius = x - thicknessAlignedLeft, outerRadius = x + thicknessAlignedRight based on thicknessAlign.
@@ -85,7 +86,7 @@ List<PieSliceData> computePies(
       outerRadius: outerRadius,
       offset: spaceOffset,
       point: point,
-      cornerRadius: cornerRadius
+      cornerRadius: min(cornerRadius, (outerRadius - innerRadius)/2)
     );
 
   }).toList();

@@ -12,6 +12,12 @@ import '../data_point.dart';
 ///
 /// Each point's [DataPoint.dy] is the value to stack. The stacker maintains
 /// cumulative y per x across calls, so line2 bases on line1, line3 on line1+line2.
+/// TODO normalizer
+///  TODO  (min: -pi, center: 0, max: +pi), => equally split negative in [-pi, 0], positive in [0, pi]
+///  TODO normalizer (min: 0, center: 0, max: 2*pi) => negative will be ignored
+///  TODO (min: 0, center: null, positive: 2*pi), => total = sum(positive + abs(negative)) => negative = abs(negative)/total * 2*pi
+///
+/// TODO lazy read-only list (will calculate values on first access to apply normalizer)
 class DataPointStacker {
 
   /// Cumulative (y + dy) at each x from previous stack() calls.
@@ -27,7 +33,7 @@ class DataPointStacker {
 
     for (final p in points) {
       final base = _cumulativeByX[p.x] ?? 0.0;
-      result.add(DataPoint(x: p.x, y: base, dy: p.dy, style: p.style));
+      result.add(DataPoint(x: p.x, y: base, dy: p.dy, style: p.style, thickness: p.thickness));
       _cumulativeByX[p.x] = base + p.dy;
     }
 

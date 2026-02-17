@@ -17,33 +17,32 @@ class DataPoint implements ILerpTo<DataPoint> {
 
   final IDataPointStyle? style;
 
+  final ThicknessOverride? thickness;
+
   const DataPoint({
     required this.x,
     this.y = 0.0,
     required this.dy,
     this.style,
+    this.thickness,
   }) : fy = y + dy;
+
+  double getYorFY(bool fy) => fy ? this.fy : y;
 
   const DataPoint.value(this.x, double value, {
     this.y = 0.0,
     this.style,
+    this.thickness,
   }) : dy = value, fy = y + value;
 
   @override
   DataPoint lerpTo(DataPoint next, double t) {
-
-    IDataPointStyle? interpolatedStyle;
-    if (style != null && next.style != null) {
-      interpolatedStyle = style!.lerpTo(next.style!, t);
-    } else {
-      interpolatedStyle = next.style;
-    }
-
     return DataPoint(
       x: lerpDouble(x, next.x, t) ?? next.x,
       y: lerpDouble(y, next.y, t) ?? next.y,
       dy: lerpDouble(dy, next.dy, t) ?? next.dy,
-      style: interpolatedStyle,
+      style: ILerpTo.lerp(style, next.style, t),
+      thickness: ILerpTo.lerp(thickness, next.thickness, t),
     );
   }
 

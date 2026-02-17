@@ -128,7 +128,7 @@ class BarData implements ISparklinesData, IChartBorder, IChartThickness, IChartD
       crop: next.crop,
       bars: interpolatedBars,
       thickness: thickness.lerpTo(next.thickness, t),
-      border: ThicknessData.lerp(border, next.border, t),
+      border: ILerpTo.lerp(border, next.border, t),
       borderRadius: lerpDouble(borderRadius, next.borderRadius, t) ?? next.borderRadius,
       pointStyle: ILerpTo.lerp(pointStyle, next.pointStyle, t),
     );

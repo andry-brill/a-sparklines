@@ -42,9 +42,7 @@ class LineData implements ISparklinesData, IChartThickness, IChartDataPointStyle
   final Gradient? areaGradient;
   final Color? areaColor;
 
-  final ILineTypeData? lineType;
-  final bool isStrokeCapRound;
-  final bool isStrokeJoinRound;
+  final ILineTypeData lineType;
 
   @override
   final IDataPointStyle? pointStyle;
@@ -59,9 +57,7 @@ class LineData implements ISparklinesData, IChartThickness, IChartDataPointStyle
     this.thickness = const ThicknessData(size: 2.0),
     this.areaGradient,
     this.areaColor,
-    this.lineType,
-    this.isStrokeCapRound = false,
-    this.isStrokeJoinRound = false,
+    this.lineType = const LinearLineType(),
     this.pointStyle,
   });
 
@@ -76,8 +72,6 @@ class LineData implements ISparklinesData, IChartThickness, IChartDataPointStyle
     Gradient? areaGradient,
     Color? areaColor,
     ILineTypeData? lineType,
-    bool? isStrokeCapRound,
-    bool? isStrokeJoinRound,
     IDataPointStyle? pointStyle,
   }) {
     return LineData(
@@ -91,8 +85,6 @@ class LineData implements ISparklinesData, IChartThickness, IChartDataPointStyle
       areaGradient: areaGradient ?? this.areaGradient,
       areaColor: areaColor ?? this.areaColor,
       lineType: lineType ?? this.lineType,
-      isStrokeCapRound: isStrokeCapRound ?? this.isStrokeCapRound,
-      isStrokeJoinRound: isStrokeJoinRound ?? this.isStrokeJoinRound,
       pointStyle: pointStyle ?? this.pointStyle,
     );
   }
@@ -109,8 +101,6 @@ class LineData implements ISparklinesData, IChartThickness, IChartDataPointStyle
     if (areaGradient != other.areaGradient) return true;
     if (areaColor != other.areaColor) return true;
     if (lineType != other.lineType) return true;
-    if (isStrokeCapRound != other.isStrokeCapRound) return true;
-    if (isStrokeJoinRound != other.isStrokeJoinRound) return true;
     if (pointStyle != other.pointStyle) return true;
 
     for (int i = 0; i < points.length; i++) {
@@ -144,8 +134,6 @@ class LineData implements ISparklinesData, IChartThickness, IChartDataPointStyle
       areaGradient: Gradient.lerp(areaGradient, next.areaGradient, t),
       areaColor: Color.lerp(areaColor, next.areaColor, t),
       lineType: next.lineType,
-      isStrokeCapRound: next.isStrokeCapRound,
-      isStrokeJoinRound: next.isStrokeJoinRound,
       pointStyle: ILerpTo.lerp(pointStyle, next.pointStyle, t),
     );
   }
