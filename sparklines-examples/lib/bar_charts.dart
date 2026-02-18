@@ -134,5 +134,33 @@ List<ExampleChart> barCharts() {
           pointStyle: CircleDataPointStyle(radius: 3, color: Color(0xFF272727))
       ),
     ),
+    ExampleChart<BarData>(
+      title: 'Colored bars different sizes',
+      modifier: (c) => c.copyWith(layout: const RelativeLayout.full()),
+      initialCharts: [
+        BarData(
+          thickness: thickness1,
+            bars: [
+          dpI(0, 1, size: 2, color: Colors.blue.shade100),
+          dpI(2, 6, size: 4, color: Colors.blue.shade300),
+          dpI(4, 3, size: 8, color: Colors.blue.shade500),
+          dpI(6, 8, size: 16, color: Colors.blue.shade700),
+          dpI(8, 2, size: 8, color: Colors.blue.shade900),
+          dpI(10, 1, size: 4, color: Colors.blue),
+        ])
+      ],
+      toggleCharts: [
+        BarData(
+            thickness: thickness1,
+            bars: [
+              dpI(0, 3, size: 2, color: Colors.blue.shade100),
+              dpI(2, 1, size: 4, color: Colors.blue.shade300),
+              dpI(4, 8, size: 8, color: Colors.blue.shade500),
+              dpI(6, 1, size: 16, color: Colors.blue.shade700),
+              dpI(8, 5, size: 8, color: Colors.blue.shade900),
+              dpI(10, 2, size: 4, color: Colors.blue),
+        ])
+      ]
+    ),
   ];
 }

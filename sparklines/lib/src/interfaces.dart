@@ -2,7 +2,6 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:sparklines/sparklines.dart';
-import 'package:sparklines/src/data/data_point.dart';
 import 'dart:ui' show lerpDouble;
 import 'package:vector_math/vector_math_64.dart';
 
@@ -21,9 +20,11 @@ class ThicknessOverride implements ILerpTo<ThicknessOverride> {
 
   final double? size;
   final Gradient? gradient;
+  final double? align;
   final Color? color;
 
   const ThicknessOverride({
+    this.align,
     this.size,
     this.color,
     this.gradient,
@@ -33,6 +34,7 @@ class ThicknessOverride implements ILerpTo<ThicknessOverride> {
   ThicknessOverride lerpTo(ThicknessOverride next, double t) {
     return ThicknessOverride(
       size: lerpDouble(size, next.size, t),
+      align: lerpDouble(align, next.align, t),
       color: Color.lerp(color, next.color, t),
       gradient: Gradient.lerp(gradient, next.gradient, t),
     );
@@ -44,7 +46,8 @@ class ThicknessOverride implements ILerpTo<ThicknessOverride> {
     if (other is! ThicknessData) return false;
     return size == other.size &&
         color == other.color &&
-        gradient == other.gradient;
+        gradient == other.gradient &&
+        align == other.align;
   }
 
 }

@@ -17,14 +17,18 @@ class BarChartRenderer extends AChartRenderer<BarData> {
 
     final paint = Paint();
 
-    final thickness = barData.thickness;
-    final barWidth = context.toScreenLength(thickness.size);
-    final align = thickness.align;
-    final half = barWidth / 2;
-    final a = half * (1 + align);
-    final b = half * (1 - align);
 
     for (final bar in barData.bars) {
+
+      final thicknessSize = bar.thickness?.size ?? barData.thickness.size;
+      final thicknessAlign = bar.thickness?.align ?? barData.thickness.align;
+      final thicknessGradient = bar.thickness?.gradient ?? barData.thickness.gradient;
+      final thicknessColor = bar.thickness?.color ?? barData.thickness.color;
+
+      final barWidth = context.toScreenLength(thicknessSize);
+      final half = barWidth / 2;
+      final a = half * (1 + thicknessAlign);
+      final b = half * (1 - thicknessAlign);
 
       // Bar axis in data space: (x, y) -> (x, fy); transform to screen
       final p0 = context.transformXY(bar.x, bar.y);
@@ -36,12 +40,11 @@ class BarChartRenderer extends AChartRenderer<BarData> {
 
       paint.style = PaintingStyle.fill;
 
-      final shaderRect = rect;
-      if (thickness.gradient != null) {
-        paint.shader = thickness.gradient!.createShader(shaderRect);
+      if (thicknessGradient != null) {
+        paint.shader = thicknessGradient.createShader(rect);
       } else {
         paint.shader = null;
-        paint.color = thickness.color;
+        paint.color = thicknessColor;
       }
 
       if (roundedRect != null) {

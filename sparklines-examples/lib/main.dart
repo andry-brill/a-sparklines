@@ -21,7 +21,8 @@ List<DataPoint> dpR(Iterable<DataPoint> point) => point.map((p) => DataPoint(x: 
 
 double xI(int i) => (gridWidth / 10.0) * i;
 double yI(int i) => (gridHeight / 10.0) * i;
-DataPoint dpI(int xi, int yi) => DataPoint.value(xI(xi), yI(yi));
+DataPoint dpI(int xi, int yi, {double? size, Color? color}) => DataPoint.value(xI(xi), yI(yi),
+    thickness: size != null || color != null ? ThicknessOverride(size: size, color: color) : null);
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
