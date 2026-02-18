@@ -47,12 +47,10 @@ class PieSliceData {
   }
 }
 
-/// TODO move to  startAngle = y, endAngle = y + dy, - stack will work fine
-/// Computes slice layout for pie, chart.
-/// - Each point (x,y) defines arc, where r = x, startAngle = y - dy, deltaAngle = dy, (y + dy = fy = endAngle)
-///   - mid point (x=10, y=0rad) == (x=10, y=0)
+/// Computes slice layout for pie chart.
+/// - Each point (x, y) defines an arc: r = x, startAngle = y, endAngle = y + dy.
 /// - innerRadius = x - thicknessAlignedLeft, outerRadius = x + thicknessAlignedRight based on thicknessAlign.
-/// - space = uniform linear gap between slices, must be set as spaceOffset (aligned with "angle" of axis-ray)
+/// - space = uniform linear gap between slices, set as spaceOffset (aligned with arc midpoint angle).
 List<PieSliceData> computePies(
   List<DataPoint> points,
   double space,
@@ -69,14 +67,14 @@ List<PieSliceData> computePies(
     final innerRadius = max(0.0, point.x - halfThicknessLeft);
     final outerRadius = point.x + halfSweepRight;
 
-    final angle = point.y;
-    final startAngle = angle - point.dy;
-    final endAngle = angle + point.dy;
+    final startAngle = point.y;
+    final endAngle = point.fy;
+    final midAngle = startAngle + (endAngle - startAngle) / 2;
 
     final spaceHalf = space / 2;
     final spaceOffset = Offset(
-      spaceHalf * cos(angle),
-      spaceHalf * sin(angle),
+      spaceHalf * cos(midAngle),
+      spaceHalf * sin(midAngle),
     );
 
     return PieSliceData(
