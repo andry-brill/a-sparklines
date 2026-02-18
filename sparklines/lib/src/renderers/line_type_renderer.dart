@@ -1,7 +1,10 @@
 
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:sparklines/src/data/data_point.dart';
 import 'package:sparklines/src/interfaces.dart';
+import 'package:vector_math/vector_math_64.dart';
 
 import '../data/line_data.dart';
 
@@ -241,144 +244,151 @@ class SteppedLineRenderer extends BaseLineTypeRenderer<SteppedLineData> {
     // Drawing joins (vertical lines) with global thickness
     // When isStrokeCapRound: offset from top and bottom by halfJoin to align with rounded value line ends
     final Paint joinsPaint = buildPaint(context, lineData);
-    // if (!isDynamicPaint) {
-    //   final path = Path();
-    //
-    //   final globalHalf = halfJoin;
-    //   final radius = halfJoin;
-    //
-    //   final screenPoints =
-    //   points.map((p) => context.transformXY(p.x, p.fy)).toList();
-    //
-    //   final stepScreenX = <double>[];
-    //   for (int i = 0; i < stepX.length; i++) {
-    //     final p = context.transformXY(stepX[i], points[i].fy);
-    //     stepScreenX.add(p.dx);
-    //   }
-    //
-    //   // =======================
-    //   // TOP CONTOUR
-    //   // =======================
-    //
-    //   for (int i = 0; i < screenPoints.length; i++) {
-    //     final curr = screenPoints[i];
-    //
-    //     final halfLocal =
-    //         context.toScreenLength(points[i].thickness?.size ?? lineData.thickness.size) / 2;
-    //
-    //     final topY = curr.dy - halfLocal;
-    //
-    //     final leftX = (i == 0)
-    //         ? curr.dx
-    //         : stepScreenX[i - 1] - globalHalf;
-    //
-    //     final rightX = (i == screenPoints.length - 1)
-    //         ? curr.dx
-    //         : stepScreenX[i] + globalHalf;
-    //
-    //     if (i == 0) {
-    //       path.moveTo(leftX, topY);
-    //     }
-    //
-    //     // Horizontal
-    //     path.lineTo(rightX, topY);
-    //
-    //     if (i < screenPoints.length - 1) {
-    //       final next = screenPoints[i + 1];
-    //
-    //       final nextHalf =
-    //           context.toScreenLength(points[i + 1].thickness?.size ?? lineData.thickness.size) / 2;
-    //
-    //       final nextTopY = next.dy - nextHalf;
-    //
-    //       final verticalX = stepScreenX[i] + globalHalf;
-    //
-    //       // Vertical
-    //       if (!isJoinRound) {
-    //         path.lineTo(verticalX, nextTopY);
-    //       } else {
-    //         final goingUp = next.dy < curr.dy;
-    //
-    //         if (goingUp) {
-    //           path.arcToPoint(
-    //             Offset(verticalX, nextTopY),
-    //             radius: Radius.circular(radius),
-    //             clockwise: false,
-    //           );
-    //         } else {
-    //           path.arcToPoint(
-    //             Offset(verticalX, nextTopY),
-    //             radius: Radius.circular(radius),
-    //             clockwise: true,
-    //           );
-    //         }
-    //       }
-    //     }
-    //   }
-    //
-    //   // =======================
-    //   // BOTTOM CONTOUR (reverse)
-    //   // =======================
-    //
-    //   for (int i = screenPoints.length - 1; i >= 0; i--) {
-    //     final curr = screenPoints[i];
-    //
-    //     final halfLocal =
-    //         context.toScreenLength(points[i].thickness?.size ?? lineData.thickness.size) / 2;
-    //
-    //     final bottomY = curr.dy + halfLocal;
-    //
-    //     final leftX = (i == 0)
-    //         ? curr.dx
-    //         : stepScreenX[i - 1] - globalHalf;
-    //
-    //     final rightX = (i == screenPoints.length - 1)
-    //         ? curr.dx
-    //         : stepScreenX[i] + globalHalf;
-    //
-    //     // Horizontal
-    //     path.lineTo(leftX, bottomY);
-    //
-    //     if (i > 0) {
-    //       final prev = screenPoints[i - 1];
-    //
-    //       final prevHalf =
-    //           context.toScreenLength(points[i - 1].thickness?.size ?? lineData.thickness.size) / 2;
-    //
-    //       final prevBottomY = prev.dy + prevHalf;
-    //
-    //       final verticalX = stepScreenX[i - 1] - globalHalf;
-    //
-    //       if (!isJoinRound) {
-    //         path.lineTo(verticalX, prevBottomY);
-    //       } else {
-    //         final goingUp = curr.dy < prev.dy;
-    //
-    //         if (goingUp) {
-    //           path.arcToPoint(
-    //             Offset(verticalX, prevBottomY),
-    //             radius: Radius.circular(radius),
-    //             clockwise: true,
-    //           );
-    //         } else {
-    //           path.arcToPoint(
-    //             Offset(verticalX, prevBottomY),
-    //             radius: Radius.circular(radius),
-    //             clockwise: false,
-    //           );
-    //         }
-    //       }
-    //     }
-    //   }
-    //
-    //   path.close();
-    //
-    //   final paint = Paint()..style = PaintingStyle.fill;
-    //   paintThickness(paint, path.getBounds(), lineData.thickness);
-    //   context.canvas.drawPath(path, paint);
-    //
-    //   return;
-    // }
+    if (!isDynamicPaint) {
+      // Axis-aligned polyline only:
+      // horizontal <-> vertical <-> horizontal
+
+      final half = <double>[
+        for (var p in points)
+          (p.thickness?.size ?? lineData.thickness.size) / 2
+      ];
+
+      // ---- Build centerline control points in data space ----
+      final ctrl = <Vector3>[
+        Vector3(points[0].x, points[0].fy, 0),
+      ];
+
+      for (int i = 0; i < stepX.length; i++) {
+        ctrl.add(Vector3(stepX[i], points[i].fy, 0));
+        ctrl.add(Vector3(stepX[i], points[i + 1].fy, 0));
+        ctrl.add(Vector3(points[i + 1].x, points[i + 1].fy, 0));
+      }
+
+      // ---- Transform to screen space ----
+      final screen = ctrl
+          .map((v) => context.pathTransform.transform3(v))
+          .map((v) => Offset(v.x, v.y))
+          .toList();
+
+      // ---- Build per-segment half thickness in screen space ----
+      final halfScreen = <double>[];
+      for (int i = 0; i < stepX.length; i++) {
+        halfScreen.add(context.toScreenLength(half[i]) / 2);
+        halfScreen.add(context.toScreenLength(halfJoin));
+        halfScreen.add(context.toScreenLength(half[i + 1]) / 2);
+      }
+
+      final segCount = screen.length - 1;
+
+      final topPoints = <Offset>[];
+      final bottomPoints = <Offset>[];
+
+      // ---- Helper: detect orientation and return normal ----
+      Offset normalOf(Offset a, Offset b) {
+        final dx = b.dx - a.dx;
+        final dy = b.dy - a.dy;
+
+        if (dx.abs() > dy.abs()) {
+          // horizontal segment
+          if (dx > 0) {
+            // left -> right
+            return const Offset(0, -1);
+          } else {
+            // right -> left
+            return const Offset(0, 1);
+          }
+        } else {
+          // vertical segment
+          if (dy > 0) {
+            // top -> bottom (Flutter Y+ is down)
+            return const Offset(1, 0);
+          } else {
+            // bottom -> top
+            return const Offset(-1, 0);
+          }
+        }
+      }
+
+      // ---- First segment ----
+          {
+        final n = normalOf(screen[0], screen[1]);
+        final h = halfScreen[0];
+
+        topPoints.add(screen[0] + n * h);
+        bottomPoints.add(screen[0] - n * h);
+      }
+
+      // ---- Interior vertices (axis-aligned miter) ----
+      for (int i = 1; i < segCount; i++) {
+        final pPrev = screen[i - 1];
+        final pCurr = screen[i];
+        final pNext = screen[i + 1];
+
+        final n1 = normalOf(pPrev, pCurr);
+        final n2 = normalOf(pCurr, pNext);
+
+        final h1 = halfScreen[i - 1];
+        final h2 = halfScreen[i];
+
+        // Offset points for segment 1
+        final a = pCurr + n1 * h1;
+        final b = pCurr - n1 * h1;
+
+        // Offset points for segment 2
+        final c = pCurr + n2 * h2;
+        final d = pCurr - n2 * h2;
+
+        // Since segments are axis-aligned,
+        // intersection becomes trivial:
+        Offset topJoin;
+        Offset bottomJoin;
+
+        if (n1.dx != 0) {
+          // first segment vertical
+          topJoin = Offset(a.dx, c.dy);
+          bottomJoin = Offset(b.dx, d.dy);
+        } else {
+          // first segment horizontal
+          topJoin = Offset(c.dx, a.dy);
+          bottomJoin = Offset(d.dx, b.dy);
+        }
+
+        topPoints.add(topJoin);
+        bottomPoints.add(bottomJoin);
+      }
+
+      // ---- Last segment ----
+          {
+        final n = normalOf(
+          screen[segCount - 1],
+          screen[segCount],
+        );
+        final h = halfScreen[segCount - 1];
+
+        topPoints.add(screen[segCount] + n * h);
+        bottomPoints.add(screen[segCount] - n * h);
+      }
+
+      // ---- Build final solid path ----
+      final path = Path();
+      path.moveTo(topPoints.first.dx, topPoints.first.dy);
+
+      for (int i = 1; i < topPoints.length; i++) {
+        path.lineTo(topPoints[i].dx, topPoints[i].dy);
+      }
+
+      for (int i = bottomPoints.length - 1; i >= 0; i--) {
+        path.lineTo(bottomPoints[i].dx, bottomPoints[i].dy);
+      }
+
+      path.close();
+
+      final paint = Paint()..style = PaintingStyle.fill;
+      paintThickness(paint, path.getBounds(), lineData.thickness);
+      context.canvas.drawPath(path, paint);
+
+      return;
+    }
 
 
     final joinsPath = Path();
@@ -438,20 +448,3 @@ class SteppedLineRenderer extends BaseLineTypeRenderer<SteppedLineData> {
 
 
 }
-
-
-// class _RoundJoinMarker extends Offset {
-//   final Offset center;
-//   final double radius;
-//   final bool isTop;
-//   final Offset n1;
-//   final Offset n2;
-//
-//   _RoundJoinMarker(
-//       this.center,
-//       this.radius,
-//       this.isTop,
-//       this.n1,
-//       this.n2,
-//       ) : super(center.dx, center.dy);
-// }
