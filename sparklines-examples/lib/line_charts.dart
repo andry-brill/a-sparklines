@@ -324,6 +324,68 @@ List<ExampleChart> lineCharts() {
           thickness: thickness1,
         ),
       ],
+    ),
+    ExampleChart<LineData>(
+      title: 'Linear dynamic paints',
+      modifier: (c) => c.copyWith(
+        layout: const RelativeLayout.full(),
+        lineType: const LinearLineData(isStrokeJoinRound: true, isStrokeCapRound: true),
+      ),
+      initialCharts: [
+        LineData(
+          points: [
+            DataPoint(x: xI(0), dy: yI(4)),
+            DataPoint(x: xI(2), dy: yI(8), thickness: ThicknessOverride(color: Colors.pink)),
+            DataPoint(x: xI(6), dy: yI(2)),
+            DataPoint(x: xI(8), dy: yI(5), thickness: ThicknessOverride(color: Colors.purpleAccent)),
+            DataPoint(x: xI(10), dy: yI(7)),
+          ],
+          thickness: thickness1,
+        ),
+      ],
+      toggleCharts: [
+        LineData(
+          points: [
+            DataPoint(x: xI(0), dy: yI(4)),
+            DataPoint(x: xI(2), dy: yI(2), thickness: ThicknessOverride(color: Colors.purpleAccent)),
+            DataPoint(x: xI(6), dy: yI(8)),
+            DataPoint(x: xI(8), dy: yI(2), thickness: ThicknessOverride(color: Colors.pink)),
+            DataPoint(x: xI(10), dy: yI(9)),
+          ],
+          thickness: thickness1,
+        ),
+      ],
+    ),
+    ExampleChart<LineData>(
+      title: 'Curved dynamic paints',
+      modifier: (c) => c.copyWith(
+        layout: const RelativeLayout.full(),
+        lineType: const CurvedLineData(isStrokeJoinRound: true, isStrokeCapRound: true),
+      ),
+      initialCharts: [
+        LineData(
+          points: [
+            DataPoint(x: xI(0), dy: yI(4)),
+            DataPoint(x: xI(2), dy: yI(8), thickness: ThicknessOverride(color: Colors.pink)),
+            DataPoint(x: xI(6), dy: yI(2)),
+            DataPoint(x: xI(8), dy: yI(5), thickness: ThicknessOverride(color: Colors.purpleAccent)),
+            DataPoint(x: xI(10), dy: yI(7)),
+          ],
+          thickness: thickness1,
+        ),
+      ],
+      toggleCharts: [
+        LineData(
+          points: [
+            DataPoint(x: xI(0), dy: yI(4)),
+            DataPoint(x: xI(2), dy: yI(2), thickness: ThicknessOverride(color: Colors.purpleAccent)),
+            DataPoint(x: xI(6), dy: yI(8)),
+            DataPoint(x: xI(8), dy: yI(2), thickness: ThicknessOverride(color: Colors.pink)),
+            DataPoint(x: xI(10), dy: yI(9)),
+          ],
+          thickness: thickness1,
+        ),
+      ],
     )
   ];
 }

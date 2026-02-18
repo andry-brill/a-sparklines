@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:sparklines/src/data/data_point.dart';
 import 'package:sparklines/src/interfaces.dart';
@@ -89,13 +91,14 @@ class SteppedLineRenderer extends BaseLineTypeRenderer<SteppedLineData> {
 
       for (int i = 0; i < stepX.length; i++) {
 
-        final localHalf0 = context.toScreenLength(
+        // Expecting that local half >= global half
+        final localHalf0 = max(globalHalfScreen, context.toScreenLength(
           (points[i].thickness?.size ?? globalSize) / 2,
-        );
+        ));
 
-        final localHalf1 = context.toScreenLength(
+        final localHalf1 = max(globalHalfScreen, context.toScreenLength(
           (points[i + 1].thickness?.size ?? globalSize) / 2,
-        );
+        ));
 
         // subtract global half
         halfScreen.add((localHalf0 - globalHalfScreen).clamp(0.0, double.infinity));
