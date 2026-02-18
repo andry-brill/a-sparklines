@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import '../renderers/lines/curved_line_renderer.dart';
+import '../renderers/lines/linear_line_renderer.dart';
+import '../renderers/lines/stepped_line_renderer.dart';
 import 'data_point.dart';
 import '../interfaces.dart';
 import '../renderers/line_chart_renderer.dart';
-import '../renderers/line_type_renderer.dart';
 
 
 class LineData implements ISparklinesData, IChartThickness, IChartDataPointStyle {
