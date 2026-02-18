@@ -71,10 +71,17 @@ abstract class BaseLineTypeRenderer<LD extends ILineTypeData> implements ILineTy
     }
   }
 
-  Paint buildPaint(ChartRenderContext context, LineData lineData, [ThicknessOverride? override]) {
+  Paint buildStrokePaint(ChartRenderContext context, LineData lineData, [ThicknessOverride? override]) {
     return Paint()
       ..style = PaintingStyle.stroke
       ..strokeWidth = context.toScreenLength(override?.size ?? lineData.thickness.size)
+      ..strokeCap = lineData.lineType.isStrokeCapRound ? StrokeCap.round : StrokeCap.butt
+      ..strokeJoin = lineData.lineType.isStrokeJoinRound ? StrokeJoin.round : StrokeJoin.miter;
+  }
+
+  Paint buildFillPaint(ChartRenderContext context, LineData lineData) {
+    return Paint()
+      ..style = PaintingStyle.fill
       ..strokeCap = lineData.lineType.isStrokeCapRound ? StrokeCap.round : StrokeCap.butt
       ..strokeJoin = lineData.lineType.isStrokeJoinRound ? StrokeJoin.round : StrokeJoin.miter;
   }
@@ -98,7 +105,7 @@ abstract class BaseLineTypeRenderer<LD extends ILineTypeData> implements ILineTy
     final path = toPath(lineData.lineType, lineData.points);
     final tPath = path.transform(context.pathTransform.storage);
 
-    final paint = buildPaint(context, lineData);
+    final paint = buildStrokePaint(context, lineData);
     paintThickness(paint, tPath.getBounds(), stroke);
     context.canvas.drawPath(tPath, paint);
   }
@@ -243,17 +250,13 @@ class SteppedLineRenderer extends BaseLineTypeRenderer<SteppedLineData> {
 
     // Drawing joins (vertical lines) with global thickness
     // When isStrokeCapRound: offset from top and bottom by halfJoin to align with rounded value line ends
-    final Paint joinsPaint = buildPaint(context, lineData);
+    final Paint joinsPaint = buildStrokePaint(context, lineData);
     if (!isDynamicPaint) {
-      // Axis-aligned polyline only:
-      // horizontal <-> vertical <-> horizontal
 
-      final half = <double>[
-        for (var p in points)
-          (p.thickness?.size ?? lineData.thickness.size) / 2
-      ];
+      final globalSize = lineData.thickness.size;
+      final globalHalfScreen = context.toScreenLength(globalSize) / 2;
 
-      // ---- Build centerline control points in data space ----
+      // ---- Build centerline in data space ----
       final ctrl = <Vector3>[
         Vector3(points[0].x, points[0].fy, 0),
       ];
@@ -270,42 +273,42 @@ class SteppedLineRenderer extends BaseLineTypeRenderer<SteppedLineData> {
           .map((v) => Offset(v.x, v.y))
           .toList();
 
-      // ---- Build per-segment half thickness in screen space ----
-      final halfScreen = <double>[];
-      for (int i = 0; i < stepX.length; i++) {
-        halfScreen.add(context.toScreenLength(half[i]) / 2);
-        halfScreen.add(context.toScreenLength(halfJoin));
-        halfScreen.add(context.toScreenLength(half[i + 1]) / 2);
-      }
-
       final segCount = screen.length - 1;
+
+      // ---- Compute effective half thickness per segment ----
+      final halfScreen = <double>[];
+
+      for (int i = 0; i < stepX.length; i++) {
+
+        final localHalf0 = context.toScreenLength(
+          (points[i].thickness?.size ?? globalSize) / 2,
+        );
+
+        final localHalf1 = context.toScreenLength(
+          (points[i + 1].thickness?.size ?? globalSize) / 2,
+        );
+
+        // subtract global half
+        halfScreen.add((localHalf0 - globalHalfScreen).clamp(0.0, double.infinity));
+        halfScreen.add(0); // vertical join uses only global stroke
+        halfScreen.add((localHalf1 - globalHalfScreen).clamp(0.0, double.infinity));
+      }
 
       final topPoints = <Offset>[];
       final bottomPoints = <Offset>[];
 
-      // ---- Helper: detect orientation and return normal ----
       Offset normalOf(Offset a, Offset b) {
         final dx = b.dx - a.dx;
         final dy = b.dy - a.dy;
 
         if (dx.abs() > dy.abs()) {
-          // horizontal segment
-          if (dx > 0) {
-            // left -> right
-            return const Offset(0, -1);
-          } else {
-            // right -> left
-            return const Offset(0, 1);
-          }
+          return dx > 0
+              ? const Offset(0, -1)
+              : const Offset(0, 1);
         } else {
-          // vertical segment
-          if (dy > 0) {
-            // top -> bottom (Flutter Y+ is down)
-            return const Offset(1, 0);
-          } else {
-            // bottom -> top
-            return const Offset(-1, 0);
-          }
+          return dy > 0
+              ? const Offset(1, 0)
+              : const Offset(-1, 0);
         }
       }
 
@@ -318,8 +321,9 @@ class SteppedLineRenderer extends BaseLineTypeRenderer<SteppedLineData> {
         bottomPoints.add(screen[0] - n * h);
       }
 
-      // ---- Interior vertices (axis-aligned miter) ----
+      // ---- Interior vertices ----
       for (int i = 1; i < segCount; i++) {
+
         final pPrev = screen[i - 1];
         final pCurr = screen[i];
         final pNext = screen[i + 1];
@@ -330,25 +334,19 @@ class SteppedLineRenderer extends BaseLineTypeRenderer<SteppedLineData> {
         final h1 = halfScreen[i - 1];
         final h2 = halfScreen[i];
 
-        // Offset points for segment 1
         final a = pCurr + n1 * h1;
         final b = pCurr - n1 * h1;
 
-        // Offset points for segment 2
         final c = pCurr + n2 * h2;
         final d = pCurr - n2 * h2;
 
-        // Since segments are axis-aligned,
-        // intersection becomes trivial:
         Offset topJoin;
         Offset bottomJoin;
 
         if (n1.dx != 0) {
-          // first segment vertical
           topJoin = Offset(a.dx, c.dy);
           bottomJoin = Offset(b.dx, d.dy);
         } else {
-          // first segment horizontal
           topJoin = Offset(c.dx, a.dy);
           bottomJoin = Offset(d.dx, b.dy);
         }
@@ -359,17 +357,14 @@ class SteppedLineRenderer extends BaseLineTypeRenderer<SteppedLineData> {
 
       // ---- Last segment ----
           {
-        final n = normalOf(
-          screen[segCount - 1],
-          screen[segCount],
-        );
+        final n = normalOf(screen[segCount - 1], screen[segCount]);
         final h = halfScreen[segCount - 1];
 
         topPoints.add(screen[segCount] + n * h);
         bottomPoints.add(screen[segCount] - n * h);
       }
 
-      // ---- Build final solid path ----
+      // ---- Build inner fill path ----
       final path = Path();
       path.moveTo(topPoints.first.dx, topPoints.first.dy);
 
@@ -383,9 +378,13 @@ class SteppedLineRenderer extends BaseLineTypeRenderer<SteppedLineData> {
 
       path.close();
 
-      final paint = Paint()..style = PaintingStyle.fill;
-      paintThickness(paint, path.getBounds(), lineData.thickness);
-      context.canvas.drawPath(path, paint);
+      final fillPaint = buildFillPaint(context, lineData);
+      paintThickness(fillPaint, path.getBounds(), lineData.thickness);
+      context.canvas.drawPath(path, fillPaint);
+
+      final strokePaint = buildStrokePaint(context, lineData);
+      paintThickness(strokePaint, path.getBounds(), lineData.thickness);
+      context.canvas.drawPath(path, strokePaint);
 
       return;
     }
