@@ -30,7 +30,7 @@ abstract class AChartRenderer<DT extends ISparklinesData> implements IChartRende
     for (final point in points) {
       final pointStyle = point.style ?? chart.pointStyle;
       if (pointStyle != null) {
-        pointStyle.renderer.render(paint, context, pointStyle, point);
+        pointStyle.renderer.render(context, paint, pointStyle, point);
       }
     }
   }

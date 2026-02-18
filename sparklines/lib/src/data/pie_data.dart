@@ -23,7 +23,7 @@ class PieData implements ISparklinesData, IChartThickness, IChartBorder, IChartD
   @override
   IChartRenderer get renderer => defaultRenderer;
 
-  /// Each point (x,y) defines arc, where radius = x, startAngle = y - dy, endAngle = y + dy
+  /// Each point (x,y) defines arc, where radius = x, startAngle = y, endAngle = y + dy
   final List<DataPoint> points;
 
   @override
@@ -46,9 +46,9 @@ class PieData implements ISparklinesData, IChartThickness, IChartBorder, IChartD
     final layouts = computePies(
       points,
       space,
-      thickness.size,
-      thickness.align,
-      borderRadius ?? 0.0
+      thickness,
+      borderRadius ?? 0.0,
+      null
     );
 
     if (layouts.isEmpty) return _bounds = Rect.fromLTRB(0, 0, 1, 1);

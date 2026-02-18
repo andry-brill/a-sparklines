@@ -4,10 +4,11 @@ import 'package:sparklines/src/data/data_point.dart';
 import 'package:sparklines/src/interfaces.dart';
 
 abstract class ADataPointRenderer<ST extends IDataPointStyle> implements IDataPointRenderer {
+
   @override
   void render(
-    Paint paint,
     ChartRenderContext context,
+    Paint paint,
     IDataPointStyle style,
     DataPoint dataPoint,
   ) {

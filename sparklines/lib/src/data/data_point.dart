@@ -35,6 +35,20 @@ class DataPoint implements ILerpTo<DataPoint> {
     this.thickness,
   }) : dy = value, fy = y + value;
 
+  DataPoint copyWith({
+    double? x,
+    double? y,
+    double? dy,
+    IDataPointStyle? style,
+    ThicknessOverride? thickness,
+  }) => DataPoint(
+    x: x ?? this.x,
+    y: y ?? this.y,
+    dy: dy ?? this.dy,
+    style: style ?? this.style,
+    thickness: thickness ?? this.thickness,
+  );
+
   @override
   DataPoint lerpTo(DataPoint next, double t) {
     return DataPoint(

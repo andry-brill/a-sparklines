@@ -13,16 +13,14 @@ class PieChartRenderer extends AChartRenderer<PieData> {
     PieData pieData,
   ) {
 
-    final cornerRadius = pieData.borderRadius != null
-        ? context.toScreenLength(pieData.borderRadius!)
-        : 0.0;
+
 
     final layouts = computePies(
       pieData.points,
       pieData.space,
-      pieData.thickness.size,
-      pieData.thickness.align,
-      cornerRadius
+      pieData.thickness,
+      pieData.borderRadius ?? 0.0,
+      context
     );
 
     final paint = Paint();
@@ -34,13 +32,13 @@ class PieChartRenderer extends AChartRenderer<PieData> {
 
       paint.style = PaintingStyle.fill;
 
-      final shaderRect = pie.getBounds();
       final thickness = pieData.thickness;
-      if (thickness.gradient != null) {
-        paint.shader = thickness.gradient!.createShader(shaderRect);
+      final thicknessGradient = layout.point.thickness?.gradient ?? thickness.gradient;
+      if (thicknessGradient != null) {
+        paint.shader = thicknessGradient.createShader(pie.getBounds());
       } else {
         paint.shader = null;
-        paint.color = thickness.color;
+        paint.color = layout.point.thickness?.color ?? thickness.color;
       }
 
       context.canvas.drawPath(pie, paint);
@@ -75,7 +73,15 @@ class PieChartRenderer extends AChartRenderer<PieData> {
       }
     }
 
-    drawDataPoints(paint, context, pieData, pieData.points);
+    // Place each data point at the slice mid-angle on the circle, in Cartesian (x, y).
+    var midPoints = pieData.points.map((point) {
+      final midAngle = point.y + point.dy / 2;
+      final x = point.x * cos(midAngle);
+      final y = point.x * sin(midAngle);
+      return point.copyWith(x: x, y: y, dy: 0.0);
+    }).toList();
+
+    drawDataPoints(paint, context, pieData, midPoints);
   }
 
 }

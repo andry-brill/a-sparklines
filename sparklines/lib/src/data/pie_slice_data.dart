@@ -1,5 +1,6 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
+import 'package:sparklines/sparklines.dart';
 import 'package:sparklines/src/layout/circle_arc_builder.dart';
 import 'data_point.dart';
 
@@ -54,15 +55,28 @@ class PieSliceData {
 List<PieSliceData> computePies(
   List<DataPoint> points,
   double space,
-  double thickness,
-  double thicknessAlign,
-  double cornerRadius,
+  ThicknessData thickness,
+  double radius,
+  ChartRenderContext? context
 ) {
-  return points.where((point) => point.x > 0 && thickness > 0).map((point) {
 
-    // align: 0 = sweep/2 each side; -1 = all "left"; +1 = all "right" (same as bar)
-    final halfThicknessLeft = thickness * (1 + thicknessAlign) / 2;
-    final halfSweepRight = thickness * (1 - thicknessAlign) / 2;
+  final cornerRadius = context != null ? context.toScreenLength(radius) : radius;
+
+  List<PieSliceData> layouts = [];
+
+  for (var point in points) {
+
+    final thicknessAlign = point.thickness?.align ?? thickness.align;
+    double thicknessSize = point.thickness?.size ?? thickness.size;
+
+    if (context != null) {
+      thicknessSize = context.toScreenLength(thicknessSize);
+    }
+
+    if (point.x <= 0 || thickness.size <= 0) continue;
+
+    final halfThicknessLeft = thicknessSize * (1 + thicknessAlign) / 2;
+    final halfSweepRight = thicknessSize * (1 - thicknessAlign) / 2;
 
     final innerRadius = max(0.0, point.x - halfThicknessLeft);
     final outerRadius = point.x + halfSweepRight;
@@ -77,7 +91,7 @@ List<PieSliceData> computePies(
       spaceHalf * sin(midAngle),
     );
 
-    return PieSliceData(
+    layouts.add(PieSliceData(
       startAngle: startAngle,
       endAngle: endAngle,
       innerRadius: innerRadius,
@@ -85,7 +99,10 @@ List<PieSliceData> computePies(
       offset: spaceOffset,
       point: point,
       cornerRadius: min(cornerRadius, (outerRadius - innerRadius)/2)
-    );
+    ));
 
-  }).toList();
+  }
+
+  return layouts;
+
 }

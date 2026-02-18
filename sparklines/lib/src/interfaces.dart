@@ -202,8 +202,8 @@ abstract class IChartRenderer {
 
 abstract class IDataPointRenderer {
   void render(
-    Paint paint,
     ChartRenderContext context,
+    Paint paint,
     IDataPointStyle style,
     DataPoint dataPoint,
   );
