@@ -264,7 +264,7 @@ List<ExampleChart> lineCharts() {
       ],
     ),
     ExampleChart<LineData>(
-      title: 'Stepped dynamic thickness',
+      title: 'Stepped dynamic thickness with rounded joins',
       modifier: (c) => c.copyWith(
         layout: const RelativeLayout(maxX: 150, maxY: 150),
         lineType: const SteppedLineData.middle(isStrokeJoinRound: true, isStrokeCapRound: true),
@@ -295,7 +295,7 @@ List<ExampleChart> lineCharts() {
       ],
     ),
     ExampleChart<LineData>(
-      title: 'Stepped dynamic thickness',
+      title: 'Stepped dynamic thickness and paint',
       modifier: (c) => c.copyWith(
         layout: const RelativeLayout(maxX: 150, maxY: 150),
         lineType: const SteppedLineData.middle(isStrokeJoinRound: true, isStrokeCapRound: true),
@@ -386,6 +386,68 @@ List<ExampleChart> lineCharts() {
           thickness: thickness1,
         ),
       ],
-    )
+    ),
+    ExampleChart<LineData>(
+      title: 'Linear dynamic thickness',
+      modifier: (c) => c.copyWith(
+        layout: const RelativeLayout.full(),
+        lineType: const LinearLineData(isStrokeJoinRound: true, isStrokeCapRound: true),
+      ),
+      initialCharts: [
+        LineData(
+          points: [
+            DataPoint(x: xI(0), dy: yI(4)),
+            DataPoint(x: xI(2), dy: yI(8), thickness: ThicknessOverride(size: 8)),
+            DataPoint(x: xI(6), dy: yI(2)),
+            DataPoint(x: xI(8), dy: yI(5), thickness: ThicknessOverride(size: 16)),
+            DataPoint(x: xI(10), dy: yI(7)),
+          ],
+          thickness: thickness1,
+        ),
+      ],
+      toggleCharts: [
+        LineData(
+          points: [
+            DataPoint(x: xI(0), dy: yI(4)),
+            DataPoint(x: xI(2), dy: yI(2), thickness: ThicknessOverride(size: 16)),
+            DataPoint(x: xI(6), dy: yI(8), thickness: ThicknessOverride(size: 24)),
+            DataPoint(x: xI(8), dy: yI(2), thickness: ThicknessOverride(size: 8)),
+            DataPoint(x: xI(10), dy: yI(9)),
+          ],
+          thickness: thickness1,
+        ),
+      ],
+    ),
+    ExampleChart<LineData>(
+      title: 'Linear dynamic thickness and paint',
+      modifier: (c) => c.copyWith(
+        layout: const RelativeLayout.full(),
+        lineType: const LinearLineData(isStrokeJoinRound: true, isStrokeCapRound: true),
+      ),
+      initialCharts: [
+        LineData(
+          points: [
+            DataPoint(x: xI(0), dy: yI(4)),
+            DataPoint(x: xI(2), dy: yI(8), thickness: ThicknessOverride(size: 8, color: Colors.pink)),
+            DataPoint(x: xI(6), dy: yI(2)),
+            DataPoint(x: xI(8), dy: yI(5), thickness: ThicknessOverride(size: 16, color: Colors.deepOrange)),
+            DataPoint(x: xI(10), dy: yI(7)),
+          ],
+          thickness: thickness1,
+        ),
+      ],
+      toggleCharts: [
+        LineData(
+          points: [
+            DataPoint(x: xI(0), dy: yI(4)),
+            DataPoint(x: xI(2), dy: yI(2), thickness: ThicknessOverride(size: 16, color: Colors.deepOrange)),
+            DataPoint(x: xI(6), dy: yI(8), thickness: ThicknessOverride(size: 24)),
+            DataPoint(x: xI(8), dy: yI(2), thickness: ThicknessOverride(size: 8, color: Colors.pink)),
+            DataPoint(x: xI(10), dy: yI(9)),
+          ],
+          thickness: thickness1,
+        ),
+      ],
+    ),
   ];
 }
