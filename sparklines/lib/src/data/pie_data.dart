@@ -80,8 +80,6 @@ class PieData implements ISparklinesData, IChartThickness, IChartBorder, IChartD
   @override
   final IDataPointStyle? pointStyle;
 
-  final String? debug;
-
   PieData({
     this.visible = true,
     this.rotation = ChartRotation.d0,
@@ -94,7 +92,6 @@ class PieData implements ISparklinesData, IChartThickness, IChartBorder, IChartD
     this.border,
     this.borderRadius,
     this.pointStyle,
-    this.debug
   });
 
   PieData copyWith({
@@ -108,7 +105,6 @@ class PieData implements ISparklinesData, IChartThickness, IChartBorder, IChartD
     double? space,
     ThicknessData? border,
     double? borderRadius,
-    String? debug,
   }) {
     return PieData(
       visible: visible ?? this.visible,
@@ -121,7 +117,6 @@ class PieData implements ISparklinesData, IChartThickness, IChartBorder, IChartD
       space: space ?? this.space,
       border: border ?? this.border,
       borderRadius: borderRadius ?? this.borderRadius,
-      debug: debug ?? this.debug
     );
   }
 
@@ -169,7 +164,6 @@ class PieData implements ISparklinesData, IChartThickness, IChartBorder, IChartD
       space: lerpDouble(space, next.space, t) ?? next.space,
       border: ILerpTo.lerp(border, next.border, t),
       borderRadius: lerpDouble(borderRadius, next.borderRadius, t) ?? next.borderRadius,
-      debug: next.debug
     );
   }
 

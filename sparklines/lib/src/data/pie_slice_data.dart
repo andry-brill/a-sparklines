@@ -1,8 +1,9 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
-import 'package:sparklines/sparklines.dart';
 import 'package:sparklines/src/layout/circle_arc_builder.dart';
+import '../interfaces.dart';
 import 'data_point.dart';
+
 
 /// Result of computing layout for a single pie slice (angle order, radii, space).
 class PieSliceData {
@@ -48,6 +49,13 @@ class PieSliceData {
   }
 }
 
+Offset toCartesian(double radius, DataPoint point) {
+  final midAngle = point.y + point.dy / 2;
+  final dx = radius * cos(midAngle);
+  final dy = radius * sin(midAngle);
+  return Offset(dx, dy);
+}
+
 /// Computes slice layout for pie chart.
 /// - Each point (x, y) defines an arc: r = x, startAngle = y, endAngle = y + dy.
 /// - innerRadius = x - thicknessAlignedLeft, outerRadius = x + thicknessAlignedRight based on thicknessAlign.
@@ -73,27 +81,19 @@ List<PieSliceData> computePies(
       thicknessSize = context.toScreenLength(thicknessSize);
     }
 
-    if (point.x <= 0 || thickness.size <= 0) continue;
+    if (point.x <= 0.0001 || thicknessSize <= 0.0001 || point.dy <= 0.0001) continue;
 
-    final halfThicknessLeft = thicknessSize * (1 + thicknessAlign) / 2;
-    final halfSweepRight = thicknessSize * (1 - thicknessAlign) / 2;
+    final halfInnerThickness = thicknessSize * (1 - thicknessAlign) / 2;
+    final halfOuterThickness = thicknessSize * (1 + thicknessAlign) / 2;
 
-    final innerRadius = max(0.0, point.x - halfThicknessLeft);
-    final outerRadius = point.x + halfSweepRight;
+    final innerRadius = max(0.0, point.x - halfInnerThickness);
+    final outerRadius = point.x + halfOuterThickness;
 
-    final startAngle = point.y;
-    final endAngle = point.fy;
-    final midAngle = startAngle + (endAngle - startAngle) / 2;
-
-    final spaceHalf = space / 2;
-    final spaceOffset = Offset(
-      spaceHalf * cos(midAngle),
-      spaceHalf * sin(midAngle),
-    );
+    final spaceOffset = toCartesian(space, point);
 
     layouts.add(PieSliceData(
-      startAngle: startAngle,
-      endAngle: endAngle,
+      startAngle: point.y,
+      endAngle: point.fy,
       innerRadius: innerRadius,
       outerRadius: outerRadius,
       offset: spaceOffset,

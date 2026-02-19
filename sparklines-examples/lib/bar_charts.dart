@@ -61,17 +61,17 @@ final barSimpleToggle = [
 ];
 
 
-final barStacker1 = DataPointStacker();
-final barStacker2 = DataPointStacker();
+final barStacker1 = DataPointPipeline().stack();
+final barStacker2 = DataPointPipeline().stack();
 
 final barStackedInitial = [
-  BarData(bars: barStacker1.stack(blueBars), thickness: thicknessBar1),
-  BarData(bars: barStacker1.stack(blueBars), thickness: thicknessBar2),
+  BarData(bars: barStacker1.build(blueBars), thickness: thicknessBar1),
+  BarData(bars: barStacker1.build(blueBars), thickness: thicknessBar2),
 ];
 
 final barStackedToggle = [
-  BarData(bars: barStacker2.stack(blueBarsMod), thickness: thicknessBar1),
-  BarData(bars: barStacker2.stack(blueBarsMod), thickness: thicknessBar2),
+  BarData(bars: barStacker2.build(blueBarsMod), thickness: thicknessBar1),
+  BarData(bars: barStacker2.build(blueBarsMod), thickness: thicknessBar2),
 ];
 
 final barBase = ExampleChart(

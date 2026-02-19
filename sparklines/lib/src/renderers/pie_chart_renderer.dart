@@ -75,10 +75,8 @@ class PieChartRenderer extends AChartRenderer<PieData> {
 
     // Place each data point at the slice mid-angle on the circle, in Cartesian (x, y).
     var midPoints = pieData.points.map((point) {
-      final midAngle = point.y + point.dy / 2;
-      final x = point.x * cos(midAngle);
-      final y = point.x * sin(midAngle);
-      return point.copyWith(x: x, y: y, dy: 0.0);
+      final cart = toCartesian(point.x, point);
+      return point.copyWith(x: cart.dx, y: cart.dy, dy: 0.0);
     }).toList();
 
     drawDataPoints(paint, context, pieData, midPoints);
