@@ -1,13 +1,45 @@
-# Sparklines
+## Sparklines
 
 Feature-rich and highly optimized sparklines for Flutter.
 
-## Getting Started
+## Installation
 
-This package provides sparklines widgets for Flutter applications.
+## Example
 
-## Usage
+---
 
-```dart
-import 'package:sparklines/sparklines.dart';
-```
+## Common features 
+
+### Layouts
+
+ Absolute
+
+ Relative
+   Sharing in case of identical layout
+
+### Rotation and origin 
+
+### Crop and visibility
+
+### DataPoint structure
+
+### DataPoint style
+
+### Thickness global and local
+
+### Border and border radius
+
+### Area color and gradient
+
+## Line charts
+
+### Line types
+
+## Between line charts 
+
+## Bar charts
+
+## Pie charts
+
+### Space
+

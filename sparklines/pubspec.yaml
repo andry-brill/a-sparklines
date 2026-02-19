@@ -1,6 +1,6 @@
 name: sparklines
 description: Feature-rich and highly optimized sparklines for Flutter
-version: 0.1.0
+version: 1.0.0
 homepage: https://github.com/yourusername/sparklines
 
 environment:
