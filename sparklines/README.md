@@ -8,7 +8,7 @@ Feature-rich and highly optimized sparklines for Flutter.
 
 ---
 
-## Common features 
+## Common features
 
 ### Layouts
 
@@ -17,7 +17,7 @@ Feature-rich and highly optimized sparklines for Flutter.
  Relative
    Sharing in case of identical layout
 
-### Rotation and origin 
+### Rotation and origin
 
 ### Crop and visibility
 
@@ -35,7 +35,7 @@ Feature-rich and highly optimized sparklines for Flutter.
 
 ### Line types
 
-## Between line charts 
+## Between line charts
 
 ## Bar charts
 
