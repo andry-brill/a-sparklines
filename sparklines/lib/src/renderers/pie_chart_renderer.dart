@@ -9,6 +9,7 @@ class PieChartRenderer extends AChartRenderer<PieData> {
 
   @override
   void renderData(
+    Canvas canvas,
     ChartRenderContext context,
     PieData pieData,
   ) {
@@ -41,11 +42,11 @@ class PieChartRenderer extends AChartRenderer<PieData> {
         paint.color = layout.point.thickness?.color ?? thickness.color;
       }
 
-      context.canvas.drawPath(pie, paint);
+      canvas.drawPath(pie, paint);
 
       final border = pieData.border;
       if (border != null) {
-        final borderSize = context.toScreenLength(border.size);
+        final borderSize = context.transformScalar(border.size);
 
         final borderLayout = PieSliceData(
           offset: layout.offset,
@@ -69,7 +70,7 @@ class PieChartRenderer extends AChartRenderer<PieData> {
           paint.color = border.color;
         }
 
-        context.canvas.drawPath(pieBorderPath, paint);
+        canvas.drawPath(pieBorderPath, paint);
       }
     }
 
@@ -79,7 +80,7 @@ class PieChartRenderer extends AChartRenderer<PieData> {
       return point.copyWith(x: cart.dx, y: cart.dy, dy: 0.0);
     }).toList();
 
-    drawDataPoints(paint, context, pieData, midPoints);
+    drawDataPoints(canvas, paint, context, pieData, midPoints);
   }
 
 }

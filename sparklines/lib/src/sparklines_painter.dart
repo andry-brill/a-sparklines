@@ -68,8 +68,7 @@ class SparklinesPainter extends CustomPainter {
       final context = ChartRenderContext(
           layout: chartLayout,
           dimensions: dimensions,
-          pathTransform: chartLayout.pathTransform(dimensions),
-          canvas: canvas
+          pathTransform: chartLayout.transform(dimensions),
       );
 
       final p0 = context.transformXY(0, 0);
@@ -97,7 +96,7 @@ class SparklinesPainter extends CustomPainter {
       }
 
 
-      chart.renderer.render(context, chart);
+      chart.renderer.render(canvas, context, chart);
 
       canvas.restore();
 

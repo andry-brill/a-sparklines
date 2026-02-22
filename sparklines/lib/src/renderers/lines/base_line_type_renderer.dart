@@ -186,7 +186,7 @@ abstract class BaseLineTypeRenderer<LD extends ILineTypeData> implements ILineTy
 
 
   @override
-  void render(ChartRenderContext context, LineData lineData) {
+  void render(Canvas canvas, ChartRenderContext context, LineData lineData) {
 
     final points = lineData.points;
     if (points.length < 2) return;
@@ -195,16 +195,16 @@ abstract class BaseLineTypeRenderer<LD extends ILineTypeData> implements ILineTy
     final bool samePaint = _isSameStrokePainter(lineData.thickness, points);
 
     if (sameStroke && samePaint) {
-      renderSimplePath(context, lineData);
+      renderSimplePath(canvas, context, lineData);
     } else {
-      renderComplexPath(context, lineData, !sameStroke, !samePaint);
+      renderComplexPath(canvas, context, lineData, !sameStroke, !samePaint);
     }
   }
 
   Paint buildStrokePaint(ChartRenderContext context, LineData lineData, [ThicknessOverride? override]) {
     return Paint()
       ..style = PaintingStyle.stroke
-      ..strokeWidth = context.toScreenLength(override?.size ?? lineData.thickness.size)
+      ..strokeWidth = context.transformScalar(override?.size ?? lineData.thickness.size)
       ..strokeCap = lineData.lineType.isStrokeCapRound ? StrokeCap.round : StrokeCap.butt
       ..strokeJoin = lineData.lineType.isStrokeJoinRound ? StrokeJoin.round : StrokeJoin.miter;
   }
@@ -226,7 +226,7 @@ abstract class BaseLineTypeRenderer<LD extends ILineTypeData> implements ILineTy
     }
   }
 
-  void renderSimplePath(ChartRenderContext context, LineData lineData) {
+  void renderSimplePath(Canvas canvas, ChartRenderContext context, LineData lineData) {
 
     final stroke = lineData.thickness;
 
@@ -235,10 +235,10 @@ abstract class BaseLineTypeRenderer<LD extends ILineTypeData> implements ILineTy
 
     final paint = buildStrokePaint(context, lineData);
     paintThickness(paint, tPath.getBounds(), stroke);
-    context.canvas.drawPath(tPath, paint);
+    canvas.drawPath(tPath, paint);
   }
 
-  bool renderDynamicPaint(ChartRenderContext context, LineData lineData, bool isDynamicStroke, bool isDynamicPaint) {
+  bool renderDynamicPaint(Canvas canvas, ChartRenderContext context, LineData lineData, bool isDynamicStroke, bool isDynamicPaint) {
 
     if (isDynamicStroke || !isDynamicPaint) return false;
 
@@ -248,12 +248,12 @@ abstract class BaseLineTypeRenderer<LD extends ILineTypeData> implements ILineTy
     final paint = buildStrokePaint(context, lineData);
     Gradient global = globalMixedGradient(lineData.thickness, lineData.points);
     paint.shader = global.createShader(tPath.getBounds());
-    context.canvas.drawPath(tPath, paint);
+    canvas.drawPath(tPath, paint);
 
     return true;
   }
 
-  void renderComplexPath(ChartRenderContext context, LineData lineData, bool isDynamicStroke, bool isDynamicPaint);
+  void renderComplexPath(Canvas canvas, ChartRenderContext context, LineData lineData, bool isDynamicStroke, bool isDynamicPaint);
 }
 
 

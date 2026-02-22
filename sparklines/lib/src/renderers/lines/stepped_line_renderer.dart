@@ -42,11 +42,11 @@ class SteppedLineRenderer extends BaseLineTypeRenderer<SteppedLineData> {
   ///   Joins - vertical lines (jumps between prev.fy and next.fy) - using "global" thickness
   ///   Values - horizontal lines (value lines) - using "local" thickness
   @override
-  void renderComplexPath(ChartRenderContext context, LineData lineData, bool isDynamicStroke, bool isDynamicPaint) {
+  void renderComplexPath(Canvas canvas, ChartRenderContext context, LineData lineData, bool isDynamicStroke, bool isDynamicPaint) {
 
     final lineType = lineData.lineType as SteppedLineData;
     final points = lineData.points;
-    final halfJoin = context.toScreenLength(lineData.thickness.size) / 2;
+    final halfJoin = context.transformScalar(lineData.thickness.size) / 2;
     final isCapRound = lineType.isStrokeCapRound;
     final isJoinRound = lineType.isStrokeJoinRound;
 
@@ -65,7 +65,7 @@ class SteppedLineRenderer extends BaseLineTypeRenderer<SteppedLineData> {
     if (!isDynamicPaint) {
 
       final globalSize = lineData.thickness.size;
-      final globalHalfScreen = context.toScreenLength(globalSize) / 2;
+      final globalHalfScreen = context.transformScalar(globalSize) / 2;
 
       // ---- Build centerline in data space ----
       final ctrl = <Vector3>[
@@ -92,11 +92,11 @@ class SteppedLineRenderer extends BaseLineTypeRenderer<SteppedLineData> {
       for (int i = 0; i < stepX.length; i++) {
 
         // Expecting that local half >= global half
-        final localHalf0 = max(globalHalfScreen, context.toScreenLength(
+        final localHalf0 = max(globalHalfScreen, context.transformScalar(
           (points[i].thickness?.size ?? globalSize) / 2,
         ));
 
-        final localHalf1 = max(globalHalfScreen, context.toScreenLength(
+        final localHalf1 = max(globalHalfScreen, context.transformScalar(
           (points[i + 1].thickness?.size ?? globalSize) / 2,
         ));
 
@@ -192,11 +192,11 @@ class SteppedLineRenderer extends BaseLineTypeRenderer<SteppedLineData> {
 
       final fillPaint = buildFillPaint(context, lineData);
       paintThickness(fillPaint, path.getBounds(), lineData.thickness);
-      context.canvas.drawPath(path, fillPaint);
+      canvas.drawPath(path, fillPaint);
 
       final strokePaint = buildStrokePaint(context, lineData);
       paintThickness(strokePaint, path.getBounds(), lineData.thickness);
-      context.canvas.drawPath(path, strokePaint);
+      canvas.drawPath(path, strokePaint);
 
       return;
     }
@@ -215,7 +215,7 @@ class SteppedLineRenderer extends BaseLineTypeRenderer<SteppedLineData> {
     }
     final tJoinsPath = context.transform(joinsPath);
     paintThickness(joinsPaint, tJoinsPath.getBounds(), lineData.thickness);
-    context.canvas.drawPath(tJoinsPath, joinsPaint);
+    canvas.drawPath(tJoinsPath, joinsPaint);
 
     // Draw value lines as filled rectangles with rounded corners (uniform thickness in screen space)
     for (int i = 0; i < points.length; i++) {
@@ -225,7 +225,7 @@ class SteppedLineRenderer extends BaseLineTypeRenderer<SteppedLineData> {
 
       final left = context.transformXY(leftEnd, points[i].fy);
       final right = context.transformXY(rightEnd, points[i].fy);
-      final screenHeight = context.toScreenLength(valueSize);
+      final screenHeight = context.transformScalar(valueSize);
       final halfScreen = screenHeight / 2;
       final centerY = (left.dy + right.dy) / 2;
 
@@ -236,7 +236,7 @@ class SteppedLineRenderer extends BaseLineTypeRenderer<SteppedLineData> {
         centerY + halfScreen,
       );
 
-      final screenRadius = context.toScreenLength(halfJoin).clamp(0.0, halfScreen);
+      final screenRadius = context.transformScalar(halfJoin).clamp(0.0, halfScreen);
       final leftRounded = (i == 0 && isCapRound) || (i > 0 && isJoinRound);
       final rightRounded = (i == points.length - 1 && isCapRound) || (i < points.length - 1 && isJoinRound);
 
@@ -253,7 +253,7 @@ class SteppedLineRenderer extends BaseLineTypeRenderer<SteppedLineData> {
         ..style = PaintingStyle.fill
         ..strokeWidth = 0;
       paintThickness(paint, rect, lineData.thickness, points[i].thickness);
-      context.canvas.drawPath(valuePath, paint);
+      canvas.drawPath(valuePath, paint);
     }
   }
 }

@@ -7,13 +7,14 @@ abstract class ADataPointRenderer<ST extends IDataPointStyle> implements IDataPo
 
   @override
   void render(
+    Canvas canvas,
     ChartRenderContext context,
     Paint paint,
     IDataPointStyle style,
     DataPoint dataPoint,
   ) {
-    renderStyle(paint, context, style as ST, dataPoint);
+    renderStyle(canvas, paint, context, style as ST, dataPoint);
   }
 
-  void renderStyle(Paint paint, ChartRenderContext context, ST style, DataPoint dataPoint);
+  void renderStyle(Canvas canvas, Paint paint, ChartRenderContext context, ST style, DataPoint dataPoint);
 }

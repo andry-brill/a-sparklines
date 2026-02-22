@@ -8,6 +8,7 @@ class BetweenLineRenderer extends AChartRenderer<BetweenLineData> {
 
   @override
   void renderData(
+    Canvas canvas,
     ChartRenderContext context,
     BetweenLineData betweenData,
   ) {
@@ -31,7 +32,7 @@ class BetweenLineRenderer extends AChartRenderer<BetweenLineData> {
 
     paint.style = PaintingStyle.fill;
 
-    context.canvas.drawPath(tPath, paint);
+    canvas.drawPath(tPath, paint);
   }
 
 }

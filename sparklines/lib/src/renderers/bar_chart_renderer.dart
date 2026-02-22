@@ -11,6 +11,7 @@ class BarChartRenderer extends AChartRenderer<BarData> {
 
   @override
   void renderData(
+    Canvas canvas,
     ChartRenderContext context,
     BarData barData,
   ) {
@@ -25,7 +26,7 @@ class BarChartRenderer extends AChartRenderer<BarData> {
       final thicknessGradient = bar.thickness?.gradient ?? barData.thickness.gradient;
       final thicknessColor = bar.thickness?.color ?? barData.thickness.color;
 
-      final barWidth = context.toScreenLength(thicknessSize);
+      final barWidth = context.transformScalar(thicknessSize);
       final half = barWidth / 2;
       final a = half * (1 + thicknessAlign);
       final b = half * (1 - thicknessAlign);
@@ -48,15 +49,15 @@ class BarChartRenderer extends AChartRenderer<BarData> {
       }
 
       if (roundedRect != null) {
-        context.canvas.drawRRect(roundedRect, paint);
+        canvas.drawRRect(roundedRect, paint);
       } else {
-        context.canvas.drawRect(rect, paint);
+        canvas.drawRect(rect, paint);
       }
 
       final border = barData.border;
       if (border != null) {
 
-        final borderSize = context.toScreenLength(border.size);
+        final borderSize = context.transformScalar(border.size);
         final borderRect = rect.inflate(borderSize * border.align);
 
         RRect? borderRoundedRect = this.roundedRect(context, barData, borderRect);
@@ -72,14 +73,14 @@ class BarChartRenderer extends AChartRenderer<BarData> {
         }
 
         if (borderRoundedRect != null) {
-          context.canvas.drawRRect(borderRoundedRect, paint);
+          canvas.drawRRect(borderRoundedRect, paint);
         } else {
-          context.canvas.drawRect(borderRect, paint);
+          canvas.drawRect(borderRect, paint);
         }
       }
     }
 
-    drawDataPoints(paint, context, barData, barData.bars);
+    drawDataPoints(canvas, paint, context, barData, barData.bars);
   }
 
   /// Builds an axis-aligned [Rect] in screen space from the bar axis segment

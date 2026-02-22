@@ -7,6 +7,7 @@ class LineChartRenderer extends AChartRenderer<LineData> {
 
   @override
   void renderData(
+    Canvas canvas,
     ChartRenderContext context,
     LineData lineData,
   ) {
@@ -29,13 +30,13 @@ class LineChartRenderer extends AChartRenderer<LineData> {
           paint.color = lineData.areaColor!;
         }
         paint.style = PaintingStyle.fill;
-        context.canvas.drawPath(tAreaPath, paint);
+        canvas.drawPath(tAreaPath, paint);
       }
     }
 
-    lineData.lineType.renderer.render(context, lineData);
+    lineData.lineType.renderer.render(canvas, context, lineData);
 
-    drawDataPoints(paint, context, lineData, lineData.points);
+    drawDataPoints(canvas, paint, context, lineData, lineData.points);
   }
 
   Path? _buildAreaPathBetweenFyAndY(LineData lineData, ChartRenderContext context) {

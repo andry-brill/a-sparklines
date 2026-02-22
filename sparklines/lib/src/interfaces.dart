@@ -136,10 +136,9 @@ abstract class ILayoutData {
   double get height;
 }
 
-/// Context passed to chart renderers (replaces per-point coordinate transformation).
+/// Context passed to chart renderers
 class ChartRenderContext {
 
-  final Canvas canvas;
   final Matrix4 _transform;
   final IChartLayout layout;
   final ILayoutData dimensions;
@@ -148,13 +147,11 @@ class ChartRenderContext {
     required this.layout,
     required this.dimensions,
     required Matrix4 pathTransform,
-    required this.canvas,
   }) : _transform = pathTransform;
 
-  /// Convert a length to screen pixels (for stroke width, radius, etc.).
-  /// Use [relativeTo] for values relative to chart width/height (e.g. RelativeLayout).
-  double toScreenLength(double value) {
-    return layout.toScreenLength(value, dimensions);
+  /// Apply transformation to scalar values like stroke width, radius, etc.
+  double transformScalar(double value) {
+    return layout.transformScalar(value, dimensions);
   }
 
   Offset transformPoint(DataPoint dataPoint) => transformXY(dataPoint.x, dataPoint.y);
@@ -175,15 +172,16 @@ abstract class IChartLayout {
   /// Resolve layout with actual dimensions (e.g., resolve infinity values).
   IChartLayout resolve(List<ILayoutData> dimensions);
 
-  Matrix4 pathTransform(ILayoutData dimensions);
+  Matrix4 transform(ILayoutData dimensions);
 
-  /// Convert a length to screen pixels (for stroke width, radius, etc.).
-  double toScreenLength(double value, ILayoutData dimensions);
+  /// Apply transformation to scalar values like stroke width, radius, etc.
+  double transformScalar(double value, ILayoutData dimensions);
 }
 
 /// Interface for chart renderers
 abstract class IChartRenderer {
   void render(
+    Canvas canvas,
     ChartRenderContext context,
     ISparklinesData data,
   );
@@ -191,6 +189,7 @@ abstract class IChartRenderer {
 
 abstract class IDataPointRenderer {
   void render(
+    Canvas canvas,
     ChartRenderContext context,
     Paint paint,
     IDataPointStyle style,
@@ -243,7 +242,7 @@ abstract class IDataPointStyle implements ILerpTo<IDataPointStyle> {
 /// Interface for line type renderers (path building + stroke rendering)
 abstract class ILineTypeRenderer {
   Path toPath(ILineTypeData lineType, List<DataPoint> points, {bool useFy = true, bool reverse = false, Path? path});
-  void render(ChartRenderContext context, LineData lineData);
+  void render(Canvas canvas, ChartRenderContext context, LineData lineData);
 }
 
 /// Marker interface for line type data

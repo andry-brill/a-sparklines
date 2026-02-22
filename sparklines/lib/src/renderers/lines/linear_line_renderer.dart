@@ -30,13 +30,13 @@ class LinearLineRenderer extends BaseLineTypeRenderer<LinearLineData> {
   }
 
   @override
-  void renderComplexPath(ChartRenderContext context, LineData lineData, bool isDynamicStroke, bool isDynamicPaint) {
-    if (!renderDynamicPaint(context, lineData, isDynamicStroke, isDynamicPaint)) {
+  void renderComplexPath(Canvas canvas, ChartRenderContext context, LineData lineData, bool isDynamicStroke, bool isDynamicPaint) {
+    if (!renderDynamicPaint(canvas, context, lineData, isDynamicStroke, isDynamicPaint)) {
 
       final points = lineData.points;
 
       final globalSize = lineData.thickness.size;
-      final globalHalfScreen = context.toScreenLength(globalSize) / 2;
+      final globalHalfScreen = context.transformScalar(globalSize) / 2;
 
       // ---- transform centerline to screen space ----
 
@@ -52,7 +52,7 @@ class LinearLineRenderer extends BaseLineTypeRenderer<LinearLineData> {
       final halfExtra = List<double>.generate(count, (i) {
 
         final localSize = points[i].thickness?.size ?? globalSize;
-        final localHalf = context.toScreenLength(localSize) / 2;
+        final localHalf = context.transformScalar(localSize) / 2;
 
         return (localHalf - globalHalfScreen).clamp(0.0, double.infinity);
       });
@@ -186,8 +186,8 @@ class LinearLineRenderer extends BaseLineTypeRenderer<LinearLineData> {
         paintThickness(strokePaint, bounds, lineData.thickness);
       }
 
-      context.canvas.drawPath(path, fillPaint);
-      context.canvas.drawPath(path, strokePaint);
+      canvas.drawPath(path, fillPaint);
+      canvas.drawPath(path, strokePaint);
     }
   }
 }

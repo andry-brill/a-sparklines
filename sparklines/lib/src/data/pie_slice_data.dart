@@ -68,7 +68,7 @@ List<PieSliceData> computePies(
   ChartRenderContext? context
 ) {
 
-  final cornerRadius = context != null ? context.toScreenLength(radius) : radius;
+  final cornerRadius = context != null ? context.transformScalar(radius) : radius;
 
   List<PieSliceData> layouts = [];
 
@@ -78,7 +78,7 @@ List<PieSliceData> computePies(
     double thicknessSize = point.thickness?.size ?? thickness.size;
 
     if (context != null) {
-      thicknessSize = context.toScreenLength(thicknessSize);
+      thicknessSize = context.transformScalar(thicknessSize);
     }
 
     if (point.x <= 0.0001 || thicknessSize <= 0.0001 || point.dy <= 0.0001) continue;
