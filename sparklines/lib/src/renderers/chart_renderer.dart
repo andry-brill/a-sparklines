@@ -7,33 +7,33 @@ abstract class AChartRenderer<DT extends ISparklinesData> implements IChartRende
   @override
   void render(
     Canvas canvas,
-    ChartRenderContext context,
+    ChartTransform transform,
     ISparklinesData data,
   ) {
-    renderData(canvas, context, data as DT);
+    renderData(canvas, transform, data as DT);
   }
 
-  void renderData(Canvas canvas, ChartRenderContext context, DT data);
+  void renderData(Canvas canvas, ChartTransform transform, DT data);
 
-  RRect? roundedRect(ChartRenderContext context, IChartBorder border, Rect rect) {
+  RRect? roundedRect(ChartTransform transform, IChartBorder border, Rect rect) {
     if (border.borderRadius == null || border.borderRadius == 0.0) {
       return null;
     }
-    final r = context.transformScalar(border.borderRadius!);
+    final r = transform.scalar(border.borderRadius!);
     return RRect.fromRectXY(rect, r, r);
   }
 
   void drawDataPoints(
     Canvas canvas,
     Paint paint,
-    ChartRenderContext context,
+    ChartTransform transform,
     IChartDataPointStyle chart,
     List<DataPoint> points,
   ) {
     for (final point in points) {
       final pointStyle = point.style ?? chart.pointStyle;
       if (pointStyle != null) {
-        pointStyle.renderer.render(canvas, context, paint, pointStyle, point);
+        pointStyle.renderer.render(canvas, transform, paint, pointStyle, point);
       }
     }
   }

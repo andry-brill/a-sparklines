@@ -9,7 +9,7 @@ class BetweenLineRenderer extends AChartRenderer<BetweenLineData> {
   @override
   void renderData(
     Canvas canvas,
-    ChartRenderContext context,
+    ChartTransform transform,
     BetweenLineData betweenData,
   ) {
     final paint = Paint();
@@ -21,7 +21,7 @@ class BetweenLineRenderer extends AChartRenderer<BetweenLineData> {
     betweenData.to.lineType.renderer.toPath(to.lineType, to.points, reverse: true, path: combinedPath);
     combinedPath.close();
 
-    final tPath = context.transform(combinedPath);
+    final tPath = transform.path(combinedPath);
 
     if (betweenData.areaGradient != null) {
       paint.shader = betweenData.areaGradient!.createShader(tPath.getBounds());

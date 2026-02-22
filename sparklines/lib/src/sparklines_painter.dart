@@ -65,14 +65,14 @@ class SparklinesPainter extends CustomPainter {
         canvas.clipRect(bounds);
       }
 
-      final context = ChartRenderContext(
+      final transform = ChartTransform(
           layout: chartLayout,
           dimensions: dimensions,
           pathTransform: chartLayout.transform(dimensions),
       );
 
-      final p0 = context.transformXY(0, 0);
-      final p1 = context.transformXY(chart.origin.dx, chart.origin.dy);
+      final p0 = transform.xy(0, 0);
+      final p1 = transform.xy(chart.origin.dx, chart.origin.dy);
 
       final offset = Offset(
         p1.dx - p0.dx,
@@ -96,7 +96,7 @@ class SparklinesPainter extends CustomPainter {
       }
 
 
-      chart.renderer.render(canvas, context, chart);
+      chart.renderer.render(canvas, transform, chart);
 
       canvas.restore();
 

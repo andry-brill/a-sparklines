@@ -125,10 +125,10 @@ class CurvedLineRenderer extends BaseLineTypeRenderer<CurvedLineData> {
   }
 
   @override
-  void renderComplexPath(Canvas canvas, ChartRenderContext context, LineData lineData, bool isDynamicStroke, bool isDynamicPaint) {
-    if (!renderDynamicPaint(canvas, context, lineData, isDynamicStroke, isDynamicPaint)) {
+  void renderComplexPath(Canvas canvas, ChartTransform transform, LineData lineData, bool isDynamicStroke, bool isDynamicPaint) {
+    if (!renderDynamicPaint(canvas, transform, lineData, isDynamicStroke, isDynamicPaint)) {
       // NB! Dynamic thickness not supported yet
-      renderSimplePath(canvas, context, lineData);
+      renderSimplePath(canvas, transform, lineData);
     }
   }
 }

@@ -42,11 +42,11 @@ class SteppedLineRenderer extends BaseLineTypeRenderer<SteppedLineData> {
   ///   Joins - vertical lines (jumps between prev.fy and next.fy) - using "global" thickness
   ///   Values - horizontal lines (value lines) - using "local" thickness
   @override
-  void renderComplexPath(Canvas canvas, ChartRenderContext context, LineData lineData, bool isDynamicStroke, bool isDynamicPaint) {
+  void renderComplexPath(Canvas canvas, ChartTransform transform, LineData lineData, bool isDynamicStroke, bool isDynamicPaint) {
 
     final lineType = lineData.lineType as SteppedLineData;
     final points = lineData.points;
-    final halfJoin = context.transformScalar(lineData.thickness.size) / 2;
+    final halfJoin = transform.scalar(lineData.thickness.size) / 2;
     final isCapRound = lineType.isStrokeCapRound;
     final isJoinRound = lineType.isStrokeJoinRound;
 
@@ -61,11 +61,11 @@ class SteppedLineRenderer extends BaseLineTypeRenderer<SteppedLineData> {
 
     // Drawing joins (vertical lines) with global thickness
     // When isStrokeCapRound: offset from top and bottom by halfJoin to align with rounded value line ends
-    final Paint joinsPaint = buildStrokePaint(context, lineData);
+    final Paint joinsPaint = buildStrokePaint(transform, lineData);
     if (!isDynamicPaint) {
 
       final globalSize = lineData.thickness.size;
-      final globalHalfScreen = context.transformScalar(globalSize) / 2;
+      final globalHalfScreen = transform.scalar(globalSize) / 2;
 
       // ---- Build centerline in data space ----
       final ctrl = <Vector3>[
@@ -80,7 +80,7 @@ class SteppedLineRenderer extends BaseLineTypeRenderer<SteppedLineData> {
 
       // ---- Transform to screen space ----
       final screen = ctrl
-          .map((v) => context.transform3(v))
+          .map((v) => transform.v3(v))
           .map((v) => Offset(v.x, v.y))
           .toList();
 
@@ -92,11 +92,11 @@ class SteppedLineRenderer extends BaseLineTypeRenderer<SteppedLineData> {
       for (int i = 0; i < stepX.length; i++) {
 
         // Expecting that local half >= global half
-        final localHalf0 = max(globalHalfScreen, context.transformScalar(
+        final localHalf0 = max(globalHalfScreen, transform.scalar(
           (points[i].thickness?.size ?? globalSize) / 2,
         ));
 
-        final localHalf1 = max(globalHalfScreen, context.transformScalar(
+        final localHalf1 = max(globalHalfScreen, transform.scalar(
           (points[i + 1].thickness?.size ?? globalSize) / 2,
         ));
 
@@ -190,11 +190,11 @@ class SteppedLineRenderer extends BaseLineTypeRenderer<SteppedLineData> {
 
       path.close();
 
-      final fillPaint = buildFillPaint(context, lineData);
+      final fillPaint = buildFillPaint(transform, lineData);
       paintThickness(fillPaint, path.getBounds(), lineData.thickness);
       canvas.drawPath(path, fillPaint);
 
-      final strokePaint = buildStrokePaint(context, lineData);
+      final strokePaint = buildStrokePaint(transform, lineData);
       paintThickness(strokePaint, path.getBounds(), lineData.thickness);
       canvas.drawPath(path, strokePaint);
 
@@ -213,7 +213,7 @@ class SteppedLineRenderer extends BaseLineTypeRenderer<SteppedLineData> {
         joinsPath.lineTo(stepX[i], bottom);
       }
     }
-    final tJoinsPath = context.transform(joinsPath);
+    final tJoinsPath = transform.path(joinsPath);
     paintThickness(joinsPaint, tJoinsPath.getBounds(), lineData.thickness);
     canvas.drawPath(tJoinsPath, joinsPaint);
 
@@ -223,9 +223,9 @@ class SteppedLineRenderer extends BaseLineTypeRenderer<SteppedLineData> {
       final leftEnd = i == 0 ? points[0].x : stepX[i - 1] - halfJoin;
       final rightEnd = i == points.length - 1 ? points[i].x : stepX[i] + halfJoin;
 
-      final left = context.transformXY(leftEnd, points[i].fy);
-      final right = context.transformXY(rightEnd, points[i].fy);
-      final screenHeight = context.transformScalar(valueSize);
+      final left = transform.xy(leftEnd, points[i].fy);
+      final right = transform.xy(rightEnd, points[i].fy);
+      final screenHeight = transform.scalar(valueSize);
       final halfScreen = screenHeight / 2;
       final centerY = (left.dy + right.dy) / 2;
 
@@ -236,7 +236,7 @@ class SteppedLineRenderer extends BaseLineTypeRenderer<SteppedLineData> {
         centerY + halfScreen,
       );
 
-      final screenRadius = context.transformScalar(halfJoin).clamp(0.0, halfScreen);
+      final screenRadius = transform.scalar(halfJoin).clamp(0.0, halfScreen);
       final leftRounded = (i == 0 && isCapRound) || (i > 0 && isJoinRound);
       final rightRounded = (i == points.length - 1 && isCapRound) || (i < points.length - 1 && isJoinRound);
 

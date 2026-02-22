@@ -7,6 +7,7 @@ import 'package:vector_math/vector_math_64.dart';
 
 /// Interface for types that can be interpolated
 abstract class ILerpTo<T> {
+
   /// Interpolate between this and [next] using interpolation factor [t] (0.0 to 1.0)
   T lerpTo(T next, double t);
 
@@ -136,34 +137,29 @@ abstract class ILayoutData {
   double get height;
 }
 
-/// Context passed to chart renderers
-class ChartRenderContext {
+class ChartTransform {
 
   final Matrix4 _transform;
-  final IChartLayout layout;
-  final ILayoutData dimensions;
+  final IChartLayout _layout;
+  final ILayoutData _dimensions;
 
-  const ChartRenderContext({
-    required this.layout,
-    required this.dimensions,
+  const ChartTransform({
+    required IChartLayout layout,
+    required ILayoutData dimensions,
     required Matrix4 pathTransform,
-  }) : _transform = pathTransform;
+  }) : _dimensions = dimensions, _layout = layout, _transform = pathTransform;
 
   /// Apply transformation to scalar values like stroke width, radius, etc.
-  double transformScalar(double value) {
-    return layout.transformScalar(value, dimensions);
-  }
+  double scalar(double value) => _layout.transformScalar(value, _dimensions);
 
-  Offset transformPoint(DataPoint dataPoint) => transformXY(dataPoint.x, dataPoint.y);
+  Vector3 v3(Vector3 v3) => _transform.transform3(v3);
+  Path path(Path path) => path.transform(_transform.storage);
+  Offset point(DataPoint dataPoint) => xy(dataPoint.x, dataPoint.y);
 
-  Vector3 transform3(Vector3 v3) => _transform.transform3(v3);
-
-  Offset transformXY(double x, double y) {
-    final point = transform3(Vector3(x, y, 0.0));
+  Offset xy(double x, double y) {
+    final point = v3(Vector3(x, y, 0.0));
     return Offset(point.x, point.y);
   }
-
-  Path transform(Path path) => path.transform(_transform.storage);
 
 }
 
@@ -182,7 +178,7 @@ abstract class IChartLayout {
 abstract class IChartRenderer {
   void render(
     Canvas canvas,
-    ChartRenderContext context,
+    ChartTransform transform,
     ISparklinesData data,
   );
 }
@@ -190,7 +186,7 @@ abstract class IChartRenderer {
 abstract class IDataPointRenderer {
   void render(
     Canvas canvas,
-    ChartRenderContext context,
+    ChartTransform transform,
     Paint paint,
     IDataPointStyle style,
     DataPoint dataPoint,
@@ -242,7 +238,7 @@ abstract class IDataPointStyle implements ILerpTo<IDataPointStyle> {
 /// Interface for line type renderers (path building + stroke rendering)
 abstract class ILineTypeRenderer {
   Path toPath(ILineTypeData lineType, List<DataPoint> points, {bool useFy = true, bool reverse = false, Path? path});
-  void render(Canvas canvas, ChartRenderContext context, LineData lineData);
+  void render(Canvas canvas, ChartTransform transform, LineData lineData);
 }
 
 /// Marker interface for line type data

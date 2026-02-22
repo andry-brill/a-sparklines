@@ -12,7 +12,7 @@ class BarChartRenderer extends AChartRenderer<BarData> {
   @override
   void renderData(
     Canvas canvas,
-    ChartRenderContext context,
+    ChartTransform transform,
     BarData barData,
   ) {
 
@@ -26,18 +26,18 @@ class BarChartRenderer extends AChartRenderer<BarData> {
       final thicknessGradient = bar.thickness?.gradient ?? barData.thickness.gradient;
       final thicknessColor = bar.thickness?.color ?? barData.thickness.color;
 
-      final barWidth = context.transformScalar(thicknessSize);
+      final barWidth = transform.scalar(thicknessSize);
       final half = barWidth / 2;
       final a = half * (1 + thicknessAlign);
       final b = half * (1 - thicknessAlign);
 
       // Bar axis in data space: (x, y) -> (x, fy); transform to screen
-      final p0 = context.transformXY(bar.x, bar.y);
-      final p1 = context.transformXY(bar.x, bar.fy);
+      final p0 = transform.xy(bar.x, bar.y);
+      final p1 = transform.xy(bar.x, bar.fy);
 
       // NB! Expecting to always have same x or y coordinates, so we can use usual rect
       final rect = _screenRectFromAxis(p0, p1, barWidth, a, b);
-      RRect? roundedRect = this.roundedRect(context, barData, rect);
+      RRect? roundedRect = this.roundedRect(transform, barData, rect);
 
       paint.style = PaintingStyle.fill;
 
@@ -57,10 +57,10 @@ class BarChartRenderer extends AChartRenderer<BarData> {
       final border = barData.border;
       if (border != null) {
 
-        final borderSize = context.transformScalar(border.size);
+        final borderSize = transform.scalar(border.size);
         final borderRect = rect.inflate(borderSize * border.align);
 
-        RRect? borderRoundedRect = this.roundedRect(context, barData, borderRect);
+        RRect? borderRoundedRect = this.roundedRect(transform, barData, borderRect);
 
         paint.style = PaintingStyle.stroke;
         paint.strokeWidth = borderSize;
@@ -80,7 +80,7 @@ class BarChartRenderer extends AChartRenderer<BarData> {
       }
     }
 
-    drawDataPoints(canvas, paint, context, barData, barData.bars);
+    drawDataPoints(canvas, paint, transform, barData, barData.bars);
   }
 
   /// Builds an axis-aligned [Rect] in screen space from the bar axis segment

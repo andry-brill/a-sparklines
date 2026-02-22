@@ -8,7 +8,7 @@ class LineChartRenderer extends AChartRenderer<LineData> {
   @override
   void renderData(
     Canvas canvas,
-    ChartRenderContext context,
+    ChartTransform transform,
     LineData lineData,
   ) {
 
@@ -18,10 +18,10 @@ class LineChartRenderer extends AChartRenderer<LineData> {
 
     final hasAreaFill = lineData.areaGradient != null || lineData.areaColor != null;
     if (hasAreaFill) {
-      final areaPath = _buildAreaPathBetweenFyAndY(lineData, context);
+      final areaPath = _buildAreaPathBetweenFyAndY(lineData, transform);
       if (areaPath != null) {
 
-        final tAreaPath = context.transform(areaPath);
+        final tAreaPath = transform.path(areaPath);
 
         if (lineData.areaGradient != null) {
           paint.shader = lineData.areaGradient!.createShader(tAreaPath.getBounds());
@@ -34,12 +34,12 @@ class LineChartRenderer extends AChartRenderer<LineData> {
       }
     }
 
-    lineData.lineType.renderer.render(canvas, context, lineData);
+    lineData.lineType.renderer.render(canvas, transform, lineData);
 
-    drawDataPoints(canvas, paint, context, lineData, lineData.points);
+    drawDataPoints(canvas, paint, transform, lineData, lineData.points);
   }
 
-  Path? _buildAreaPathBetweenFyAndY(LineData lineData, ChartRenderContext context) {
+  Path? _buildAreaPathBetweenFyAndY(LineData lineData, ChartTransform transform) {
     final points = lineData.points;
     if (points.length < 2) return null;
 

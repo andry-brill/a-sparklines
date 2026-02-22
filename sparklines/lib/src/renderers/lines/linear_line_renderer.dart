@@ -30,18 +30,18 @@ class LinearLineRenderer extends BaseLineTypeRenderer<LinearLineData> {
   }
 
   @override
-  void renderComplexPath(Canvas canvas, ChartRenderContext context, LineData lineData, bool isDynamicStroke, bool isDynamicPaint) {
-    if (!renderDynamicPaint(canvas, context, lineData, isDynamicStroke, isDynamicPaint)) {
+  void renderComplexPath(Canvas canvas, ChartTransform transform, LineData lineData, bool isDynamicStroke, bool isDynamicPaint) {
+    if (!renderDynamicPaint(canvas, transform, lineData, isDynamicStroke, isDynamicPaint)) {
 
       final points = lineData.points;
 
       final globalSize = lineData.thickness.size;
-      final globalHalfScreen = context.transformScalar(globalSize) / 2;
+      final globalHalfScreen = transform.scalar(globalSize) / 2;
 
       // ---- transform centerline to screen space ----
 
       final center = points.map((p) {
-        final v = context.transform3(Vector3(p.x, p.fy, 0));
+        final v = transform.v3(Vector3(p.x, p.fy, 0));
         return Offset(v.x, v.y);
       }).toList();
 
@@ -52,7 +52,7 @@ class LinearLineRenderer extends BaseLineTypeRenderer<LinearLineData> {
       final halfExtra = List<double>.generate(count, (i) {
 
         final localSize = points[i].thickness?.size ?? globalSize;
-        final localHalf = context.transformScalar(localSize) / 2;
+        final localHalf = transform.scalar(localSize) / 2;
 
         return (localHalf - globalHalfScreen).clamp(0.0, double.infinity);
       });
@@ -175,8 +175,8 @@ class LinearLineRenderer extends BaseLineTypeRenderer<LinearLineData> {
 
       final bounds = path.getBounds();
 
-      final fillPaint = buildFillPaint(context, lineData);
-      final strokePaint = buildStrokePaint(context, lineData);
+      final fillPaint = buildFillPaint(transform, lineData);
+      final strokePaint = buildStrokePaint(transform, lineData);
 
       if (isDynamicStroke) {
         Gradient global = globalMixedGradient(lineData.thickness, lineData.points);
