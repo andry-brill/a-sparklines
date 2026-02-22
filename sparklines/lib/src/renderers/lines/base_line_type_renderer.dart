@@ -231,7 +231,7 @@ abstract class BaseLineTypeRenderer<LD extends ILineTypeData> implements ILineTy
     final stroke = lineData.thickness;
 
     final path = toPath(lineData.lineType, lineData.points);
-    final tPath = path.transform(context.pathTransform.storage);
+    final tPath = context.transform(path);
 
     final paint = buildStrokePaint(context, lineData);
     paintThickness(paint, tPath.getBounds(), stroke);
@@ -243,7 +243,7 @@ abstract class BaseLineTypeRenderer<LD extends ILineTypeData> implements ILineTy
     if (isDynamicStroke || !isDynamicPaint) return false;
 
     final path = toPath(lineData.lineType, lineData.points);
-    final tPath = path.transform(context.pathTransform.storage);
+    final tPath = context.transform(path);
 
     final paint = buildStrokePaint(context, lineData);
     Gradient global = globalMixedGradient(lineData.thickness, lineData.points);

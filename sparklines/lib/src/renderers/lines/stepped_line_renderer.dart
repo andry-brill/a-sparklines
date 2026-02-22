@@ -80,7 +80,7 @@ class SteppedLineRenderer extends BaseLineTypeRenderer<SteppedLineData> {
 
       // ---- Transform to screen space ----
       final screen = ctrl
-          .map((v) => context.pathTransform.transform3(v))
+          .map((v) => context.transform3(v))
           .map((v) => Offset(v.x, v.y))
           .toList();
 
@@ -213,7 +213,7 @@ class SteppedLineRenderer extends BaseLineTypeRenderer<SteppedLineData> {
         joinsPath.lineTo(stepX[i], bottom);
       }
     }
-    final tJoinsPath = joinsPath.transform(context.pathTransform.storage);
+    final tJoinsPath = context.transform(joinsPath);
     paintThickness(joinsPaint, tJoinsPath.getBounds(), lineData.thickness);
     context.canvas.drawPath(tJoinsPath, joinsPaint);
 

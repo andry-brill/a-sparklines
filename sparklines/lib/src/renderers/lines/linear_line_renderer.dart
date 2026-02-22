@@ -41,7 +41,7 @@ class LinearLineRenderer extends BaseLineTypeRenderer<LinearLineData> {
       // ---- transform centerline to screen space ----
 
       final center = points.map((p) {
-        final v = context.pathTransform.transform3(Vector3(p.x, p.fy, 0));
+        final v = context.transform3(Vector3(p.x, p.fy, 0));
         return Offset(v.x, v.y);
       }).toList();
 

@@ -19,14 +19,17 @@ class LineChartRenderer extends AChartRenderer<LineData> {
     if (hasAreaFill) {
       final areaPath = _buildAreaPathBetweenFyAndY(lineData, context);
       if (areaPath != null) {
+
+        final tAreaPath = context.transform(areaPath);
+
         if (lineData.areaGradient != null) {
-          paint.shader = lineData.areaGradient!.createShader(context.bounds);
+          paint.shader = lineData.areaGradient!.createShader(tAreaPath.getBounds());
         } else {
           paint.shader = null;
           paint.color = lineData.areaColor!;
         }
         paint.style = PaintingStyle.fill;
-        context.drawPath(areaPath, paint);
+        context.canvas.drawPath(tAreaPath, paint);
       }
     }
 

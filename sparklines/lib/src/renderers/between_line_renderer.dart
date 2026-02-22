@@ -20,7 +20,7 @@ class BetweenLineRenderer extends AChartRenderer<BetweenLineData> {
     betweenData.to.lineType.renderer.toPath(to.lineType, to.points, reverse: true, path: combinedPath);
     combinedPath.close();
 
-    final tPath = combinedPath.transform(context.pathTransform.storage);
+    final tPath = context.transform(combinedPath);
 
     if (betweenData.areaGradient != null) {
       paint.shader = betweenData.areaGradient!.createShader(tPath.getBounds());

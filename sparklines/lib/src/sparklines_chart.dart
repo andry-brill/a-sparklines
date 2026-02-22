@@ -188,16 +188,54 @@ class _SparklinesRenderWidget extends StatelessWidget {
   Widget _buildFlexible() {
     return LayoutBuilder(
       builder: (context, constraints) {
-        double w = constraints.maxWidth;
-        double h = constraints.maxHeight;
+        double maxW = constraints.maxWidth;
+        double maxH = constraints.maxHeight;
 
-        if (aspectRatio != null) {
-          if (w / h > aspectRatio!) {
-            h = w / aspectRatio!;
+        double w = maxW;
+        double h = maxH;
+
+        final aspect = aspectRatio;
+
+        // Handle unbounded constraints
+        final hasBoundedWidth = maxW.isFinite;
+        final hasBoundedHeight = maxH.isFinite;
+
+        if (aspect != null) {
+          if (hasBoundedWidth && hasBoundedHeight) {
+            // Fit inside bounds while preserving aspect ratio
+            final constraintAspect = maxW / maxH;
+
+            if (constraintAspect > aspect) {
+              // Too wide, limit by height
+              h = maxH;
+              w = h * aspect;
+            } else {
+              // Too tall, limit by width
+              w = maxW;
+              h = w / aspect;
+            }
+          } else if (hasBoundedWidth) {
+            // Width bounded, height infinite
+            w = maxW;
+            h = w / aspect;
+          } else if (hasBoundedHeight) {
+            // Height bounded, width infinite
+            h = maxH;
+            w = h * aspect;
           } else {
-            w = h * aspectRatio!;
+            // Both unbounded, fallback safely
+            w = 0;
+            h = 0;
           }
+        } else {
+          // No aspect ratio, clamp infinities
+          if (!hasBoundedWidth) w = 0;
+          if (!hasBoundedHeight) h = 0;
         }
+
+        // Ensure result stays within constraints
+        w = w.clamp(0.0, hasBoundedWidth ? maxW : double.infinity);
+        h = h.clamp(0.0, hasBoundedHeight ? maxH : double.infinity);
 
         return _buildPainter(w, h);
       },

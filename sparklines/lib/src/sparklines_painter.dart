@@ -65,7 +65,22 @@ class SparklinesPainter extends CustomPainter {
         canvas.clipRect(bounds);
       }
 
-      canvas.translate(chart.origin.dx, chart.origin.dy);
+      final context = ChartRenderContext(
+          layout: chartLayout,
+          dimensions: dimensions,
+          pathTransform: chartLayout.pathTransform(dimensions),
+          canvas: canvas
+      );
+
+      final p0 = context.transformXY(0, 0);
+      final p1 = context.transformXY(chart.origin.dx, chart.origin.dy);
+
+      final offset = Offset(
+        p1.dx - p0.dx,
+        p1.dy - p0.dy,
+      );
+
+      canvas.translate(offset.dx, offset.dy);
 
       final rotation = chart.rotation.angle;
       if (rotation != 0.0) {
@@ -81,12 +96,6 @@ class SparklinesPainter extends CustomPainter {
         }
       }
 
-      final context = ChartRenderContext(
-        layout: chartLayout,
-        dimensions: dimensions,
-        pathTransform: chartLayout.pathTransform(dimensions),
-        canvas: canvas
-      );
 
       chart.renderer.render(context, chart);
 

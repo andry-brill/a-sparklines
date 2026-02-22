@@ -3,6 +3,7 @@ import '../data/data_point.dart';
 import '../interfaces.dart';
 
 abstract class AChartRenderer<DT extends ISparklinesData> implements IChartRenderer {
+
   @override
   void render(
     ChartRenderContext context,

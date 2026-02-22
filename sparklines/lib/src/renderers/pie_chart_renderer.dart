@@ -28,7 +28,7 @@ class PieChartRenderer extends AChartRenderer<PieData> {
     for (final layout in layouts) {
 
       Path pie = layout.toPath();
-      pie = pie.transform(context.pathTransform.storage);
+      pie = context.transform(pie);
 
       paint.style = PaintingStyle.fill;
 

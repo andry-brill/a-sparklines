@@ -140,19 +140,16 @@ abstract class ILayoutData {
 class ChartRenderContext {
 
   final Canvas canvas;
-  final Matrix4 pathTransform;
+  final Matrix4 _transform;
   final IChartLayout layout;
   final ILayoutData dimensions;
 
   const ChartRenderContext({
     required this.layout,
     required this.dimensions,
-    required this.pathTransform,
+    required Matrix4 pathTransform,
     required this.canvas,
-  });
-
-  /// Bounds rect (0, 0, width, height) for shaders and clipping
-  Rect get bounds => Rect.fromLTWH(0, 0, dimensions.width, dimensions.height);
+  }) : _transform = pathTransform;
 
   /// Convert a length to screen pixels (for stroke width, radius, etc.).
   /// Use [relativeTo] for values relative to chart width/height (e.g. RelativeLayout).
@@ -160,24 +157,16 @@ class ChartRenderContext {
     return layout.toScreenLength(value, dimensions);
   }
 
-  Offset transform(DataPoint dataPoint) {
-    final point = pathTransform.transform3(Vector3(dataPoint.x, dataPoint.fy, 0.0));
-    return Offset(point.x, point.y);
-  }
+  Offset transformPoint(DataPoint dataPoint) => transformXY(dataPoint.x, dataPoint.y);
+
+  Vector3 transform3(Vector3 v3) => _transform.transform3(v3);
 
   Offset transformXY(double x, double y) {
-    final point = pathTransform.transform3(Vector3(x, y, 0.0));
+    final point = transform3(Vector3(x, y, 0.0));
     return Offset(point.x, point.y);
   }
 
-  void drawCircle(DataPoint dataPoint, double radius, Paint paint) {
-    canvas.drawCircle(transform(dataPoint), radius, paint);
-  }
-
-  void drawPath(Path path, Paint paint) {
-    final tPath = path.transform(pathTransform.storage);
-    canvas.drawPath(tPath, paint);
-  }
+  Path transform(Path path) => path.transform(_transform.storage);
 
 }
 
