@@ -5,7 +5,8 @@ import '../interfaces.dart';
 import '../renderers/between_line_renderer.dart';
 
 /// Between line chart data (fills area between two lines)
-class BetweenLineData implements ISparklinesData {
+class BetweenLineData implements ISparklinesData, IChartArea {
+
   static final IChartRenderer defaultRenderer = BetweenLineRenderer();
 
   @override
@@ -36,8 +37,14 @@ class BetweenLineData implements ISparklinesData {
   @override
   double get maxY => math.max(from.maxY, to.maxY);
 
-  final Color areaColor;
+  @override
   final Gradient? areaGradient;
+
+  @override
+  final Color areaColor;
+
+  @override
+  final PathFillType? areaFillType;
 
   const BetweenLineData({
     this.visible = true,
@@ -49,6 +56,7 @@ class BetweenLineData implements ISparklinesData {
     required this.to,
     this.areaColor = const Color(0xFF000000),
     this.areaGradient,
+    this.areaFillType,
   });
 
   BetweenLineData copyWith({
@@ -61,6 +69,7 @@ class BetweenLineData implements ISparklinesData {
     LineData? to,
     Color? color,
     Gradient? gradient,
+    PathFillType? areaFillType,
   }) {
     return BetweenLineData(
       visible: visible ?? this.visible,
@@ -72,6 +81,7 @@ class BetweenLineData implements ISparklinesData {
       to: to ?? this.to,
       areaColor: color ?? this.areaColor,
       areaGradient: gradient ?? this.areaGradient,
+      areaFillType: areaFillType ?? this.areaFillType,
     );
   }
 
@@ -84,6 +94,7 @@ class BetweenLineData implements ISparklinesData {
     if (layout != other.layout) return true;
     if (areaColor != other.areaColor) return true;
     if (areaGradient != other.areaGradient) return true;
+    if (areaFillType != other.areaFillType) return true;
 
     if (from.shouldRepaint(other.from) || to.shouldRepaint(other.to)) {
       return true;
@@ -107,6 +118,7 @@ class BetweenLineData implements ISparklinesData {
       to: to.lerpTo(next.to, t) as LineData,
       areaColor: Color.lerp(areaColor, next.areaColor, t)!,
       areaGradient: Gradient.lerp(areaGradient, next.areaGradient, t),
+      areaFillType: next.areaFillType
     );
   }
 }

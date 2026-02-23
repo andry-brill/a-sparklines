@@ -101,6 +101,12 @@ abstract class IChartThickness {
   ThicknessData get thickness;
 }
 
+abstract class IChartArea {
+  Gradient? get areaGradient;
+  Color? get areaColor;
+  PathFillType? get areaFillType;
+}
+
 abstract class IChartDataPointStyle {
   IDataPointStyle? get pointStyle;
 }

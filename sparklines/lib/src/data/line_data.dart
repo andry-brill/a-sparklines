@@ -7,7 +7,7 @@ import '../interfaces.dart';
 import '../renderers/line_chart_renderer.dart';
 
 
-class LineData implements ISparklinesData, IChartThickness, IChartDataPointStyle {
+class LineData implements ISparklinesData, IChartThickness, IChartDataPointStyle, IChartArea {
 
   static final LineChartRenderer defaultRenderer = LineChartRenderer();
 
@@ -42,8 +42,14 @@ class LineData implements ISparklinesData, IChartThickness, IChartDataPointStyle
   @override
   final ThicknessData thickness;
 
+  @override
   final Gradient? areaGradient;
+
+  @override
   final Color? areaColor;
+
+  @override
+  final PathFillType? areaFillType;
 
   final ILineTypeData lineType;
 
@@ -62,6 +68,7 @@ class LineData implements ISparklinesData, IChartThickness, IChartDataPointStyle
     this.areaColor,
     this.lineType = const LinearLineData(),
     this.pointStyle,
+    this.areaFillType,
   });
 
   LineData copyWith({
@@ -74,6 +81,7 @@ class LineData implements ISparklinesData, IChartThickness, IChartDataPointStyle
     ThicknessData? thickness,
     Gradient? areaGradient,
     Color? areaColor,
+    PathFillType? areaFillType,
     ILineTypeData? lineType,
     IDataPointStyle? pointStyle,
   }) {
@@ -87,6 +95,7 @@ class LineData implements ISparklinesData, IChartThickness, IChartDataPointStyle
       thickness: thickness ?? this.thickness,
       areaGradient: areaGradient ?? this.areaGradient,
       areaColor: areaColor ?? this.areaColor,
+      areaFillType: areaFillType ?? this.areaFillType,
       lineType: lineType ?? this.lineType,
       pointStyle: pointStyle ?? this.pointStyle,
     );
@@ -103,6 +112,7 @@ class LineData implements ISparklinesData, IChartThickness, IChartDataPointStyle
     if (thickness != other.thickness) return true;
     if (areaGradient != other.areaGradient) return true;
     if (areaColor != other.areaColor) return true;
+    if (areaFillType != other.areaFillType) return true;
     if (lineType != other.lineType) return true;
     if (pointStyle != other.pointStyle) return true;
 
@@ -136,6 +146,7 @@ class LineData implements ISparklinesData, IChartThickness, IChartDataPointStyle
       thickness: thickness.lerpTo(next.thickness, t),
       areaGradient: Gradient.lerp(areaGradient, next.areaGradient, t),
       areaColor: Color.lerp(areaColor, next.areaColor, t),
+      areaFillType: next.areaFillType,
       lineType: next.lineType,
       pointStyle: ILerpTo.lerp(pointStyle, next.pointStyle, t),
     );

@@ -69,6 +69,7 @@ List<PieSliceData> computePies(
 ) {
 
   final cornerRadius = transform != null ? transform.scalar(radius) : radius;
+  final spaceSize = transform != null ? transform.scalar(space) : space;
 
   List<PieSliceData> layouts = [];
 
@@ -89,7 +90,7 @@ List<PieSliceData> computePies(
     final innerRadius = max(0.0, point.x - halfInnerThickness);
     final outerRadius = point.x + halfOuterThickness;
 
-    final spaceOffset = toCartesian(space, point);
+    final spaceOffset = toCartesian(spaceSize, point);
 
     layouts.add(PieSliceData(
       startAngle: point.y,

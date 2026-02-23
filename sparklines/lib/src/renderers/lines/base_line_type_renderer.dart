@@ -30,7 +30,8 @@ abstract class BaseLineTypeRenderer<LD extends ILineTypeData> implements ILineTy
       path.moveTo(first.x, first.getYorFY(useFy));
     } else {
       final last = points.last;
-      path.moveTo(last.x, last.getYorFY(useFy));
+      // NB! In case of reverse drawing we need to draw line to start, as we will fill polygon at the end
+      path.lineTo(last.x, last.getYorFY(useFy));
     }
   }
 

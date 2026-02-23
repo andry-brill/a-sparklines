@@ -29,6 +29,7 @@ class LineChartRenderer extends AChartRenderer<LineData> {
           paint.shader = null;
           paint.color = lineData.areaColor!;
         }
+
         paint.style = PaintingStyle.fill;
         canvas.drawPath(tAreaPath, paint);
       }
@@ -40,20 +41,18 @@ class LineChartRenderer extends AChartRenderer<LineData> {
   }
 
   Path? _buildAreaPathBetweenFyAndY(LineData lineData, ChartTransform transform) {
+
     final points = lineData.points;
     if (points.length < 2) return null;
 
     final renderer = lineData.lineType.renderer;
-    final topPath = renderer.toPath(lineData.lineType, points);
-    final areaPath = Path.from(topPath);
 
-    final last = points.last;
-    areaPath.lineTo(last.x, last.y);
-
+    final areaPath = renderer.toPath(lineData.lineType, points);
     renderer.toPath(lineData.lineType, points, useFy: false, reverse: true, path: areaPath);
 
-    final first = points.first;
-    areaPath.lineTo(first.x, first.fy);
+    areaPath..fillType = lineData.areaFillType ?? PathFillType.evenOdd
+      ..close();
+
     return areaPath;
   }
 }

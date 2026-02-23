@@ -86,10 +86,8 @@ class CurvedLineRenderer extends BaseLineTypeRenderer<CurvedLineData> {
       double smoothness,
       bool useFy,
       ) {
-    final count = points.length;
 
-    final last = points.last;
-    path.moveTo(last.x, last.getYorFY(useFy));
+    final count = points.length;
 
     for (int i = count - 1; i > 0; i--) {
       final p0 = i < count - 1 ? points[i + 1] : points[i];
