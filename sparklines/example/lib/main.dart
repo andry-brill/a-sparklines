@@ -1,7 +1,7 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
-import 'package:sparklines/sparklines.dart';
+import 'package:any_sparklines/any_sparklines.dart';
 
 final bigPie = PieData(
   points: [

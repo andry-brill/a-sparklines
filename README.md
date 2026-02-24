@@ -6,44 +6,6 @@ Feature-rich, highly optimized sparklines for Flutter. Line, bar, pie, and betwe
 
 ---
 
-## Installation
-
-
-```yaml
-dependencies:
-  sparklines: ^1.0.0
-```
-
----
-
-## Example
-
-```dart
-import 'package:flutter/material.dart';
-import 'package:sparklines/sparklines.dart';
-
-SparklinesChart(
-  width: 300,
-  height: 120,
-  layout: const RelativeLayout.full(),
-  crop: true,
-  charts: [
-    LineData(
-      points: [
-        DataPoint.value(0, 10),
-        DataPoint.value(1, 25),
-        DataPoint.value(2, 15),
-        DataPoint.value(3, 40),
-      ],
-      thickness: const ThicknessData(size: 2, color: Colors.blue),
-      areaColor: Colors.blue.withOpacity(0.2),
-    ),
-  ],
-)
-```
-
----
-
 ## Core concepts
 
 ### Layouts

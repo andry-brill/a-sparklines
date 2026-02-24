@@ -1,0 +1,19 @@
+library;
+
+export 'chart/sparklines_chart.dart';
+export 'data/bar_data.dart';
+export 'data/between_line_data.dart';
+export 'data/data_point.dart';
+export 'data/line_data.dart';
+export 'data/pie_data.dart';
+export 'interfaces/chart_rotation.dart';
+export 'interfaces/chart_style.dart';
+export 'interfaces/chart_transform.dart';
+export 'interfaces/data_point_style.dart';
+export 'interfaces/layout.dart';
+export 'interfaces/lerp.dart';
+export 'interfaces/sparklines_data.dart';
+export 'interfaces/thickness.dart';
+export 'layout/chart_layout.dart';
+export 'layout/relative_dimension.dart';
+export 'renderers/circle_data_point.dart';
