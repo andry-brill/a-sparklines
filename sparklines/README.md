@@ -2,7 +2,7 @@
 
 Feature-rich, highly optimized sparklines for Flutter. Line, bar, pie, and between-line charts with shared layouts, animation, and flexible styling.
 
-![App Screenshot](example/web/example.png)
+![App Screenshot](https://raw.githubusercontent.com/andry-brill/a-sparklines/main/sparklines/example/web/example.png)
 
 ---
 
