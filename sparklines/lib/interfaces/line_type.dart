@@ -14,7 +14,7 @@ abstract class ILineChartData {
 /// Interface for line type renderers (path building + stroke rendering)
 abstract class ILineTypeRenderer {
   Path toPath(ILineTypeData lineType, List<DataPoint> points,
-      {bool useFy = true, bool reverse = false, Path? path});
+      {bool reverse = false, Path? path});
   void render(Canvas canvas, ChartTransform transform, ILineChartData lineData);
 }
 

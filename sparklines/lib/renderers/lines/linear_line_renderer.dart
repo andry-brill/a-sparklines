@@ -13,17 +13,17 @@ class LinearLineRenderer extends BaseLineTypeRenderer<LinearLineData> {
   const LinearLineRenderer();
 
   @override
-  Path toLinePath(LinearLineData lineType, Path path, List<DataPoint> points, {bool useFy = true, bool reverse = false}) {
+  Path toLinePath(LinearLineData lineType, Path path, List<DataPoint> points, {bool reverse = false}) {
 
     if (reverse) {
       for (int i = points.length - 2; i >= 0; i--) {
         final point = points[i];
-        path.lineTo(point.x, point.getYorFY(useFy));
+        path.lineTo(point.x, point.fy);
       }
     } else {
       for (int i = 1; i < points.length; i++) {
         final point = points[i];
-        path.lineTo(point.x, point.getYorFY(useFy));
+        path.lineTo(point.x, point.fy);
       }
     }
 

@@ -11,27 +11,27 @@ abstract class BaseLineTypeRenderer<LD extends ILineTypeData> implements ILineTy
   const BaseLineTypeRenderer();
 
   @override
-  Path toPath(ILineTypeData lineType, List<DataPoint> points, {bool useFy = true, bool reverse = false, Path? path}) {
+  Path toPath(ILineTypeData lineType, List<DataPoint> points, {bool reverse = false, Path? path}) {
 
     final pathOut = path ?? Path();
     if (points.isEmpty) return pathOut;
 
-    moveToStart(pathOut, points, useFy, reverse);
+    moveToStart(pathOut, points, reverse);
     if (points.length == 1) return pathOut;
 
-    return toLinePath(lineType as LD, pathOut, points, useFy: useFy, reverse: reverse);
+    return toLinePath(lineType as LD, pathOut, points, reverse: reverse);
   }
 
-  Path toLinePath(LD lineType, Path path, List<DataPoint> points, {bool useFy = true, bool reverse = false});
+  Path toLinePath(LD lineType, Path path, List<DataPoint> points, {bool reverse = false});
 
-  void moveToStart(Path path, List<DataPoint> points, bool useFy, bool reverse) {
+  void moveToStart(Path path, List<DataPoint> points, bool reverse) {
     if (!reverse) {
       final first = points[0];
-      path.moveTo(first.x, first.getYorFY(useFy));
+      path.moveTo(first.x, first.fy);
     } else {
       final last = points.last;
       // NB! In case of reverse drawing we need to draw line to start, as we will fill polygon at the end
-      path.lineTo(last.x, last.getYorFY(useFy));
+      path.lineTo(last.x, last.fy);
     }
   }
 

@@ -11,8 +11,8 @@ class DataPoint implements ILerpTo<DataPoint> {
   /// Offset by X
   final double x;
 
-  /// Extra offset by X
-  final double dx;
+  /// Mainly used as offset of x in pie chart
+  final double? dx;
 
   /// Offset by Y
   final double y;
@@ -29,17 +29,16 @@ class DataPoint implements ILerpTo<DataPoint> {
 
   const DataPoint({
     required this.x,
-    this.dx = 0.0,
+    this.dx,
     this.y = 0.0,
     required this.dy,
     this.style,
     this.thickness,
   }) : fy = y + dy;
 
-  double getYorFY(bool fy) => fy ? this.fy : y;
-
   DataPoint copyWith({
     double? x,
+    double? dx,
     double? y,
     double? dy,
     IDataPointStyle? style,
@@ -48,6 +47,7 @@ class DataPoint implements ILerpTo<DataPoint> {
     x: x ?? this.x,
     y: y ?? this.y,
     dy: dy ?? this.dy,
+    dx: dx ?? this.dx,
     style: style ?? this.style,
     thickness: thickness ?? this.thickness,
   );
@@ -56,6 +56,7 @@ class DataPoint implements ILerpTo<DataPoint> {
   DataPoint lerpTo(DataPoint next, double t) {
     return DataPoint(
       x: lerpDouble(x, next.x, t) ?? next.x,
+      dx: lerpDouble(dx, next.dx, t) ?? next.dx,
       y: lerpDouble(y, next.y, t) ?? next.y,
       dy: lerpDouble(dy, next.dy, t) ?? next.dy,
       style: ILerpTo.lerp(style, next.style, t),
@@ -67,7 +68,8 @@ class DataPoint implements ILerpTo<DataPoint> {
   bool operator ==(Object other) {
     if (identical(this, other)) return true;
     if (other is! DataPoint) return false;
-    return this.y == other.y && this.x == other.x && this.dy == other.dy;
+    return this.y == other.y && this.x == other.x && this.dy == other.dy && this.dx == other.dx &&
+      this.thickness == other.thickness && this.style == other.style;
   }
 }
 

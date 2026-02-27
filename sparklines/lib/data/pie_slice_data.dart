@@ -13,6 +13,7 @@ class PieSliceData {
   final double endAngle;
   final double innerRadius;
   final double outerRadius;
+  final double padAngle;
   final Offset offset;
   final double cornerRadius;
 
@@ -26,6 +27,7 @@ class PieSliceData {
     required this.offset,
     required this.point,
     required this.cornerRadius,
+    required this.padAngle,
   });
 
   /// Builds filled arc path using [CircleArcBuilder] with uniform thickness in screen space.
@@ -36,7 +38,7 @@ class PieSliceData {
       outerRadius: outerRadius,
       startAngle: startAngle + pi/2,
       endAngle: endAngle + pi/2,
-      padAngle: 0.0,
+      padAngle: padAngle,
       cornerRadius: cornerRadius,
     );
 
@@ -63,14 +65,14 @@ Offset toCartesian(double radius, DataPoint point) {
 /// - space = uniform linear gap between slices, set as spaceOffset (aligned with arc midpoint angle).
 List<PieSliceData> computePies(
   List<DataPoint> points,
-  double space,
+  double dx,
+  double padAngle,
   ThicknessData thickness,
   double radius,
   ChartTransform? transform
 ) {
 
   final cornerRadius = transform != null ? transform.scalar(radius) : radius;
-  final spaceSize = transform != null ? transform.scalar(space) : space;
 
   List<PieSliceData> layouts = [];
 
@@ -91,7 +93,8 @@ List<PieSliceData> computePies(
     final innerRadius = max(0.0, point.x - halfInnerThickness);
     final outerRadius = point.x + halfOuterThickness;
 
-    final spaceOffset = toCartesian(spaceSize, point);
+    final pointDx = point.dx ?? dx;
+    final spaceOffset = toCartesian(pointDx, point);
 
     layouts.add(PieSliceData(
       startAngle: point.y,
@@ -100,7 +103,8 @@ List<PieSliceData> computePies(
       outerRadius: outerRadius,
       offset: spaceOffset,
       point: point,
-      cornerRadius: min(cornerRadius, (outerRadius - innerRadius)/2)
+      cornerRadius: min(cornerRadius, (outerRadius - innerRadius)/2),
+      padAngle: padAngle
     ));
 
   }

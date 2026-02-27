@@ -28,7 +28,7 @@ final bigPie = PieData(
     ),
   ],
   borderRadius: 4.0,
-  space: 12,
+  dx: 12,
   thickness: ThicknessData(
     size: 20,
     color: Colors.blue.shade300,
@@ -62,7 +62,7 @@ final bigPieT = PieData(
     ),
   ],
   borderRadius: 4.0,
-  space: 12,
+  dx: 12,
   thickness: ThicknessData(
     size: 20,
     color: Colors.blue.shade300,
@@ -175,10 +175,11 @@ final smallPieT = PieData(
 );
 
 
-final fillPie = PieData(
+final dxPie = PieData(
+  origin: Offset(115, 130),
   points: [
     DataPoint(
-      x: 10.0,
+      x: 7.0,
       y: pi/2,
       dy: pi + pi/3,
       thickness: ThicknessOverride(
@@ -186,72 +187,94 @@ final fillPie = PieData(
       ),
     ),
     DataPoint(
-      x: 10.0,
-      y: pi + pi/3 + pi/2,
+      x: 7.0,
+      dx: 3.0,
+      y: -pi/6,
       dy: pi - pi/3,
     ),
-
   ],
   borderRadius: 3.0,
-  space: 3.0,
   thickness: ThicknessData(
-    size: 30,
+    size: 26,
     color: Colors.blue,
   ),
 );
 
 
-final fillPieT = PieData(
+final dxPieT = PieData(
+  origin: Offset(115, 130),
   points: [
     DataPoint(
-      x: 40.0,
-      y: 0,
-      dy: pi,
+      x: 7.0,
+      y: pi/2,
+      dx: 3.0,
+      dy: pi/2,
       thickness: ThicknessOverride(
         color: Colors.blue.shade100,
       ),
     ),
     DataPoint(
-      x: 60.0,
-      y: 0,
-      dy: pi,
-      thickness: ThicknessOverride(
-        color: Colors.blue.shade100,
-      ),
-    ),
-    DataPoint(
-      x: 80.0,
-      y: 0,
-      dy: pi,
-      thickness: ThicknessOverride(
-        color: Colors.blue.shade100,
-      ),
-    ),
-    DataPoint(x: 40.0, y:pi / 4.0, dy:  pi - pi / 4.0),
-    DataPoint(
-      x: 60.0,
-      y: pi / 3.0,
-      dy: pi - pi / 3.0,
-      thickness: ThicknessOverride(
-        color: Colors.blue.shade600,
-      ),
-    ),
-    DataPoint(
-      x: 80.0,
-      y: pi / 6.0,
-      dy: pi - pi / 6.0,
-      thickness: ThicknessOverride(
-        color: Colors.blue.shade900,
-      ),
+      x: 7.0,
+      y: -pi,
+      dy: pi + pi/2,
     ),
   ],
-  borderRadius: 6.0,
+  borderRadius: 3.0,
   thickness: ThicknessData(
-    size: 12,
-    color: Colors.blue.shade300,
+    size: 26,
+    color: Colors.blue,
   ),
 );
 
+
+final padPie = PieData(
+  points: [
+    DataPoint(
+      x: 18.0,
+      y: pi/2,
+      dy: pi + pi/3,
+      thickness: ThicknessOverride(
+        color: Colors.blue.shade100,
+      ),
+    ),
+    DataPoint(
+      x: 18.0,
+      y: -pi/6,
+      dy: pi - pi/3,
+    ),
+  ],
+  borderRadius: 3.0,
+  padAngle: pi / 30,
+  thickness: ThicknessData(
+    size: 16,
+    color: Colors.blue,
+  ),
+);
+
+
+final padPieT = PieData(
+  points: [
+    DataPoint(
+      x: 18.0,
+      y: pi/2,
+      dy: pi/2,
+      thickness: ThicknessOverride(
+        color: Colors.blue.shade100,
+      ),
+    ),
+    DataPoint(
+      x: 18.0,
+      y: -pi,
+      dy: pi + pi/2,
+    ),
+  ],
+  borderRadius: 3.0,
+  padAngle: pi / 30,
+  thickness: ThicknessData(
+    size: 16,
+    color: Colors.blue,
+  ),
+);
 
 final steppedLine = LineData(
     origin: const Offset(0, -140),
@@ -279,7 +302,7 @@ final steppedLineT = LineData(
     DataPoint(x: -100, dy: 80),
     DataPoint(x: -70, dy: 10),
     DataPoint(x: -45, dy: 50),
-    DataPoint(x: -20, dy: 120),
+    DataPoint(x: -20, dy: 70),
     DataPoint(x: 0, dy: 0),
 ]);
 
@@ -366,11 +389,11 @@ class _ExamplePageState extends State<_ExamplePage> {
   bool _toggled = false;
 
   static final _initialCharts = [
-    bigPie, steppedLine, smallPie, between, lineTop, lineBottom, bars, fillPie
+    bigPie, steppedLine, smallPie, between, lineTop, lineBottom, dxPie, padPie, bars
   ];
 
   static final _toggleCharts = [
-    bigPieT, steppedLineT, smallPieT, betweenT, lineTopT, lineBottomT, fillPieT
+    bigPieT, steppedLineT, smallPieT, betweenT, lineTopT, lineBottomT, dxPieT, padPieT
   ];
 
   @override

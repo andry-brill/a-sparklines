@@ -15,11 +15,10 @@ class PieChartRenderer extends AChartRenderer<PieData> {
     PieData pieData,
   ) {
 
-
-
     final layouts = computePies(
       pieData.points,
-      pieData.space,
+      pieData.dx,
+      pieData.padAngle,
       pieData.thickness,
       pieData.borderRadius ?? 0.0,
       transform
@@ -56,7 +55,8 @@ class PieChartRenderer extends AChartRenderer<PieData> {
           startAngle: layout.startAngle,
           endAngle: layout.endAngle,
           point: layout.point,
-          cornerRadius: layout.cornerRadius
+          cornerRadius: layout.cornerRadius,
+          padAngle: layout.padAngle
         );
 
         Path pieBorderPath = borderLayout.toPath();

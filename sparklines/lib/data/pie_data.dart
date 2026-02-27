@@ -35,7 +35,9 @@ class PieData implements ISparklinesData, IChartThickness, IChartBorder, IChartD
   @override
   final ThicknessData thickness;
 
-  final double space;
+  final double dx;
+
+  final double padAngle;
 
   @override
   final ThicknessData? border;
@@ -51,7 +53,8 @@ class PieData implements ISparklinesData, IChartThickness, IChartBorder, IChartD
 
     final layouts = computePies(
       points,
-      space,
+      dx,
+      padAngle,
       thickness,
       borderRadius ?? 0.0,
       null
@@ -94,7 +97,8 @@ class PieData implements ISparklinesData, IChartThickness, IChartBorder, IChartD
     this.crop,
     required this.points,
     this.thickness = const ThicknessData(size: 2.0),
-    this.space = 0.0,
+    this.dx = 0.0,
+    this.padAngle = 0.0,
     this.border,
     this.borderRadius,
     this.pointStyle,
@@ -108,7 +112,8 @@ class PieData implements ISparklinesData, IChartThickness, IChartBorder, IChartD
     bool? crop,
     List<DataPoint>? points,
     ThicknessData? thickness,
-    double? space,
+    double? dx,
+    double? padAngle,
     ThicknessData? border,
     double? borderRadius,
   }) {
@@ -120,7 +125,8 @@ class PieData implements ISparklinesData, IChartThickness, IChartBorder, IChartD
       crop: crop ?? this.crop,
       points: points ?? this.points,
       thickness: thickness ?? this.thickness,
-      space: space ?? this.space,
+      dx: dx ?? this.dx,
+      padAngle: padAngle ?? this.padAngle,
       border: border ?? this.border,
       borderRadius: borderRadius ?? this.borderRadius,
     );
@@ -135,7 +141,8 @@ class PieData implements ISparklinesData, IChartThickness, IChartBorder, IChartD
     if (layout != other.layout) return true;
     if (points.length != other.points.length) return true;
     if (thickness != other.thickness) return true;
-    if (space != other.space) return true;
+    if (dx != other.dx) return true;
+    if (padAngle != other.padAngle) return true;
     if (border != other.border) return true;
     if (borderRadius != other.borderRadius) return true;
 
@@ -167,7 +174,8 @@ class PieData implements ISparklinesData, IChartThickness, IChartBorder, IChartD
       crop: next.crop,
       points: interpolatedPies,
       thickness: thickness.lerpTo(next.thickness, t),
-      space: lerpDouble(space, next.space, t) ?? next.space,
+      dx: lerpDouble(dx, next.dx, t) ?? next.dx,
+      padAngle: lerpDouble(padAngle, next.padAngle, t) ?? next.padAngle,
       border: ILerpTo.lerp(border, next.border, t),
       borderRadius: lerpDouble(borderRadius, next.borderRadius, t) ?? next.borderRadius,
     );

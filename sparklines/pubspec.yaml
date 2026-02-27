@@ -5,7 +5,7 @@ homepage: https://github.com/andry-brill/a-sparklines
 repository: https://github.com/andry-brill/a-sparklines
 issue_tracker: https://github.com/andry-brill/a-sparklines/issues
 
-version: 1.0.0
+version: 1.1.0
 
 environment:
   sdk: '>=3.0.0 <4.0.0'

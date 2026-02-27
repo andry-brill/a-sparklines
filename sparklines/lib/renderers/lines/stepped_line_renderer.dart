@@ -14,25 +14,25 @@ class SteppedLineRenderer extends BaseLineTypeRenderer<SteppedLineData> {
   const SteppedLineRenderer();
 
   @override
-  Path toLinePath(SteppedLineData lineType, Path path, List<DataPoint> points, {bool useFy = true, bool reverse = false}) {
+  Path toLinePath(SteppedLineData lineType, Path path, List<DataPoint> points, {bool reverse = false}) {
 
     if (reverse) {
       for (int i = points.length - 1; i >= 1; i--) {
         final curr = points[i];
         final prev = points[i - 1];
         final stepX = prev.x + (curr.x - prev.x) * lineType.stepJumpAt;
-        path.lineTo(stepX, curr.getYorFY(useFy));
-        path.lineTo(stepX, prev.getYorFY(useFy));
-        path.lineTo(prev.x, prev.getYorFY(useFy));
+        path.lineTo(stepX, curr.fy);
+        path.lineTo(stepX, prev.fy);
+        path.lineTo(prev.x, prev.fy);
       }
     } else {
       for (int i = 1; i < points.length; i++) {
         final prev = points[i - 1];
         final curr = points[i];
         final stepX = prev.x + (curr.x - prev.x) * lineType.stepJumpAt;
-        path.lineTo(stepX, prev.getYorFY(useFy));
-        path.lineTo(stepX, curr.getYorFY(useFy));
-        path.lineTo(curr.x, curr.getYorFY(useFy));
+        path.lineTo(stepX, prev.fy);
+        path.lineTo(stepX, curr.fy);
+        path.lineTo(curr.x, curr.fy);
       }
     }
 

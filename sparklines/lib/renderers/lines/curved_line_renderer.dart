@@ -15,22 +15,21 @@ class CurvedLineRenderer extends BaseLineTypeRenderer<CurvedLineData> {
       CurvedLineData lineType,
       Path path,
       List<DataPoint> points, {
-        bool useFy = true,
         bool reverse = false,
       }) {
     if (points.isEmpty) return path;
     if (points.length == 1) {
       final p = points.first;
-      path.moveTo(p.x, p.getYorFY(useFy));
+      path.moveTo(p.x, p.fy);
       return path;
     }
 
     final s = lineType.smoothness.clamp(0.0, 1.0);
 
     if (reverse) {
-      _buildReverse(path, points, s, useFy);
+      _buildReverse(path, points, s);
     } else {
-      _buildForward(path, points, s, useFy);
+      _buildForward(path, points, s);
     }
 
     return path;
@@ -40,12 +39,11 @@ class CurvedLineRenderer extends BaseLineTypeRenderer<CurvedLineData> {
       Path path,
       List<DataPoint> points,
       double smoothness,
-      bool useFy,
       ) {
     final count = points.length;
 
     final first = points.first;
-    path.moveTo(first.x, first.getYorFY(useFy));
+    path.moveTo(first.x, first.fy);
 
     for (int i = 0; i < count - 1; i++) {
       final p0 = i > 0 ? points[i - 1] : points[i];
@@ -56,16 +54,16 @@ class CurvedLineRenderer extends BaseLineTypeRenderer<CurvedLineData> {
       final cp1x =
           p1.x + (p2.x - p0.x) * smoothness / 6.0;
       final cp1y =
-          p1.getYorFY(useFy) +
-              (p2.getYorFY(useFy) - p0.getYorFY(useFy)) *
+          p1.fy +
+              (p2.fy - p0.fy) *
                   smoothness /
                   6.0;
 
       final cp2x =
           p2.x - (p3.x - p1.x) * smoothness / 6.0;
       final cp2y =
-          p2.getYorFY(useFy) -
-              (p3.getYorFY(useFy) - p1.getYorFY(useFy)) *
+          p2.fy -
+              (p3.fy - p1.fy) *
                   smoothness /
                   6.0;
 
@@ -75,7 +73,7 @@ class CurvedLineRenderer extends BaseLineTypeRenderer<CurvedLineData> {
         cp2x,
         cp2y,
         p2.x,
-        p2.getYorFY(useFy),
+        p2.fy,
       );
     }
   }
@@ -84,7 +82,6 @@ class CurvedLineRenderer extends BaseLineTypeRenderer<CurvedLineData> {
       Path path,
       List<DataPoint> points,
       double smoothness,
-      bool useFy,
       ) {
 
     final count = points.length;
@@ -98,16 +95,16 @@ class CurvedLineRenderer extends BaseLineTypeRenderer<CurvedLineData> {
       final cp1x =
           p1.x + (p2.x - p0.x) * smoothness / 6.0;
       final cp1y =
-          p1.getYorFY(useFy) +
-              (p2.getYorFY(useFy) - p0.getYorFY(useFy)) *
+          p1.fy +
+              (p2.fy - p0.fy) *
                   smoothness /
                   6.0;
 
       final cp2x =
           p2.x - (p3.x - p1.x) * smoothness / 6.0;
       final cp2y =
-          p2.getYorFY(useFy) -
-              (p3.getYorFY(useFy) - p1.getYorFY(useFy)) *
+          p2.fy -
+              (p3.fy - p1.fy) *
                   smoothness /
                   6.0;
 
@@ -117,7 +114,7 @@ class CurvedLineRenderer extends BaseLineTypeRenderer<CurvedLineData> {
         cp2x,
         cp2y,
         p2.x,
-        p2.getYorFY(useFy),
+        p2.fy,
       );
     }
   }
