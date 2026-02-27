@@ -8,13 +8,19 @@ import '../interfaces/thickness.dart';
 /// A single data point with x, y coordinates and optional style
 class DataPoint implements ILerpTo<DataPoint> {
 
+  /// Offset by X
   final double x;
+
+  /// Extra offset by X
+  final double dx;
+
+  /// Offset by Y
   final double y;
 
-  /// Value (offset by y)
+  /// Value
   final double dy;
 
-  /// Full Y
+  /// Full Y (y + dy)
   final double fy;
 
   final IDataPointStyle? style;
@@ -23,6 +29,7 @@ class DataPoint implements ILerpTo<DataPoint> {
 
   const DataPoint({
     required this.x,
+    this.dx = 0.0,
     this.y = 0.0,
     required this.dy,
     this.style,
@@ -30,12 +37,6 @@ class DataPoint implements ILerpTo<DataPoint> {
   }) : fy = y + dy;
 
   double getYorFY(bool fy) => fy ? this.fy : y;
-
-  const DataPoint.value(this.x, double value, {
-    this.y = 0.0,
-    this.style,
-    this.thickness,
-  }) : dy = value, fy = y + value;
 
   DataPoint copyWith({
     double? x,

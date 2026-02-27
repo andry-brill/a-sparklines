@@ -41,6 +41,10 @@ abstract class DataPointModifier {
 
 class DataPointPipelineContext {
 
+  /// spacing between points in normalized units
+  final double spacing;
+  DataPointPipelineContext({required this.spacing});
+
   final cumulativeByX = <double, double>{};
 
   double globalMinY = double.infinity;
@@ -56,7 +60,9 @@ class DataPointPipelineContext {
 
 class DataPointPipeline {
 
-  final context = DataPointPipelineContext();
+  final DataPointPipelineContext context;
+
+  DataPointPipeline({double spacing = 0.0}) : context = DataPointPipelineContext(spacing: spacing);
 
   final List<List<DataPoint>> _inputs = [];
 
@@ -109,11 +115,13 @@ class DataPointPipeline {
 
   // builder methods
 
+  /// Stack points on point.y by point.x with point.dy values
   DataPointPipeline stack([bool enabled = true]) {
     if (enabled) _modifiers.add(StackModifier());
     return this;
   }
 
+  /// Normalize point.dy values
   DataPointPipeline normalize2pi({
     double low = 0.0,
     double high = 2 * pi,
@@ -121,6 +129,7 @@ class DataPointPipeline {
     double? threshold,
   }) => normalize(low: low, high: high, mid: mid, threshold: threshold);
 
+  /// Normalize point.dy values
   DataPointPipeline normalize({
     double low = 0.0,
     double high = 1.0,
@@ -153,7 +162,7 @@ class StackModifier implements DataPointModifier {
 
       result.add(p.copyWith(y: base));
 
-      context.cumulativeByX[p.x] = base + p.dy;
+      context.cumulativeByX[p.x] = base + p.dy + context.spacing;
     }
 
     return result;
@@ -189,7 +198,7 @@ class NormalizeModifier implements DataPointModifier {
 
     while (true) {
 
-      final normalized = _normalizeOnce(working);
+      final normalized = _normalizeOnce(working, context);
 
       if (threshold == null) {
         return normalized;
@@ -227,25 +236,23 @@ class NormalizeModifier implements DataPointModifier {
     }
   }
 
-  List<DataPoint> _normalizeOnce(List<DataPoint> input) {
+  List<DataPoint> _normalizeOnce(List<DataPoint> input, DataPointPipelineContext context) {
 
     double negSum = 0;
     double posSum = 0;
 
     for (final p in input) {
-      if (p.dy < 0) negSum += -p.dy;
-      else if (p.dy > 0) posSum += p.dy;
+      if (p.dy < 0) negSum += -p.dy + (negSum > 0 ? context.spacing : 0.0);
+      else if (p.dy > 0) posSum += p.dy + (posSum > 0 ? context.spacing : 0.0);
     }
 
-    final total = negSum + posSum;
+    final total = negSum + posSum + (negSum > 0 && posSum > 0 ? context.spacing : 0.0);
 
     if (total == 0) return input;
 
-    final actualMid = mid ??
-        (low + (negSum / total) * (high - low));
-
-    final negRange = actualMid - low;
-    final posRange = high - actualMid;
+    final split = mid ?? (low + (negSum / total) * (high - low));
+    final negRange = split - low;
+    final posRange = high - split;
 
     final negScale = negSum == 0 ? 0 : negRange / negSum;
     final posScale = posSum == 0 ? 0 : posRange / posSum;
@@ -256,41 +263,15 @@ class NormalizeModifier implements DataPointModifier {
 
       final dy = p.dy;
 
+      double newDy = 0.0;
+
       if (dy < 0) {
-
-        if (negRange == 0) continue;
-
-        final newDy = (-dy) * negScale;
-
-        result.add(
-          p.copyWith(
-            y: actualMid - newDy,
-            dy: newDy,
-          ),
-        );
-
+        newDy = (-dy) * negScale;
       } else if (dy > 0) {
-
-        if (posRange == 0) continue;
-
-        final newDy = dy * posScale;
-
-        result.add(
-          p.copyWith(
-            y: actualMid,
-            dy: newDy,
-          ),
-        );
-
-      } else {
-
-        result.add(
-          p.copyWith(
-            y: actualMid,
-            dy: 0,
-          ),
-        );
+        newDy = dy * posScale;
       }
+
+      result.add(p.copyWith(dy: newDy));
     }
 
     return result;

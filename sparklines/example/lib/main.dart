@@ -175,6 +175,84 @@ final smallPieT = PieData(
 );
 
 
+final fillPie = PieData(
+  points: [
+    DataPoint(
+      x: 10.0,
+      y: pi/2,
+      dy: pi + pi/3,
+      thickness: ThicknessOverride(
+        color: Colors.blue.shade100,
+      ),
+    ),
+    DataPoint(
+      x: 10.0,
+      y: pi + pi/3 + pi/2,
+      dy: pi - pi/3,
+    ),
+
+  ],
+  borderRadius: 3.0,
+  space: 3.0,
+  thickness: ThicknessData(
+    size: 30,
+    color: Colors.blue,
+  ),
+);
+
+
+final fillPieT = PieData(
+  points: [
+    DataPoint(
+      x: 40.0,
+      y: 0,
+      dy: pi,
+      thickness: ThicknessOverride(
+        color: Colors.blue.shade100,
+      ),
+    ),
+    DataPoint(
+      x: 60.0,
+      y: 0,
+      dy: pi,
+      thickness: ThicknessOverride(
+        color: Colors.blue.shade100,
+      ),
+    ),
+    DataPoint(
+      x: 80.0,
+      y: 0,
+      dy: pi,
+      thickness: ThicknessOverride(
+        color: Colors.blue.shade100,
+      ),
+    ),
+    DataPoint(x: 40.0, y:pi / 4.0, dy:  pi - pi / 4.0),
+    DataPoint(
+      x: 60.0,
+      y: pi / 3.0,
+      dy: pi - pi / 3.0,
+      thickness: ThicknessOverride(
+        color: Colors.blue.shade600,
+      ),
+    ),
+    DataPoint(
+      x: 80.0,
+      y: pi / 6.0,
+      dy: pi - pi / 6.0,
+      thickness: ThicknessOverride(
+        color: Colors.blue.shade900,
+      ),
+    ),
+  ],
+  borderRadius: 6.0,
+  thickness: ThicknessData(
+    size: 12,
+    color: Colors.blue.shade300,
+  ),
+);
+
+
 final steppedLine = LineData(
     origin: const Offset(0, -140),
     lineType: SteppedLineData.middle(isStrokeCapRound: true, isStrokeJoinRound: true),
@@ -288,11 +366,11 @@ class _ExamplePageState extends State<_ExamplePage> {
   bool _toggled = false;
 
   static final _initialCharts = [
-    bigPie, steppedLine, smallPie, between, lineTop, lineBottom, bars
+    bigPie, steppedLine, smallPie, between, lineTop, lineBottom, bars, fillPie
   ];
 
   static final _toggleCharts = [
-    bigPieT, steppedLineT, smallPieT, betweenT, lineTopT, lineBottomT,
+    bigPieT, steppedLineT, smallPieT, betweenT, lineTopT, lineBottomT, fillPieT
   ];
 
   @override

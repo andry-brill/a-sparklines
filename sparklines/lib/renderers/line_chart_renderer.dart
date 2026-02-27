@@ -48,7 +48,8 @@ class LineChartRenderer extends AChartRenderer<LineData> {
     final renderer = lineData.lineType.renderer;
 
     final areaPath = renderer.toPath(lineData.lineType, points);
-    renderer.toPath(lineData.lineType, points, useFy: false, reverse: true, path: areaPath);
+    final yPoints = points.map((p) => p.copyWith(dy: 0)).toList();
+    renderer.toPath(lineData.lineType, yPoints, useFy: false, reverse: true, path: areaPath);
 
     areaPath..fillType = lineData.areaFillType ?? PathFillType.evenOdd
       ..close();
