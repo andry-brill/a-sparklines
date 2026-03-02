@@ -1,6 +1,7 @@
 
 import 'package:flutter/material.dart';
 import '../data/layout_data.dart';
+import '../interfaces/chart_flip.dart';
 import '../interfaces/chart_rotation.dart';
 import '../interfaces/chart_transform.dart';
 import '../interfaces/layout.dart';
@@ -98,6 +99,15 @@ class SparklinesPainter extends CustomPainter {
         }
       }
 
+      final flip = chart.flip;
+      if (flip != ChartFlip.none) {
+        final center = bounds.center;
+        canvas.translate(center.dx, center.dy);
+        final sx = (flip == ChartFlip.horizontally || flip == ChartFlip.both) ? -1.0 : 1.0;
+        final sy = (flip == ChartFlip.vertically || flip == ChartFlip.both) ? -1.0 : 1.0;
+        canvas.scale(sx, sy);
+        canvas.translate(-center.dx, -center.dy);
+      }
 
       chart.renderer.render(canvas, transform, chart);
 

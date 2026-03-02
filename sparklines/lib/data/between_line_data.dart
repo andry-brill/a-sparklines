@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'dart:math' as math;
+import '../interfaces/chart_flip.dart';
 import '../interfaces/chart_rotation.dart';
 import '../interfaces/chart_area.dart';
 import '../interfaces/layout.dart';
@@ -16,6 +17,8 @@ class BetweenLineData implements ISparklinesData, IChartArea {
   final bool visible;
   @override
   final ChartRotation rotation;
+  @override
+  final ChartFlip flip;
   @override
   final Offset origin;
   @override
@@ -52,6 +55,7 @@ class BetweenLineData implements ISparklinesData, IChartArea {
   const BetweenLineData({
     this.visible = true,
     this.rotation = ChartRotation.d0,
+    this.flip = ChartFlip.none,
     this.origin = Offset.zero,
     this.layout,
     this.crop,
@@ -65,6 +69,7 @@ class BetweenLineData implements ISparklinesData, IChartArea {
   BetweenLineData copyWith({
     bool? visible,
     ChartRotation? rotation,
+    ChartFlip? flip,
     Offset? origin,
     IChartLayout? layout,
     bool? crop,
@@ -93,6 +98,7 @@ class BetweenLineData implements ISparklinesData, IChartArea {
     if (other is! BetweenLineData) return true;
     if (visible != other.visible) return true;
     if (rotation != other.rotation) return true;
+    if (flip != other.flip) return true;
     if (origin != other.origin) return true;
     if (layout != other.layout) return true;
     if (areaColor != other.areaColor) return true;
@@ -114,6 +120,7 @@ class BetweenLineData implements ISparklinesData, IChartArea {
     return BetweenLineData(
       visible: next.visible,
       rotation: next.rotation,
+      flip: next.flip,
       origin: Offset.lerp(origin, next.origin, t) ?? next.origin,
       layout: next.layout,
       crop: next.crop,

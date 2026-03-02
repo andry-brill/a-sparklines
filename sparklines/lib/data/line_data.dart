@@ -1,5 +1,6 @@
 import 'package:any_sparklines/interfaces/data_point_data.dart';
 import 'package:flutter/material.dart';
+import '../interfaces/chart_flip.dart';
 import '../interfaces/chart_rotation.dart';
 import '../interfaces/chart_area.dart';
 import '../interfaces/layout.dart';
@@ -23,6 +24,8 @@ class LineData implements ISparklinesData, IChartThickness, IChartDataPointStyle
   final bool visible;
   @override
   final ChartRotation rotation;
+  @override
+  final ChartFlip flip;
   @override
   final Offset origin;
   @override
@@ -67,6 +70,7 @@ class LineData implements ISparklinesData, IChartThickness, IChartDataPointStyle
   const LineData({
     this.visible = true,
     this.rotation = ChartRotation.d0,
+    this.flip = ChartFlip.none,
     this.origin = Offset.zero,
     this.layout,
     this.crop,
@@ -82,6 +86,7 @@ class LineData implements ISparklinesData, IChartThickness, IChartDataPointStyle
   LineData copyWith({
     bool? visible,
     ChartRotation? rotation,
+    ChartFlip? flip,
     Offset? origin,
     IChartLayout? layout,
     bool? crop,
@@ -96,6 +101,7 @@ class LineData implements ISparklinesData, IChartThickness, IChartDataPointStyle
     return LineData(
       visible: visible ?? this.visible,
       rotation: rotation ?? this.rotation,
+      flip: flip ?? this.flip,
       origin: origin ?? this.origin,
       layout: layout ?? this.layout,
       crop: crop ?? this.crop,
@@ -114,6 +120,7 @@ class LineData implements ISparklinesData, IChartThickness, IChartDataPointStyle
     if (other is! LineData) return true;
     if (visible != other.visible) return true;
     if (rotation != other.rotation) return true;
+    if (flip != other.flip) return true;
     if (origin != other.origin) return true;
     if (layout != other.layout) return true;
     if (line.length != other.line.length) return true;
@@ -147,6 +154,7 @@ class LineData implements ISparklinesData, IChartThickness, IChartDataPointStyle
     return LineData(
       visible: next.visible,
       rotation: next.rotation,
+      flip: next.flip,
       origin: Offset.lerp(origin, next.origin, t) ?? next.origin,
       layout: next.layout,
       crop: next.crop,

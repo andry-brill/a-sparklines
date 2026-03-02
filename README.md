@@ -14,9 +14,10 @@ Feature-rich, highly optimized sparklines for Flutter. Line, bar, pie, and betwe
 - **RelativeLayout** — Data is scaled to explicit bounds. Use `RelativeLayout.normalized()` (0–1), `RelativeLayout.signed()` (-1–1), or `RelativeLayout.full()` (auto from data). Set `minX`/`maxX`/`minY`/`maxY` to `double.infinity` or `double.negativeInfinity` to derive from chart data. **Identical layout instances are resolved once and shared** across all charts using them.
 - **RelativeDimension** — For `RelativeLayout`, use `relativeTo: RelativeDimension.width` or `RelativeDimension.height` so lengths (e.g. stroke width) scale with chart size; `none` uses absolute values.
 
-### Rotation and origin
+### Rotation, flip, and origin
 
 - **ChartRotation** — `d0`, `d90`, `d180`, `d270` (clockwise). For `d90`/`d270`, logical width/height are swapped so the chart fills the widget.
+- **ChartFlip** — `none`, `vertically`, `horizontally`, `both`. Flip charts around axes; applied after rotation.
 - **origin** — `Offset` applied before rotation; use to position charts.
 
 ### Crop and visibility

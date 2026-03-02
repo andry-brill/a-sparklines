@@ -1,4 +1,8 @@
 
+## 2.1.1
+
+* Added **ChartFlip** — `none`, `vertically`, `horizontally`, `both`. Flip charts around axes; available on all chart data types via `ISparklinesData.flip`.
+
 ## 2.1.0
 
 * Renaming

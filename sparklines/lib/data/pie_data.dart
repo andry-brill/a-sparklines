@@ -2,6 +2,7 @@ import 'package:any_sparklines/interfaces/pie_offset.dart';
 import 'package:flutter/material.dart';
 import 'dart:ui' show lerpDouble;
 import '../interfaces/chart_border.dart';
+import '../interfaces/chart_flip.dart';
 import '../interfaces/chart_rotation.dart';
 import '../interfaces/data_point_style.dart';
 import '../interfaces/layout.dart';
@@ -20,6 +21,8 @@ class PieData implements ISparklinesData, IChartThickness, IChartBorder, IChartD
   final bool visible;
   @override
   final ChartRotation rotation;
+  @override
+  final ChartFlip flip;
   @override
   final Offset origin;
   @override
@@ -91,9 +94,15 @@ class PieData implements ISparklinesData, IChartThickness, IChartBorder, IChartD
   @override
   final IDataPointStyle? pointStyle;
 
+  /// Pie in the standard mathematical (Cartesian) coordinate system.
+  ///
+  /// By default:
+  /// * **Zero Y (0°):** Starts at the **3 o'clock** position (positive X-axis).
+  /// * **Direction:** Rotates **anticlockwise**.
   PieData({
     this.visible = true,
     this.rotation = ChartRotation.d0,
+    this.flip = ChartFlip.none,
     this.origin = Offset.zero,
     this.layout,
     this.crop,
@@ -106,9 +115,29 @@ class PieData implements ISparklinesData, IChartThickness, IChartBorder, IChartD
     this.pointStyle,
   });
 
+  /// Pie in the human-friendly "Clock" or "Gauge" orientation.
+  ///
+  /// Features:
+  /// * **Zero Y (0°):** Starts at the **12 o'clock** position (Top).
+  /// * **Direction:** Rotates **clockwise**.
+  PieData.clockwise({
+    this.visible = true,
+    this.origin = Offset.zero,
+    this.layout,
+    this.crop,
+    required this.pies,
+    this.thickness = const ThicknessData(size: 2.0),
+    this.pieOffset = 0.0,
+    this.padAngle = 0.0,
+    this.border,
+    this.borderRadius,
+    this.pointStyle,
+  }) : rotation = ChartRotation.d90, flip = ChartFlip.acrossY;
+
   PieData copyWith({
     bool? visible,
     ChartRotation? rotation,
+    ChartFlip? flip,
     Offset? origin,
     IChartLayout? layout,
     bool? crop,
@@ -122,6 +151,7 @@ class PieData implements ISparklinesData, IChartThickness, IChartBorder, IChartD
     return PieData(
       visible: visible ?? this.visible,
       rotation: rotation ?? this.rotation,
+      flip: flip ?? this.flip,
       origin: origin ?? this.origin,
       layout: layout ?? this.layout,
       crop: crop ?? this.crop,
@@ -139,6 +169,7 @@ class PieData implements ISparklinesData, IChartThickness, IChartBorder, IChartD
     if (other is! PieData) return true;
     if (visible != other.visible) return true;
     if (rotation != other.rotation) return true;
+    if (flip != other.flip) return true;
     if (origin != other.origin) return true;
     if (layout != other.layout) return true;
     if (pies.length != other.pies.length) return true;
@@ -171,6 +202,7 @@ class PieData implements ISparklinesData, IChartThickness, IChartBorder, IChartD
     return PieData(
       visible: next.visible,
       rotation: next.rotation,
+      flip: next.flip,
       origin: Offset.lerp(origin, next.origin, t) ?? next.origin,
       layout: next.layout,
       crop: next.crop,

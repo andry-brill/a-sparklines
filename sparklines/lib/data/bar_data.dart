@@ -2,6 +2,7 @@ import 'package:any_sparklines/interfaces/data_point_data.dart';
 import 'package:flutter/material.dart';
 import 'dart:ui' show lerpDouble;
 import '../interfaces/chart_border.dart';
+import '../interfaces/chart_flip.dart';
 import '../interfaces/chart_rotation.dart';
 import '../interfaces/data_point_style.dart';
 import '../interfaces/layout.dart';
@@ -20,6 +21,8 @@ class BarData implements ISparklinesData, IChartBorder, IChartThickness, IChartD
   final bool visible;
   @override
   final ChartRotation rotation;
+  @override
+  final ChartFlip flip;
   @override
   final Offset origin;
   @override
@@ -58,6 +61,7 @@ class BarData implements ISparklinesData, IChartBorder, IChartThickness, IChartD
   const BarData({
     this.visible = true,
     this.rotation = ChartRotation.d0,
+    this.flip = ChartFlip.none,
     this.origin = Offset.zero,
     this.layout,
     this.crop,
@@ -71,6 +75,7 @@ class BarData implements ISparklinesData, IChartBorder, IChartThickness, IChartD
   BarData copyWith({
     bool? visible,
     ChartRotation? rotation,
+    ChartFlip? flip,
     Offset? origin,
     IChartLayout? layout,
     bool? crop,
@@ -83,6 +88,7 @@ class BarData implements ISparklinesData, IChartBorder, IChartThickness, IChartD
     return BarData(
       visible: visible ?? this.visible,
       rotation: rotation ?? this.rotation,
+      flip: flip ?? this.flip,
       origin: origin ?? this.origin,
       layout: layout ?? this.layout,
       crop: crop ?? this.crop,
@@ -99,6 +105,7 @@ class BarData implements ISparklinesData, IChartBorder, IChartThickness, IChartD
     if (other is! BarData) return true;
     if (visible != other.visible) return true;
     if (rotation != other.rotation) return true;
+    if (flip != other.flip) return true;
     if (origin != other.origin) return true;
     if (layout != other.layout) return true;
     if (thickness != other.thickness) return true;
@@ -130,6 +137,7 @@ class BarData implements ISparklinesData, IChartBorder, IChartThickness, IChartD
     return BarData(
       visible: next.visible,
       rotation: next.rotation,
+      flip: next.flip,
       origin: Offset.lerp(origin, next.origin, t) ?? next.origin,
       layout: next.layout,
       crop: next.crop,

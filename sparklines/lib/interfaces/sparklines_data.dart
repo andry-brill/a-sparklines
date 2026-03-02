@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import 'chart_flip.dart';
 import 'chart_rotation.dart';
 import 'chart_transform.dart';
 import 'layout.dart';
@@ -21,6 +22,9 @@ abstract class ISparklinesData implements ILerpTo<ISparklinesData> {
 
   /// Rotation (d90/d270 use swapped dimensions so chart fills bounds)
   ChartRotation get rotation;
+
+  /// Flip: none, vertically, horizontally, or both
+  ChartFlip get flip;
 
   /// Origin offset for positioning
   Offset get origin;

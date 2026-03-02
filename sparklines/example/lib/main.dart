@@ -205,23 +205,26 @@ final smallPieT = PieData(
 
 final dxPie = PieData(
   origin: Offset(115, 130),
+  flip: ChartFlip.acrossY,
+  rotation: ChartRotation.d90,
   pies: [
     DataPoint(
       x: 7.0,
-      y: pi/2,
-      dy: pi + pi/3,
+      y: pi/2 - pi/6,
+      dy: 2 * pi - (pi/2 - pi/6),
       data: {
         IThicknessOverride: ThicknessOverride(
           color: Colors.blue.shade100,
         ),
+        IPieOffset: PieOffset(0.0),
       },
     ),
     DataPoint(
       x: 7.0,
-      y: -pi/6,
-      dy: pi - pi/3,
+      y: 0,
+      dy: pi/2 - pi/6,
       data: {
-        IPieOffset: PieOffset(3.0),
+        IPieOffset: PieOffset(4.0),
         IDataPointBorder: DataPointBorder(borderRadius: 4.0)
       }
     ),
@@ -236,13 +239,15 @@ final dxPie = PieData(
 
 final dxPieT = PieData(
   origin: Offset(115, 130),
+  flip: ChartFlip.acrossY,
+  rotation: ChartRotation.d90,
   pies: [
     DataPoint(
       x: 7.0,
-      y: pi/2,
+      y: pi + pi/2,
       dy: pi/2,
       data: {
-        IPieOffset: PieOffset(3.0),
+        IPieOffset: PieOffset(4.0),
         IThicknessOverride: ThicknessOverride(
           color: Colors.blue.shade100,
         )
@@ -250,8 +255,11 @@ final dxPieT = PieData(
     ),
     DataPoint(
       x: 7.0,
-      y: -pi,
+      y: 0,
       dy: pi + pi/2,
+      data: {
+        IPieOffset: PieOffset(0.0),
+      }
     ),
   ],
   borderRadius: 3.0,
