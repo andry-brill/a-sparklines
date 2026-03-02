@@ -326,6 +326,7 @@ final padPieT = PieData(
 final steppedLine = LineData(
     origin: const Offset(0, -140),
     lineType: SteppedLineData.middle(isStrokeCapRound: true, isStrokeJoinRound: true),
+    pointStyle: CircleDataPointStyle(radius: 9, color: Colors.blue.shade900),
     thickness: ThicknessData(size: 8, color: Colors.blue),
     areaGradient: LinearGradient(colors: [Colors.blue.shade200, Colors.blue.shade200.withValues(alpha: 0)], begin: AlignmentGeometry.topCenter, end: AlignmentGeometry.bottomCenter),
     line: [
@@ -341,6 +342,7 @@ final steppedLine = LineData(
 final steppedLineT = LineData(
   origin: const Offset(0, -140),
   lineType: SteppedLineData.middle(isStrokeCapRound: true, isStrokeJoinRound: true),
+  pointStyle: CircleDataPointStyle(radius: 12, color: Colors.blue),
   thickness: ThicknessData(size: 8, color: Colors.blue),
   areaGradient: LinearGradient(colors: [Colors.blue.shade200, Colors.blue.shade200.withValues(alpha: 0)], begin: AlignmentGeometry.topCenter, end: AlignmentGeometry.bottomCenter),
   line: [

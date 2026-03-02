@@ -57,22 +57,22 @@ const thickness2 = ThicknessData(size: 4, color: Colors.deepOrange);
 
 final initialCharts = [
   LineData(
-    points: blueLine,
+    line: blueLine,
     thickness: thickness1,
   ),
   LineData(
-    points: orangeLine,
+    line: orangeLine,
     thickness: thickness2,
   ),
 ];
 
 final toggleCharts = [
   LineData(
-    points: blueLineMod,
+    line: blueLineMod,
     thickness: thickness1,
   ),
   LineData(
-    points: orangeLineMod,
+    line: orangeLineMod,
     thickness: thickness2,
   ),
 ];
@@ -213,21 +213,21 @@ List<ExampleChart> lineCharts() {
       ),
       initialCharts: [
         LineData(
-          points: lineStacker1.build(blueLine),
+          line: lineStacker1.build(blueLine),
           thickness: thickness1,
         ),
         LineData(
-          points: lineStacker1.build(blueLine),
+          line: lineStacker1.build(blueLine),
           thickness: thickness2,
         ),
       ].reversed.toList(),
       toggleCharts: [
         LineData(
-          points: lineStacker2.build(blueLineMod),
+          line: lineStacker2.build(blueLineMod),
           thickness: thickness1,
         ),
         LineData(
-          points: lineStacker2.build(blueLineMod),
+          line: lineStacker2.build(blueLineMod),
           thickness: thickness2,
         ),
       ].reversed.toList(),
@@ -240,24 +240,24 @@ List<ExampleChart> lineCharts() {
       ),
       initialCharts: [
         LineData(
-          points: [
-            DataPoint(x: xI(0), dy: yI(4), thickness: ThicknessOverride(size: 8)),
-            DataPoint(x: xI(2), dy: yI(8), thickness: ThicknessOverride(size: 24)),
-            DataPoint(x: xI(6), dy: yI(2), thickness: ThicknessOverride(size: 16)),
-            DataPoint(x: xI(8), dy: yI(5), thickness: ThicknessOverride(size: 24)),
-            DataPoint(x: xI(10), dy: yI(7), thickness: ThicknessOverride(size: 8)),
+          line: [
+            DataPoint(x: xI(0), dy: yI(4), data: {IThicknessOverride: ThicknessOverride(size: 8)}),
+            DataPoint(x: xI(2), dy: yI(8), data: {IThicknessOverride: ThicknessOverride(size: 24)}),
+            DataPoint(x: xI(6), dy: yI(2), data: {IThicknessOverride: ThicknessOverride(size: 16)}),
+            DataPoint(x: xI(8), dy: yI(5), data: {IThicknessOverride: ThicknessOverride(size: 24)}),
+            DataPoint(x: xI(10), dy: yI(7), data: {IThicknessOverride: ThicknessOverride(size: 8)}),
           ],
           thickness: thickness1,
         ),
       ],
       toggleCharts: [
         LineData(
-          points: [
-            DataPoint(x: xI(0), dy: yI(8), thickness: ThicknessOverride(size: 16)),
-            DataPoint(x: xI(2), dy: yI(4), thickness: ThicknessOverride(size: 8)),
-            DataPoint(x: xI(6), dy: yI(1), thickness: ThicknessOverride(size: 24)),
-            DataPoint(x: xI(8), dy: yI(2), thickness: ThicknessOverride(size: 8)),
-            DataPoint(x: xI(10), dy: yI(9), thickness: ThicknessOverride(size: 16)),
+          line: [
+            DataPoint(x: xI(0), dy: yI(8), data: {IThicknessOverride: ThicknessOverride(size: 16)}),
+            DataPoint(x: xI(2), dy: yI(4), data: {IThicknessOverride: ThicknessOverride(size: 8)}),
+            DataPoint(x: xI(6), dy: yI(1), data: {IThicknessOverride: ThicknessOverride(size: 24)}),
+            DataPoint(x: xI(8), dy: yI(2), data: {IThicknessOverride: ThicknessOverride(size: 8)}),
+            DataPoint(x: xI(10), dy: yI(9), data: {IThicknessOverride: ThicknessOverride(size: 16)}),
           ],
           thickness: thickness1,
         ),
@@ -271,24 +271,24 @@ List<ExampleChart> lineCharts() {
       ),
       initialCharts: [
         LineData(
-          points: [
-            DataPoint(x: xI(0), dy: yI(4), thickness: ThicknessOverride(size: 8)),
-            DataPoint(x: xI(2), dy: yI(8), thickness: ThicknessOverride(size: 24)),
-            DataPoint(x: xI(6), dy: yI(2), thickness: ThicknessOverride(size: 16)),
-            DataPoint(x: xI(8), dy: yI(5), thickness: ThicknessOverride(size: 24)),
-            DataPoint(x: xI(10), dy: yI(7), thickness: ThicknessOverride(size: 8)),
+          line: [
+            DataPoint(x: xI(0), dy: yI(4), data: {IThicknessOverride: ThicknessOverride(size: 8)}),
+            DataPoint(x: xI(2), dy: yI(8), data: {IThicknessOverride: ThicknessOverride(size: 24)}),
+            DataPoint(x: xI(6), dy: yI(2), data: {IThicknessOverride: ThicknessOverride(size: 16)}),
+            DataPoint(x: xI(8), dy: yI(5), data: {IThicknessOverride: ThicknessOverride(size: 24)}),
+            DataPoint(x: xI(10), dy: yI(7), data: {IThicknessOverride: ThicknessOverride(size: 8)}),
           ],
           thickness: thickness1,
         ),
       ],
       toggleCharts: [
         LineData(
-          points: [
-            DataPoint(x: xI(0), dy: yI(8), thickness: ThicknessOverride(size: 16)),
-            DataPoint(x: xI(2), dy: yI(4), thickness: ThicknessOverride(size: 8)),
-            DataPoint(x: xI(6), dy: yI(1), thickness: ThicknessOverride(size: 24)),
-            DataPoint(x: xI(8), dy: yI(2), thickness: ThicknessOverride(size: 8)),
-            DataPoint(x: xI(10), dy: yI(9), thickness: ThicknessOverride(size: 16)),
+          line: [
+            DataPoint(x: xI(0), dy: yI(8), data: {IThicknessOverride: ThicknessOverride(size: 16)}),
+            DataPoint(x: xI(2), dy: yI(4), data: {IThicknessOverride: ThicknessOverride(size: 8)}),
+            DataPoint(x: xI(6), dy: yI(1), data: {IThicknessOverride: ThicknessOverride(size: 24)}),
+            DataPoint(x: xI(8), dy: yI(2), data: {IThicknessOverride: ThicknessOverride(size: 8)}),
+            DataPoint(x: xI(10), dy: yI(9), data: {IThicknessOverride: ThicknessOverride(size: 16)}),
           ],
           thickness: thickness1,
         ),
@@ -302,24 +302,24 @@ List<ExampleChart> lineCharts() {
       ),
       initialCharts: [
         LineData(
-          points: [
-            DataPoint(x: xI(0), dy: yI(4), thickness: ThicknessOverride(size: 8, color: Colors.pink)),
-            DataPoint(x: xI(2), dy: yI(8), thickness: ThicknessOverride(size: 24, color: Colors.purpleAccent)),
-            DataPoint(x: xI(6), dy: yI(2), thickness: ThicknessOverride(size: 16, color: Colors.pink)),
-            DataPoint(x: xI(8), dy: yI(5), thickness: ThicknessOverride(size: 24, color: Colors.purpleAccent)),
-            DataPoint(x: xI(10), dy: yI(7), thickness: ThicknessOverride(size: 8, color: Colors.pink)),
+          line: [
+            DataPoint(x: xI(0), dy: yI(4), data: {IThicknessOverride: ThicknessOverride(size: 8, color: Colors.pink)}),
+            DataPoint(x: xI(2), dy: yI(8), data: {IThicknessOverride: ThicknessOverride(size: 24, color: Colors.purpleAccent)}),
+            DataPoint(x: xI(6), dy: yI(2), data: {IThicknessOverride: ThicknessOverride(size: 16, color: Colors.pink)}),
+            DataPoint(x: xI(8), dy: yI(5), data: {IThicknessOverride: ThicknessOverride(size: 24, color: Colors.purpleAccent)}),
+            DataPoint(x: xI(10), dy: yI(7), data: {IThicknessOverride: ThicknessOverride(size: 8, color: Colors.pink)}),
           ],
           thickness: thickness1,
         ),
       ],
       toggleCharts: [
         LineData(
-          points: [
-            DataPoint(x: xI(0), dy: yI(4), thickness: ThicknessOverride(size: 8, color: Colors.pink)),
-            DataPoint(x: xI(2), dy: yI(8), thickness: ThicknessOverride(size: 24, color: Colors.purpleAccent)),
-            DataPoint(x: xI(6), dy: yI(2), thickness: ThicknessOverride(size: 16, color: Colors.pink)),
-            DataPoint(x: xI(8), dy: yI(5), thickness: ThicknessOverride(size: 24, color: Colors.purpleAccent)),
-            DataPoint(x: xI(10), dy: yI(7), thickness: ThicknessOverride(size: 8, color: Colors.pink)),
+          line: [
+            DataPoint(x: xI(0), dy: yI(4), data: {IThicknessOverride: ThicknessOverride(size: 8, color: Colors.pink)}),
+            DataPoint(x: xI(2), dy: yI(8), data: {IThicknessOverride: ThicknessOverride(size: 24, color: Colors.purpleAccent)}),
+            DataPoint(x: xI(6), dy: yI(2), data: {IThicknessOverride: ThicknessOverride(size: 16, color: Colors.pink)}),
+            DataPoint(x: xI(8), dy: yI(5), data: {IThicknessOverride: ThicknessOverride(size: 24, color: Colors.purpleAccent)}),
+            DataPoint(x: xI(10), dy: yI(7), data: {IThicknessOverride: ThicknessOverride(size: 8, color: Colors.pink)}),
           ],
           thickness: thickness1,
         ),
@@ -333,11 +333,11 @@ List<ExampleChart> lineCharts() {
       ),
       initialCharts: [
         LineData(
-          points: [
+          line: [
             DataPoint(x: xI(0), dy: yI(4)),
-            DataPoint(x: xI(2), dy: yI(8), thickness: ThicknessOverride(color: Colors.pink)),
+            DataPoint(x: xI(2), dy: yI(8), data: {IThicknessOverride: ThicknessOverride(color: Colors.pink)}),
             DataPoint(x: xI(6), dy: yI(2)),
-            DataPoint(x: xI(8), dy: yI(5), thickness: ThicknessOverride(color: Colors.purpleAccent)),
+            DataPoint(x: xI(8), dy: yI(5), data: {IThicknessOverride: ThicknessOverride(color: Colors.purpleAccent)}),
             DataPoint(x: xI(10), dy: yI(7)),
           ],
           thickness: thickness1,
@@ -345,11 +345,11 @@ List<ExampleChart> lineCharts() {
       ],
       toggleCharts: [
         LineData(
-          points: [
+          line: [
             DataPoint(x: xI(0), dy: yI(4)),
-            DataPoint(x: xI(2), dy: yI(2), thickness: ThicknessOverride(color: Colors.purpleAccent)),
+            DataPoint(x: xI(2), dy: yI(2), data: {IThicknessOverride: ThicknessOverride(color: Colors.purpleAccent)}),
             DataPoint(x: xI(6), dy: yI(8)),
-            DataPoint(x: xI(8), dy: yI(2), thickness: ThicknessOverride(color: Colors.pink)),
+            DataPoint(x: xI(8), dy: yI(2), data: {IThicknessOverride: ThicknessOverride(color: Colors.pink)}),
             DataPoint(x: xI(10), dy: yI(9)),
           ],
           thickness: thickness1,
@@ -364,11 +364,11 @@ List<ExampleChart> lineCharts() {
       ),
       initialCharts: [
         LineData(
-          points: [
+          line: [
             DataPoint(x: xI(0), dy: yI(4)),
-            DataPoint(x: xI(2), dy: yI(8), thickness: ThicknessOverride(color: Colors.pink)),
+            DataPoint(x: xI(2), dy: yI(8), data: {IThicknessOverride: ThicknessOverride(color: Colors.pink)}),
             DataPoint(x: xI(6), dy: yI(2)),
-            DataPoint(x: xI(8), dy: yI(5), thickness: ThicknessOverride(color: Colors.purpleAccent)),
+            DataPoint(x: xI(8), dy: yI(5), data: {IThicknessOverride: ThicknessOverride(color: Colors.purpleAccent)}),
             DataPoint(x: xI(10), dy: yI(7)),
           ],
           thickness: thickness1,
@@ -376,11 +376,11 @@ List<ExampleChart> lineCharts() {
       ],
       toggleCharts: [
         LineData(
-          points: [
+          line: [
             DataPoint(x: xI(0), dy: yI(4)),
-            DataPoint(x: xI(2), dy: yI(2), thickness: ThicknessOverride(color: Colors.purpleAccent)),
+            DataPoint(x: xI(2), dy: yI(2), data: {IThicknessOverride: ThicknessOverride(color: Colors.purpleAccent)}),
             DataPoint(x: xI(6), dy: yI(8)),
-            DataPoint(x: xI(8), dy: yI(2), thickness: ThicknessOverride(color: Colors.pink)),
+            DataPoint(x: xI(8), dy: yI(2), data: {IThicknessOverride: ThicknessOverride(color: Colors.pink)}),
             DataPoint(x: xI(10), dy: yI(9)),
           ],
           thickness: thickness1,
@@ -395,11 +395,11 @@ List<ExampleChart> lineCharts() {
       ),
       initialCharts: [
         LineData(
-          points: [
+          line: [
             DataPoint(x: xI(0), dy: yI(4)),
-            DataPoint(x: xI(2), dy: yI(8), thickness: ThicknessOverride(size: 8)),
+            DataPoint(x: xI(2), dy: yI(8), data: {IThicknessOverride: ThicknessOverride(size: 8)}),
             DataPoint(x: xI(6), dy: yI(2)),
-            DataPoint(x: xI(8), dy: yI(5), thickness: ThicknessOverride(size: 16)),
+            DataPoint(x: xI(8), dy: yI(5), data: {IThicknessOverride: ThicknessOverride(size: 16)}),
             DataPoint(x: xI(10), dy: yI(7)),
           ],
           thickness: thickness1,
@@ -407,11 +407,11 @@ List<ExampleChart> lineCharts() {
       ],
       toggleCharts: [
         LineData(
-          points: [
+          line: [
             DataPoint(x: xI(0), dy: yI(4)),
-            DataPoint(x: xI(2), dy: yI(2), thickness: ThicknessOverride(size: 16)),
-            DataPoint(x: xI(6), dy: yI(8), thickness: ThicknessOverride(size: 24)),
-            DataPoint(x: xI(8), dy: yI(2), thickness: ThicknessOverride(size: 8)),
+            DataPoint(x: xI(2), dy: yI(2), data: {IThicknessOverride: ThicknessOverride(size: 16)}),
+            DataPoint(x: xI(6), dy: yI(8), data: {IThicknessOverride: ThicknessOverride(size: 24)}),
+            DataPoint(x: xI(8), dy: yI(2), data: {IThicknessOverride: ThicknessOverride(size: 8)}),
             DataPoint(x: xI(10), dy: yI(9)),
           ],
           thickness: thickness1,
@@ -426,11 +426,11 @@ List<ExampleChart> lineCharts() {
       ),
       initialCharts: [
         LineData(
-          points: [
+          line: [
             DataPoint(x: xI(0), dy: yI(4)),
-            DataPoint(x: xI(2), dy: yI(8), thickness: ThicknessOverride(size: 8, color: Colors.pink)),
+            DataPoint(x: xI(2), dy: yI(8), data: {IThicknessOverride: ThicknessOverride(size: 8, color: Colors.pink)}),
             DataPoint(x: xI(6), dy: yI(2)),
-            DataPoint(x: xI(8), dy: yI(5), thickness: ThicknessOverride(size: 16, color: Colors.deepOrange)),
+            DataPoint(x: xI(8), dy: yI(5), data: {IThicknessOverride: ThicknessOverride(size: 16, color: Colors.deepOrange)}),
             DataPoint(x: xI(10), dy: yI(7)),
           ],
           thickness: thickness1,
@@ -438,11 +438,11 @@ List<ExampleChart> lineCharts() {
       ],
       toggleCharts: [
         LineData(
-          points: [
+          line: [
             DataPoint(x: xI(0), dy: yI(4)),
-            DataPoint(x: xI(2), dy: yI(2), thickness: ThicknessOverride(size: 16, color: Colors.deepOrange)),
-            DataPoint(x: xI(6), dy: yI(8), thickness: ThicknessOverride(size: 24)),
-            DataPoint(x: xI(8), dy: yI(2), thickness: ThicknessOverride(size: 8, color: Colors.pink)),
+            DataPoint(x: xI(2), dy: yI(2), data: {IThicknessOverride: ThicknessOverride(size: 16, color: Colors.deepOrange)}),
+            DataPoint(x: xI(6), dy: yI(8), data: {IThicknessOverride: ThicknessOverride(size: 24)}),
+            DataPoint(x: xI(8), dy: yI(2), data: {IThicknessOverride: ThicknessOverride(size: 8, color: Colors.pink)}),
             DataPoint(x: xI(10), dy: yI(9)),
           ],
           thickness: thickness1,

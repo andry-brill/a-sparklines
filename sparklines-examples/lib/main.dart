@@ -1,7 +1,7 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
-import 'package:sparklines/sparklines.dart';
+import 'package:any_sparklines/any_sparklines.dart';
 
 part 'line_charts.dart';
 part 'bar_charts.dart';
@@ -17,12 +17,15 @@ const gridHeight = 150.0;
 
 double xR(double value) => value / gridWidth;
 double yR(double value) => value / gridHeight;
-List<DataPoint> dpR(Iterable<DataPoint> point) => point.map((p) => DataPoint(x: xR(p.x), y: yR(p.y), dy: yR(p.dy), style: p.style)).toList();
+List<DataPoint> dpR(Iterable<DataPoint> point) => point.map((p) => DataPoint(x: xR(p.x), y: yR(p.y), dy: yR(p.dy), data: p.data)).toList();
 
 double xI(int i) => (gridWidth / 10.0) * i;
 double yI(int i) => (gridHeight / 10.0) * i;
-DataPoint dpI(int xi, int yi, {double? size, Color? color}) => DataPoint.value(xI(xi), yI(yi),
-    thickness: size != null || color != null ? ThicknessOverride(size: size, color: color) : null);
+DataPoint dpI(int xi, int yi, {double? size, Color? color}) => DataPoint(
+    x: xI(xi),
+    y: 0,
+    dy: yI(yi),
+    data: size != null || color != null ? {IThicknessOverride: ThicknessOverride(size: size, color: color)} : const {});
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
@@ -130,7 +133,7 @@ class _MyHomePageState extends State<MyHomePage>
   void initState() {
     super.initState();
     _tabController = TabController(
-      initialIndex: 2,
+      initialIndex: 0,
       length: examples.length,
       vsync: this,
     );

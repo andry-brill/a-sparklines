@@ -1,4 +1,8 @@
 
+## 2.1.2
+
+* Fixed drawing DataPoints in `CircleDataPointRenderer`
+
 ## 2.1.1
 
 * Added **ChartFlip** — `none`, `vertically`, `horizontally`, `both`. Flip charts around axes; available on all chart data types via `ISparklinesData.flip`.

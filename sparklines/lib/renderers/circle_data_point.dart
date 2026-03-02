@@ -43,7 +43,7 @@ class CircleDataPointRenderer extends ADataPointRenderer<CircleDataPointStyle> {
     paint.shader = null;
 
     final radius = transform.scalar(style.radius);
-    canvas.drawCircle(transform.xy(dataPoint.x, dataPoint.y), radius, paint);
+    canvas.drawCircle(transform.xy(dataPoint.x, dataPoint.fy), radius, paint);
   }
 
 }

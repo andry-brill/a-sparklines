@@ -10,7 +10,7 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  sparklines:
+  any_sparklines:
     path: ../sparklines
 
 dev_dependencies:
