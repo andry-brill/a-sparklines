@@ -1,6 +1,5 @@
 import 'dart:ui' show lerpDouble;
 
-import 'package:any_sparklines/data/data_point.dart';
 import 'package:flutter/material.dart';
 
 import 'data_point_data.dart';

@@ -1,4 +1,3 @@
-import 'package:any_sparklines/interfaces/data_point_style.dart';
 import 'package:flutter/material.dart';
 import '../data/data_point.dart';
 import '../interfaces/chart_style.dart';
