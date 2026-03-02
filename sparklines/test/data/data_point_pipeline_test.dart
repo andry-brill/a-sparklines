@@ -125,24 +125,13 @@ void main() {
       expect(actualThirdY, equals(expectedThirdY));
     });
 
-    test('given: pipeline.stack(spacing: 0) and two bars at same x, should: stack with no spacing (second bar at 6.0)', () {
-
-      final pipeline = DataPointPipeline().stack(spacing: 0.0);
-      final input = points([(1.0, 0.0, 6.0), (1.0, 0.0, 4.0)]);
-      final out = pipeline.build(input);
-
-      final actualSecondY = out[1].y;
-      final expectedSecondY = 6.0;
-
-      expect(actualSecondY, equals(expectedSecondY));
-    });
   });
 
   group('NormalizeModifier', () {
 
     test('given: pipeline.normalize() and empty input, should: return empty list', () {
 
-      final pipeline = DataPointPipeline().normalize(low: 0.0, high: 1.0);
+      final pipeline = DataPointPipeline().normalize(total: 1.0);
       final input = <DataPoint>[];
       final out = pipeline.build(input);
 
@@ -152,9 +141,9 @@ void main() {
       expect(actual, equals(expected));
     });
 
-    test('given: pipeline.normalize() and single point with positive dy, should: scale to fill [0, high]', () {
+    test('given: pipeline.normalize() and single point with positive dy, should: scale dy to total', () {
 
-      final pipeline = DataPointPipeline().normalize(low: 0.0, high: 1.0);
+      final pipeline = DataPointPipeline().normalize(total: 1.0);
       final input = pointList(0.0, 0.0, 100.0);
       final out = pipeline.build(input);
 
@@ -164,9 +153,9 @@ void main() {
       expect(actualDy, equals(expectedDy));
     });
 
-    test('given: pipeline.normalize() default [0,1] and positive dy only, should: scale to 0..1', () {
+    test('given: pipeline.normalize(total: 1.0) and positive dy only, should: scale sum to total', () {
 
-      final pipeline = DataPointPipeline().normalize(low: 0.0, high: 1.0);
+      final pipeline = DataPointPipeline().normalize(total: 1.0);
       final input = points([(0.0, 0.0, 4.0), (1.0, 0.0, 6.0)]);
       final out = pipeline.build(input);
 
@@ -179,21 +168,9 @@ void main() {
       expect(actualSecondDy, closeTo(expectedSecondDy, 1e-10));
     });
 
-    test('given: pipeline.normalize(low: 0, high: 1, mid: 0.5) and two equal positive dy, should: keep y unchanged and scale dy into [mid, high]', () {
+    test('given: pipeline.normalize(total: 1.0) with mixed positive and negative dy, should: scale abs(dy) to total', () {
 
-      final pipeline = DataPointPipeline().normalize(low: 0.0, high: 1.0, mid: 0.5);
-      final input = points([(0.0, 0.0, 1.0), (1.0, 0.0, 1.0)]);
-      final out = pipeline.build(input);
-
-      expect(out[0].y, equals(0.0));
-      expect(out[1].y, equals(0.0));
-      expect(out[0].dy, closeTo(0.25, 1e-10));
-      expect(out[1].dy, closeTo(0.25, 1e-10));
-    });
-
-    test('given: pipeline.normalize(low: 0, high: 1) with mixed positive and negative dy, should: keep y unchanged and scale dy (split from negSum/total)', () {
-
-      final pipeline = DataPointPipeline().normalize(low: 0.0, high: 1.0);
+      final pipeline = DataPointPipeline().normalize(total: 1.0);
       final input = points([(0.0, 0.0, 3.0), (1.0, 0.0, -2.0)]);
       final out = pipeline.build(input);
 
@@ -205,7 +182,7 @@ void main() {
 
     test('given: pipeline.normalize() and all zero dy, should: return input unchanged', () {
 
-      final pipeline = DataPointPipeline().normalize(low: 0.0, high: 1.0);
+      final pipeline = DataPointPipeline().normalize(total: 1.0);
       final input = points([(0.0, 7.0, 0.0), (1.0, 8.0, 0.0)]);
       final out = pipeline.build(input);
 
@@ -231,7 +208,7 @@ void main() {
 
     test('given: pipeline.normalize(threshold: 2.0) and two equal points, should: remove all and return empty', () {
 
-      final pipeline = DataPointPipeline().normalize(low: 0.0, high: 1.0, threshold: 2.0);
+      final pipeline = DataPointPipeline().normalize(total: 1.0, threshold: 2.0);
       final input = points([(0.0, 0.0, 1.0), (1.0, 0.0, 1.0)]);
       final out = pipeline.build(input);
 
@@ -241,77 +218,10 @@ void main() {
       expect(actual, equals(expected));
     });
 
-    test('given: pipeline.normalize(low: 0, mid: 0, high: 1.0) with mixed dy, should: return all points with negative dy set to 0 and positive scaled to [0,1]', () {
-
-      final pipeline = DataPointPipeline().normalize(low: 0.0, mid: 0.0, high: 1.0);
-      final input = points([(0.0, 0.0, -2.0), (1.0, 0.0, 3.0), (2.0, 0.0, -1.0), (3.0, 0.0, 5.0)]);
-      final out = pipeline.build(input);
-
-      final actualLength = out.length;
-      final expectedLength = 4;
-      final actualSumDy = out[0].dy + out[1].dy + out[2].dy + out[3].dy;
-      final expectedSumDy = 1.0;
-
-      expect(actualLength, equals(expectedLength));
-      expect(out[0].dy, equals(0.0));
-      expect(out[1].dy, closeTo(3.0 / 8.0, 1e-10));
-      expect(out[2].dy, equals(0.0));
-      expect(out[3].dy, closeTo(5.0 / 8.0, 1e-10));
-      expect(actualSumDy, closeTo(expectedSumDy, 1e-10));
-    });
-
-    test('given: pipeline.normalize(low: -1, mid: 0, high: 0) with mixed dy, should: return all points with positive dy set to 0 and negative scaled (y unchanged)', () {
-
-      final pipeline = DataPointPipeline().normalize(low: -1.0, mid: 0.0, high: 0.0);
-      final input = points([(0.0, 0.0, 4.0), (1.0, 0.0, -3.0), (2.0, 0.0, 2.0), (3.0, 0.0, -5.0)]);
-      final out = pipeline.build(input);
-
-      final actualLength = out.length;
-      final expectedLength = 4;
-      final actualSumDy = out[0].dy + out[1].dy + out[2].dy + out[3].dy;
-      final expectedSumDy = 1.0;
-
-      expect(actualLength, equals(expectedLength));
-      expect(out[0].y, equals(0.0));
-      expect(out[1].y, equals(0.0));
-      expect(out[0].dy, equals(0.0));
-      expect(out[1].dy, closeTo(3.0 / 8.0, 1e-10));
-      expect(out[2].dy, equals(0.0));
-      expect(out[3].dy, closeTo(5.0 / 8.0, 1e-10));
-      expect(actualSumDy, closeTo(expectedSumDy, 1e-10));
-    });
-
-    test('given: pipeline.normalize(low: 0, mid: 0.6, high: 1.0) with 5 points (2 negative, 3 positive), should: keep y unchanged and scale dy into [0,0.6] and [0.6,1]', () {
-
-      final pipeline = DataPointPipeline().normalize(low: 0.0, mid: 0.6, high: 1.0);
-      final input = points([(0.0, 0.0, -2.0), (1.0, 0.0, -1.0), (2.0, 0.0, 2.0), (3.0, 0.0, 3.0), (4.0, 0.0, 4.0)]);
-      final out = pipeline.build(input);
-
-      final actualLength = out.length;
-      final expectedLength = 5;
-      final negRange = 0.6;
-      final posRange = 0.4;
-      final negSum = 3.0;
-      final posSum = 9.0;
-
-      expect(actualLength, equals(expectedLength));
-      expect(out[0].y, equals(0.0));
-      expect(out[1].y, equals(0.0));
-      expect(out[2].y, equals(0.0));
-      expect(out[3].y, equals(0.0));
-      expect(out[4].y, equals(0.0));
-      expect(out[0].dy, closeTo(2.0 * negRange / negSum, 1e-10));
-      expect(out[1].dy, closeTo(1.0 * negRange / negSum, 1e-10));
-      expect(out[2].dy, closeTo(2.0 * posRange / posSum, 1e-10));
-      expect(out[3].dy, closeTo(3.0 * posRange / posSum, 1e-10));
-      expect(out[4].dy, closeTo(4.0 * posRange / posSum, 1e-10));
-    });
-
-    test('given: pipeline.normalize(threshold: 2.0, thresholdPoint: DataPoint(x: 0, dy: 0)) and two equal points, should: return single point with accumulated dy', () {
+    test('given: pipeline.normalize(threshold: 2.0, thresholdPoint: DataPoint(x: 0, dy: 0)) and two equal points, should: return single point with normalized accumulated dy', () {
 
       final pipeline = DataPointPipeline().normalize(
-        low: 0.0,
-        high: 1.0,
+        total: 1.0,
         threshold: 2.0,
         thresholdPoint: const DataPoint(x: 0.0, y: 0.0, dy: 0.0),
       );
@@ -321,7 +231,7 @@ void main() {
       final actualLength = out.length;
       final expectedLength = 1;
       final actualDy = out[0].dy;
-      final expectedDy = 2.0;
+      final expectedDy = 1.0;
 
       expect(actualLength, equals(expectedLength));
       expect(out[0].x, equals(0.0));
@@ -332,8 +242,7 @@ void main() {
     test('given: pipeline.normalize(threshold: 0.4, thresholdPoint: DataPoint(x: 0, dy: 0)) and three points (one small), should: remove small point and include thresholdPoint in result with accumulated dy', () {
 
       final pipeline = DataPointPipeline().normalize(
-        low: 0.0,
-        high: 1.0,
+        total: 1.0,
         threshold: 0.4,
         thresholdPoint: const DataPoint(x: 0.0, y: 0.0, dy: 0.0),
       );
@@ -348,8 +257,7 @@ void main() {
     test('given: pipeline.normalize(threshold: 0.3, thresholdPoint: DataPoint(x: -1, dy: 0)) and points all below threshold, should: include thresholdPoint with accumulated dy (may absorb result points until threshold met)', () {
 
       final pipeline = DataPointPipeline().normalize(
-        low: 0.0,
-        high: 1.0,
+        total: 1.0,
         threshold: 0.3,
         thresholdPoint: const DataPoint(x: -1.0, y: 0.0, dy: 0.0),
       );
@@ -365,8 +273,7 @@ void main() {
     test('given: pipeline.normalize(threshold: 0.0, thresholdPoint: DataPoint(x: 0, dy: 0)) and positive points, should: not add thresholdPoint when dy remains zero', () {
 
       final pipeline = DataPointPipeline().normalize(
-        low: 0.0,
-        high: 1.0,
+        total: 1.0,
         threshold: 0.0,
         thresholdPoint: const DataPoint(x: 0.0, y: 0.0, dy: 0.0),
       );
@@ -385,7 +292,7 @@ void main() {
 
     test('given: pipeline.stack().normalize() and two bars at same x, should: stack first then normalize dy only (y unchanged)', () {
 
-      final pipeline = DataPointPipeline().stack().normalize(low: 0.0, high: 1.0);
+      final pipeline = DataPointPipeline().stack().normalize(total: 1.0);
       final input = points([(1.0, 0.0, 6.0), (1.0, 0.0, 4.0)]);
       final out = pipeline.build(input);
 
@@ -403,7 +310,7 @@ void main() {
 
     test('given: pipeline.normalize().stack() and two bars at same x, should: normalize first then stack', () {
 
-      final pipeline = DataPointPipeline().normalize(low: 0.0, high: 1.0).stack();
+      final pipeline = DataPointPipeline().normalize(total: 1.0).stack();
       final input = points([(1.0, 0.0, 6.0), (1.0, 0.0, 4.0)]);
       final out = pipeline.build(input);
 
@@ -418,7 +325,7 @@ void main() {
 
     test('given: pipeline.stack().normalize() with two x positions, should: stack per x then normalize total', () {
 
-      final pipeline = DataPointPipeline().stack().normalize(low: 0.0, high: 1.0);
+      final pipeline = DataPointPipeline().stack().normalize(total: 1.0);
       final input = points([(0.0, 0.0, 3.0), (0.0, 0.0, 2.0), (1.0, 0.0, 5.0)]);
       final out = pipeline.build(input);
 
@@ -431,9 +338,9 @@ void main() {
       expect(actualSumDy, closeTo(expectedSumDy, 1e-10));
     });
 
-    test('given: pipeline.normalize(low: 0, high: 1.0).stack(spacing: 0.1) and four points at same x, should: normalize then stack with spacing', () {
+    test('given: pipeline.normalize(total: 1.0).stack(spacing: 0.1) and four points at same x, should: normalize then stack with spacing', () {
 
-      final pipeline = DataPointPipeline().normalize(low: 0.0, high: 1.0).stack(spacing: 0.1);
+      final pipeline = DataPointPipeline().normalize(total: 1.0).stack(spacing: 0.1);
       final input = points([(1.0, 0.0, 2.0), (1.0, 0.0, 3.0), (1.0, 0.0, 1.0), (1.0, 0.0, 4.0)]);
       final out = pipeline.build(input);
 
@@ -451,7 +358,7 @@ void main() {
     });
 
 
-    test('given: pipeline.normalize(low: 0, high: 1.2, spacing: 0.1, threshold: 0.01, thresholdPoint).stack(spacing: 0.1) and four points at same x, should: normalize then stack, threshold with spacing', () {
+    test('given: pipeline.normalize(total, spacing, threshold, thresholdPoint).stack(spacing) and four points at same x, should: normalize then stack, threshold with spacing', () {
 
       final spacing = 0.1;
       final pipeline = DataPointPipeline()
@@ -477,7 +384,7 @@ void main() {
       expect(out[2].fy, equals(1.2));
 
       final thresholdPoints = out[2].of<IThresholdPoints>();
-      expect(thresholdPoints != null, true);
+      expect(thresholdPoints, isNotNull);
 
       final tps = thresholdPoints!.thresholdPoints;
       expect(tps[0], equals(input.last));

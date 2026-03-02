@@ -2,7 +2,7 @@
 
 Feature-rich, highly optimized sparklines for Flutter. Line, bar, pie, and between-line charts with shared layouts, animation, and flexible styling.
 
-![App Screenshot](sparklines/example/web/example.png)
+![App Screenshot](https://raw.githubusercontent.com/andry-brill/a-sparklines/main/sparklines/example/web/example.png)
 
 ---
 
@@ -11,7 +11,7 @@ Feature-rich, highly optimized sparklines for Flutter. Line, bar, pie, and betwe
 ### Layouts
 
 - **AbsoluteLayout** — Data coordinates map 1:1 to pixels; origin bottom-left, Y up.
-- **RelativeLayout** — Data is scaled to explicit bounds. Use `RelativeLayout.normalized()` (0–1), `RelativeLayout.signed()` (-1–1), or `RelativeLayout.full()` (auto from data). Set `minX`/`maxX`/`minY`/`maxY` to `double.infinity` to derive from chart data. **Identical layout instances are resolved once and shared** across all charts using them.
+- **RelativeLayout** — Data is scaled to explicit bounds. Use `RelativeLayout.normalized()` (0–1), `RelativeLayout.signed()` (-1–1), or `RelativeLayout.full()` (auto from data). Set `minX`/`maxX`/`minY`/`maxY` to `double.infinity` or `double.negativeInfinity` to derive from chart data. **Identical layout instances are resolved once and shared** across all charts using them.
 - **RelativeDimension** — For `RelativeLayout`, use `relativeTo: RelativeDimension.width` or `RelativeDimension.height` so lengths (e.g. stroke width) scale with chart size; `none` uses absolute values.
 
 ### Rotation and origin
@@ -29,8 +29,14 @@ Feature-rich, highly optimized sparklines for Flutter. Line, bar, pie, and betwe
 - **x** — X coordinate.
 - **y** — Base Y (e.g. stacked base).
 - **dy** — Delta from base; **fy = y + dy** is the value used for drawing.
-- **style** — Optional `IDataPointStyle` (e.g. `CircleDataPointStyle`).
-- **thickness** — Optional `ThicknessOverride` (size, color, gradient, align) for this point.
+- **data** — Extensible `Map<Type, IDataPointData?>` for per-point metadata. Keys are type tokens; values implement `IDataPointData` (supports `lerpTo` for animation). Use `point.of<M>()` for type-safe access.
+
+**Common data entries** (via extension getters or `of<M>()`):
+
+- **style** — `IDataPointStyle?` (e.g. `CircleDataPointStyle`) for point markers.
+- **thickness** — `IThicknessOverride?` (size, color, gradient, align) to override chart thickness for this point.
+- **pieOffset** — `IPieOffset?` for pie slice offset.
+- **DataPointMeta** — `id`, `key`, `label` for tooltips or identification.
 
 ### Thickness (global and per-point)
 
@@ -44,12 +50,13 @@ Feature-rich, highly optimized sparklines for Flutter. Line, bar, pie, and betwe
 ### Area fill (line charts)
 
 - **areaColor** / **areaGradient** — Fill below the line (from line down to base Y). Gradient takes precedence over color.
+- **areaFillType** — Optional `PathFillType` for the fill.
 
 ---
 
 ## Line charts
 
-**LineData** — `points`, `thickness`, `areaColor`/`areaGradient`, `lineType`, `pointStyle`.
+**LineData** — `points`, `thickness`, `areaColor`/`areaGradient`, `areaFillType`, `lineType`, `pointStyle`.
 
 ### Line types
 
@@ -61,7 +68,7 @@ Feature-rich, highly optimized sparklines for Flutter. Line, bar, pie, and betwe
 
 ## Between-line charts
 
-**BetweenLineData** — Fills the area between two lines. `from`, `to` (both `LineData`), `areaColor`, `areaGradient`. Uses same layout; both lines share the same coordinate system.
+**BetweenLineData** — Fills the area between two lines. `from`, `to` (both `LineData`), `areaColor`, `areaGradient`, `areaFillType`. Uses same layout; both lines share the same coordinate system.
 
 ---
 
@@ -73,7 +80,7 @@ Feature-rich, highly optimized sparklines for Flutter. Line, bar, pie, and betwe
 
 ## Pie charts
 
-**PieData** — Each **DataPoint** is one arc: **x** = radius, **y** = start angle, **dy** = sweep (end = y + dy). Angles in radians. `thickness`, `space` (gap between slices), `border`, `borderRadius`, `pointStyle`. Bounds are computed from slice geometry.
+**PieData** — Each **DataPoint** is one arc: **x** = radius, **y** = start angle, **dy** = sweep (end = y + dy). Angles in radians. `thickness`, `padAngle` (gap between slices), `pieOffset`, `border`, `borderRadius`, `pointStyle`. Bounds are computed from slice geometry.
 
 ---
 
@@ -81,12 +88,14 @@ Feature-rich, highly optimized sparklines for Flutter. Line, bar, pie, and betwe
 
 **DataPointPipeline** — Build transformed lists for stacking/normalization; reuse one pipeline for multiple series so shared state (e.g. stacking) is consistent.
 
-- **stack()** — Stack points by x; each point’s `y` becomes the running sum at that x, `dy` stays the value.
-- **normalize(low, high, mid?, threshold?)** — Scale values into [low, high]; optional `mid` for diverging; `threshold` repeatedly drops smallest segment until none below threshold.
-- **normalize2pi(low, high, mid?, threshold?)** — Same with default range `[0, 2π]` for angles.
+- **stack({ spacing })** — Stack points by x; each point’s `y` becomes the running sum at that x, `dy` stays the value. Optional `spacing` adds gap between stacked segments.
+- **normalize({ total, threshold?, spacing?, thresholdPoint? })** — Scale `dy` so sum of `abs(dy)` equals `total` (default 1.0). `threshold` repeatedly drops smallest segment until none below threshold; `thresholdPoint` receives accumulated dy of removed points. `spacing` reserves gap between segments.
+- **normalize2pi({ total, threshold?, spacing?, thresholdPoint? })** — Same as `normalize` with default `total` 2π for angles.
+
+**IThresholdPoints** / **ThresholdPoints** — When `normalize` removes below-threshold points and uses `thresholdPoint`, the aggregate point’s `data` contains `ThresholdPoints(removed)` so you can access the original points via `point.of<IThresholdPoints>()?.thresholdPoints`.
 
 ```dart
-final pipeline = DataPointPipeline().stack().normalize();
+final pipeline = DataPointPipeline().stack().normalize(total: 1.0);
 final seriesA = pipeline.build(rawPointsA);
 final seriesB = pipeline.build(rawPointsB);
 ```
@@ -115,4 +124,4 @@ Charts implement `ILerpTo` for smooth transitions when data changes.
 - **IDataPointStyle** + **IDataPointRenderer** — Custom point markers.
 - **IChartRenderer** — Custom chart types.
 - **ILineTypeData** + **ILineTypeRenderer** — Custom line path and stroke.
-- **IChartLayout** — Custom coordinate systems; implement `resolve()`, `pathTransform()`, `toScreenLength()`.
+- **IChartLayout** — Custom coordinate systems; implement `resolve()`, `transform()`, `transformScalar()`.
