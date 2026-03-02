@@ -1,3 +1,4 @@
+import 'package:any_sparklines/interfaces/pie_offset.dart';
 import 'package:flutter/material.dart';
 import 'dart:ui' show lerpDouble;
 import '../interfaces/chart_rotation.dart';
@@ -12,7 +13,7 @@ import 'data_point.dart';
 import 'pie_slice_data.dart';
 
 
-class PieData implements ISparklinesData, IChartThickness, IChartBorder, IChartDataPointStyle {
+class PieData implements ISparklinesData, IChartThickness, IChartBorder, IChartDataPointStyle, IChartPieOffset {
   static final IChartRenderer defaultRenderer = PieChartRenderer();
 
   @override
@@ -35,7 +36,8 @@ class PieData implements ISparklinesData, IChartThickness, IChartBorder, IChartD
   @override
   final ThicknessData thickness;
 
-  final double dx;
+  @override
+  final double pieOffset;
 
   final double padAngle;
 
@@ -53,7 +55,7 @@ class PieData implements ISparklinesData, IChartThickness, IChartBorder, IChartD
 
     final layouts = computePies(
       points,
-      dx,
+      pieOffset,
       padAngle,
       thickness,
       borderRadius ?? 0.0,
@@ -97,7 +99,7 @@ class PieData implements ISparklinesData, IChartThickness, IChartBorder, IChartD
     this.crop,
     required this.points,
     this.thickness = const ThicknessData(size: 2.0),
-    this.dx = 0.0,
+    this.pieOffset = 0.0,
     this.padAngle = 0.0,
     this.border,
     this.borderRadius,
@@ -112,7 +114,7 @@ class PieData implements ISparklinesData, IChartThickness, IChartBorder, IChartD
     bool? crop,
     List<DataPoint>? points,
     ThicknessData? thickness,
-    double? dx,
+    double? pieOffset,
     double? padAngle,
     ThicknessData? border,
     double? borderRadius,
@@ -125,7 +127,7 @@ class PieData implements ISparklinesData, IChartThickness, IChartBorder, IChartD
       crop: crop ?? this.crop,
       points: points ?? this.points,
       thickness: thickness ?? this.thickness,
-      dx: dx ?? this.dx,
+      pieOffset: pieOffset ?? this.pieOffset,
       padAngle: padAngle ?? this.padAngle,
       border: border ?? this.border,
       borderRadius: borderRadius ?? this.borderRadius,
@@ -141,7 +143,7 @@ class PieData implements ISparklinesData, IChartThickness, IChartBorder, IChartD
     if (layout != other.layout) return true;
     if (points.length != other.points.length) return true;
     if (thickness != other.thickness) return true;
-    if (dx != other.dx) return true;
+    if (pieOffset != other.pieOffset) return true;
     if (padAngle != other.padAngle) return true;
     if (border != other.border) return true;
     if (borderRadius != other.borderRadius) return true;
@@ -174,7 +176,7 @@ class PieData implements ISparklinesData, IChartThickness, IChartBorder, IChartD
       crop: next.crop,
       points: interpolatedPies,
       thickness: thickness.lerpTo(next.thickness, t),
-      dx: lerpDouble(dx, next.dx, t) ?? next.dx,
+      pieOffset: lerpDouble(pieOffset, next.pieOffset, t) ?? next.pieOffset,
       padAngle: lerpDouble(padAngle, next.padAngle, t) ?? next.padAngle,
       border: ILerpTo.lerp(border, next.border, t),
       borderRadius: lerpDouble(borderRadius, next.borderRadius, t) ?? next.borderRadius,

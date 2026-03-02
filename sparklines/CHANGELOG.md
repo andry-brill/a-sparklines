@@ -1,3 +1,14 @@
+## 2.0.0
+
+* `DataPoint`
+  * added `IDataPointData`
+    * `DataPointMeta`
+    * `ThresholdPoints`
+  * migrated everything to `DataPoint.data`
+* `DataPointPipeline`
+  * refactored
+  * tests
+
 ## 1.1.0
 
 * `DataPoint`

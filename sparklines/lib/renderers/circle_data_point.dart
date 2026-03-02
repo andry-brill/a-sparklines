@@ -2,12 +2,13 @@ import 'dart:ui';
 
 import '../data/data_point.dart';
 import '../interfaces/chart_transform.dart';
+import '../interfaces/data_point_data.dart';
 import '../interfaces/data_point_style.dart';
 import 'data_point_renderer.dart';
 
 
 /// Circle style for data points
-class CircleDataPointStyle implements IDataPointStyle {
+class CircleDataPointStyle extends ADataPointData<CircleDataPointStyle> implements IDataPointStyle {
 
   static IDataPointRenderer defaultRenderer = CircleDataPointRenderer();
 
@@ -20,9 +21,7 @@ class CircleDataPointStyle implements IDataPointStyle {
   });
 
   @override
-  IDataPointStyle lerpTo(IDataPointStyle next, double t) {
-    if (next is! CircleDataPointStyle) return next;
-
+  CircleDataPointStyle lerp(CircleDataPointStyle next, double t) {
     return CircleDataPointStyle(
       radius: lerpDouble(radius, next.radius, t) ?? next.radius,
       color: Color.lerp(color, next.color, t) ?? next.color,

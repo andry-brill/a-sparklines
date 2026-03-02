@@ -1,10 +1,11 @@
+import 'package:any_sparklines/data/data_point.dart';
 import 'package:flutter/material.dart';
 
 import 'chart_transform.dart';
-import 'lerp.dart';
+import 'data_point_data.dart';
 
 /// Style interface for data points
-abstract class IDataPointStyle implements ILerpTo<IDataPointStyle> {
+abstract class IDataPointStyle implements IDataPointData {
   IDataPointRenderer get renderer;
 }
 

@@ -1,6 +1,8 @@
 import 'dart:collection';
 import 'dart:math';
 
+import 'package:any_sparklines/interfaces/data_point_data.dart';
+
 import 'data_point.dart';
 
 
@@ -41,9 +43,10 @@ abstract class DataPointModifier {
 
 class DataPointPipelineContext {
 
-  /// spacing between points in normalized units
-  final double spacing;
-  DataPointPipelineContext({required this.spacing});
+
+  final double _snapEpsilon;
+  final int _snapMultiplier;
+  DataPointPipelineContext(this._snapEpsilon, this._snapMultiplier);
 
   final cumulativeByX = <double, double>{};
 
@@ -55,6 +58,14 @@ class DataPointPipelineContext {
     globalMaxY = max(globalMaxY, points.maxY);
   }
 
+
+  double snap(double v) {
+    if (v.abs() < _snapEpsilon) return 0.0;
+    final nv = v * _snapMultiplier;
+    final r = nv.roundToDouble();
+    if ((nv - r).abs() < _snapEpsilon) return r / _snapMultiplier;
+    return v;
+  }
 }
 
 
@@ -62,7 +73,10 @@ class DataPointPipeline {
 
   final DataPointPipelineContext context;
 
-  DataPointPipeline({double spacing = 0.0}) : context = DataPointPipelineContext(spacing: spacing);
+  DataPointPipeline({
+    double snapEpsilon = 1e-9,
+    int snapMultiplier = 1000000
+  }) : context = DataPointPipelineContext(snapEpsilon, snapMultiplier);
 
   final List<List<DataPoint>> _inputs = [];
 
@@ -116,31 +130,31 @@ class DataPointPipeline {
   // builder methods
 
   /// Stack points on point.y by point.x with point.dy values
-  DataPointPipeline stack([bool enabled = true]) {
-    if (enabled) _modifiers.add(StackModifier());
+  DataPointPipeline stack({ double spacing = 0.0 }) {
+    _modifiers.add(_StackModifier(spacing));
     return this;
   }
 
   /// Normalize point.dy values
   DataPointPipeline normalize2pi({
-    double low = 0.0,
-    double high = 2 * pi,
-    double? mid,
+    double total = 2.0,
     double? threshold,
-  }) => normalize(low: low, high: high, mid: mid, threshold: threshold);
+    double? spacing,
+    DataPoint? thresholdPoint,
+  }) => normalize(total: total * pi, threshold: threshold, spacing: spacing, thresholdPoint: thresholdPoint);
 
   /// Normalize point.dy values
   DataPointPipeline normalize({
-    double low = 0.0,
-    double high = 1.0,
-    double? mid,
+    double total = 1.0,
     double? threshold,
+    double? spacing,
+    DataPoint? thresholdPoint,
   }) {
-    _modifiers.add(NormalizeModifier(
-      low: low,
-      high: high,
-      mid: mid,
+    _modifiers.add(_NormalizeModifier(
+      total: total,
       threshold: threshold,
+      spacing: spacing,
+      thresholdPoint: thresholdPoint,
     ));
     return this;
   }
@@ -148,7 +162,10 @@ class DataPointPipeline {
 }
 
 
-class StackModifier implements DataPointModifier {
+class _StackModifier implements DataPointModifier {
+
+  final double spacing;
+  const _StackModifier(this.spacing);
 
   @override
   List<DataPoint> apply(
@@ -158,11 +175,16 @@ class StackModifier implements DataPointModifier {
     final result = <DataPoint>[];
 
     for (final p in input) {
+
       final base = context.cumulativeByX[p.x] ?? 0.0;
 
-      result.add(p.copyWith(y: base));
+      result.add(p.copyWith(
+          y: base,
+          dy: p.dy,
+          fy: context.snap(base + p.dy)
+      ));
 
-      context.cumulativeByX[p.x] = base + p.dy + context.spacing;
+      context.cumulativeByX[p.x] = context.snap(base + p.dy + spacing);
     }
 
     return result;
@@ -170,21 +192,32 @@ class StackModifier implements DataPointModifier {
 }
 
 
-class NormalizeModifier implements DataPointModifier {
+class _NormalizeModifier implements DataPointModifier {
 
-  final double low;
-  final double? mid;
-  final double high;
+  /// Sum of abs(dy) must be equal to total
+  final double total;
 
   /// threshold in normalized units
-  final double? threshold;
+  final double threshold;
 
-  NormalizeModifier({
-    required this.low,
-    required this.high,
-    this.mid,
-    this.threshold,
-  }) : assert(low < high);
+  /// spacing in normalized units
+  final double spacing;
+
+  /// When set, removed (below-threshold) points' dy is accumulated here
+  final DataPoint? thresholdPoint;
+
+  _NormalizeModifier({
+    required this.total,
+    double? threshold,
+    double? spacing,
+    this.thresholdPoint,
+  }) :
+        assert(total >= 0.0),
+        assert(spacing == null || spacing >= 0.0),
+        assert(threshold == null || threshold >= 0.0),
+    spacing = spacing ?? 0.0,
+    threshold = threshold ?? 0.0
+  ;
 
   @override
   List<DataPoint> apply(
@@ -194,87 +227,97 @@ class NormalizeModifier implements DataPointModifier {
 
     if (input.isEmpty) return input;
 
-    var working = List<DataPoint>.from(input);
+    var working = DataPoints.from(input);
+    DataPoints removed = List.unmodifiable([]);
+    final thresholdPoint = this.thresholdPoint;
 
     while (true) {
 
-      final normalized = _normalizeOnce(working, context);
+      DataPoints current = working;
 
-      if (threshold == null) {
-        return normalized;
-      }
-
-      // find smallest absolute normalized dy below threshold
-      double minValue = double.infinity;
-
-      for (final p in normalized) {
-        final v = p.dy.abs();
-        if (v < threshold! && v < minValue) {
-          minValue = v;
+      int? thresholdIndex;
+      if (thresholdPoint != null && removed.isNotEmpty) {
+        final sum = context.snap(removed.sumDY);
+        if (sum != 0.0) {
+          thresholdIndex = current.length;
+          current = [...current, thresholdPoint.copyWith(
+              dy: sum,
+              data: { IThresholdPoints: ThresholdPoints(removed) }
+          )];
         }
       }
 
-      // nothing to remove → done
-      if (minValue == double.infinity) {
+      final normalized = _normalizeOnce(current, context);
+
+      if (threshold <= 0.0) {
         return normalized;
       }
-
-      // remove the corresponding original datapoint
-      final indexToRemove = normalized.indexWhere(
-            (p) => p.dy.abs() == minValue,
-      );
-
-      if (indexToRemove == -1) {
-        return normalized;
-      }
-
-      working.removeAt(indexToRemove);
 
       if (working.isEmpty) {
-        return const [];
+        return normalized;
       }
+
+      DataPoint? tPoint;
+      bool canReturn = true;
+      if (thresholdIndex != null) {
+        tPoint = normalized.removeAt(thresholdIndex);
+        canReturn = tPoint.dy.abs() >= threshold;
+      }
+
+      int? indexToRemove;
+      double minValue = double.negativeInfinity;
+
+      for (int i = 0; i < normalized.length; i++) {
+        final v = normalized[i].dy.abs();
+        if (indexToRemove == null || v < minValue) {
+          minValue = v;
+          indexToRemove = i;
+        }
+      }
+
+      if ((minValue >= threshold) && canReturn) {
+        if (tPoint == null) return normalized;
+        return normalized..add(tPoint);
+      }
+
+      removed = List.unmodifiable([...removed, working.removeAt(indexToRemove!)]);
     }
   }
 
   List<DataPoint> _normalizeOnce(List<DataPoint> input, DataPointPipelineContext context) {
 
-    double negSum = 0;
-    double posSum = 0;
-
-    for (final p in input) {
-      if (p.dy < 0) negSum += -p.dy + (negSum > 0 ? context.spacing : 0.0);
-      else if (p.dy > 0) posSum += p.dy + (posSum > 0 ? context.spacing : 0.0);
+    double sum = 0.0;
+    for (var p in input) {
+      sum += p.dy.abs();
     }
 
-    final total = negSum + posSum + (negSum > 0 && posSum > 0 ? context.spacing : 0.0);
+    if (sum == 0) return input;
 
-    if (total == 0) return input;
+    double availableTotal = context.snap(max(0.0, total - spacing * (input.length - 1)));
+    sum = context.snap(sum);
 
-    final split = mid ?? (low + (negSum / total) * (high - low));
-    final negRange = split - low;
-    final posRange = high - split;
-
-    final negScale = negSum == 0 ? 0 : negRange / negSum;
-    final posScale = posSum == 0 ? 0 : posRange / posSum;
+    final scale = availableTotal / sum;
 
     final result = <DataPoint>[];
 
+    double newTotal = 0.0;
     for (final p in input) {
-
-      final dy = p.dy;
-
-      double newDy = 0.0;
-
-      if (dy < 0) {
-        newDy = (-dy) * negScale;
-      } else if (dy > 0) {
-        newDy = dy * posScale;
-      }
-
+      final newDy = context.snap(p.dy * scale);
       result.add(p.copyWith(dy: newDy));
+      newTotal += newDy;
+    }
+
+    newTotal = context.snap(newTotal);
+
+    double diff = newTotal - availableTotal;
+    if (diff != 0.0) {
+      final last = result.removeLast();
+      result.add(last.copyWith(dy: last.dy - diff));
     }
 
     return result;
   }
+
 }
+
 

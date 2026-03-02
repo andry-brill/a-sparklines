@@ -65,7 +65,7 @@ Offset toCartesian(double radius, DataPoint point) {
 /// - space = uniform linear gap between slices, set as spaceOffset (aligned with arc midpoint angle).
 List<PieSliceData> computePies(
   List<DataPoint> points,
-  double dx,
+  double offset,
   double padAngle,
   ThicknessData thickness,
   double radius,
@@ -93,7 +93,7 @@ List<PieSliceData> computePies(
     final innerRadius = max(0.0, point.x - halfInnerThickness);
     final outerRadius = point.x + halfOuterThickness;
 
-    final pointDx = point.dx ?? dx;
+    final pointDx = point.pieOffset?.pieOffset  ?? offset;
     final spaceOffset = toCartesian(pointDx, point);
 
     layouts.add(PieSliceData(

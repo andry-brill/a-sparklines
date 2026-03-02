@@ -1,24 +1,34 @@
 import 'dart:ui' show lerpDouble;
 
+import 'package:any_sparklines/data/data_point.dart';
 import 'package:flutter/material.dart';
 
+import 'data_point_data.dart';
 import 'lerp.dart';
 
-class ThicknessOverride implements ILerpTo<ThicknessOverride> {
-  final double? size;
-  final Gradient? gradient;
-  final double? align;
-  final Color? color;
+abstract class IThicknessOverride {
+  double? get size;
+  Gradient? get gradient;
+  double? get align;
+  Color? get color;
+}
+
+class ThicknessOverride extends ADataPointData<ThicknessOverride> implements IThicknessOverride {
+
+  @override final double? size;
+  @override final Gradient? gradient;
+  @override final double? align;
+  @override final Color? color;
 
   const ThicknessOverride({
-    this.align,
     this.size,
-    this.color,
     this.gradient,
+    this.align,
+    this.color,
   });
 
   @override
-  ThicknessOverride lerpTo(ThicknessOverride next, double t) {
+  ThicknessOverride lerp(ThicknessOverride next, double t) {
     return ThicknessOverride(
       size: lerpDouble(size, next.size, t),
       align: lerpDouble(align, next.align, t),

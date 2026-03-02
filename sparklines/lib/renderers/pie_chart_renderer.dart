@@ -1,5 +1,6 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
+import '../data/data_point.dart';
 import '../interfaces/chart_transform.dart';
 import '../data/pie_data.dart';
 import '../data/pie_slice_data.dart';
@@ -17,7 +18,7 @@ class PieChartRenderer extends AChartRenderer<PieData> {
 
     final layouts = computePies(
       pieData.points,
-      pieData.dx,
+      pieData.pieOffset,
       pieData.padAngle,
       pieData.thickness,
       pieData.borderRadius ?? 0.0,

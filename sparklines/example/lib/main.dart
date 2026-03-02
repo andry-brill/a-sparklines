@@ -10,25 +10,29 @@ final bigPie = PieData(
       x: 100.0,
       y: pi / 6.0,
       dy: pi / 6.0,
-      thickness: ThicknessOverride(
-        size: 30,
-        align: ThicknessData.alignOutside,
-        color: Colors.blue.shade600,
-      ),
+      data: {
+        IThicknessOverride: ThicknessOverride(
+          size: 30,
+          align: ThicknessData.alignOutside,
+          color: Colors.blue.shade600,
+        ),
+      }
     ),
     DataPoint(
       x: 100.0,
       y: pi / 3.0,
       dy: pi / 6.0,
-      thickness: ThicknessOverride(
-        size: 40,
-        align: ThicknessData.alignOutside,
-        color: Colors.blue.shade900,
-      ),
+      data: {
+        IThicknessOverride: ThicknessOverride(
+          size: 40,
+          align: ThicknessData.alignOutside,
+          color: Colors.blue.shade900,
+        ),
+      },
     ),
   ],
   borderRadius: 4.0,
-  dx: 12,
+  pieOffset: 12,
   thickness: ThicknessData(
     size: 20,
     color: Colors.blue.shade300,
@@ -44,25 +48,29 @@ final bigPieT = PieData(
       x: 100.0,
       y: pi / 3.0,
       dy: pi / 3.0,
-      thickness: ThicknessOverride(
-        size: 30,
-        align: ThicknessData.alignOutside,
-        color: Colors.blue.shade600,
-      ),
+      data: {
+        IThicknessOverride: ThicknessOverride(
+          size: 30,
+          align: ThicknessData.alignOutside,
+          color: Colors.blue.shade600,
+        ),
+      },
     ),
     DataPoint(
       x: 100.0,
       y: 2 * pi / 3.0,
       dy: pi / 3.0,
-      thickness: ThicknessOverride(
-        size: 40,
-        align: ThicknessData.alignOutside,
-        color: Colors.blue.shade900,
-      ),
+      data: {
+        IThicknessOverride: ThicknessOverride(
+          size: 40,
+          align: ThicknessData.alignOutside,
+          color: Colors.blue.shade900,
+        ),
+      },
     ),
   ],
   borderRadius: 4.0,
-  dx: 12,
+  pieOffset: 12,
   thickness: ThicknessData(
     size: 20,
     color: Colors.blue.shade300,
@@ -77,42 +85,52 @@ final smallPie = PieData(
       x: 40.0,
       y: 0,
       dy: pi,
-      thickness: ThicknessOverride(
-        color: Colors.blue.shade100,
-      ),
+      data: {
+        IThicknessOverride: ThicknessOverride(
+          color: Colors.blue.shade100,
+        ),
+      },
     ),
     DataPoint(
       x: 60.0,
       y: 0,
       dy: pi,
-      thickness: ThicknessOverride(
-        color: Colors.blue.shade100,
-      ),
+      data: {
+        IThicknessOverride: ThicknessOverride(
+          color: Colors.blue.shade100,
+        ),
+      },
     ),
     DataPoint(
       x: 80.0,
       y: 0,
       dy: pi,
-      thickness: ThicknessOverride(
-        color: Colors.blue.shade100,
-      ),
+      data: {
+        IThicknessOverride: ThicknessOverride(
+          color: Colors.blue.shade100,
+        ),
+      },
     ),
     DataPoint(x: 40.0, y: pi - pi / 2.0, dy: pi / 2.0),
     DataPoint(
       x: 60.0,
       y: pi - pi / 3.0,
       dy: pi / 3.0,
-      thickness: ThicknessOverride(
-        color: Colors.blue.shade600,
-      ),
+      data: {
+        IThicknessOverride: ThicknessOverride(
+          color: Colors.blue.shade600,
+        ),
+      },
     ),
     DataPoint(
       x: 80.0,
       y: pi - pi / 3.0,
       dy: pi / 3.0,
-      thickness: ThicknessOverride(
-        color: Colors.blue.shade900,
-      ),
+      data: {
+        IThicknessOverride: ThicknessOverride(
+          color: Colors.blue.shade900,
+        ),
+      },
     ),
   ],
   borderRadius: 6.0,
@@ -129,42 +147,52 @@ final smallPieT = PieData(
       x: 40.0,
       y: 0,
       dy: pi,
-      thickness: ThicknessOverride(
-        color: Colors.blue.shade100,
-      ),
+      data: {
+        IThicknessOverride: ThicknessOverride(
+          color: Colors.blue.shade100,
+        ),
+      },
     ),
     DataPoint(
       x: 60.0,
       y: 0,
       dy: pi,
-      thickness: ThicknessOverride(
-        color: Colors.blue.shade100,
-      ),
+      data: {
+        IThicknessOverride: ThicknessOverride(
+          color: Colors.blue.shade100,
+        ),
+      },
     ),
     DataPoint(
       x: 80.0,
       y: 0,
       dy: pi,
-      thickness: ThicknessOverride(
-        color: Colors.blue.shade100,
-      ),
+      data: {
+        IThicknessOverride: ThicknessOverride(
+          color: Colors.blue.shade100,
+        ),
+      },
     ),
     DataPoint(x: 40.0, y:pi / 4.0, dy:  pi - pi / 4.0),
     DataPoint(
       x: 60.0,
       y: pi / 3.0,
       dy: pi - pi / 3.0,
-      thickness: ThicknessOverride(
-        color: Colors.blue.shade600,
-      ),
+      data: {
+        IThicknessOverride: ThicknessOverride(
+          color: Colors.blue.shade600,
+        ),
+      },
     ),
     DataPoint(
       x: 80.0,
       y: pi / 6.0,
       dy: pi - pi / 6.0,
-      thickness: ThicknessOverride(
-        color: Colors.blue.shade900,
-      ),
+      data: {
+        IThicknessOverride: ThicknessOverride(
+          color: Colors.blue.shade900,
+        ),
+      },
     ),
   ],
   borderRadius: 6.0,
@@ -182,15 +210,19 @@ final dxPie = PieData(
       x: 7.0,
       y: pi/2,
       dy: pi + pi/3,
-      thickness: ThicknessOverride(
-        color: Colors.blue.shade100,
-      ),
+      data: {
+        IThicknessOverride: ThicknessOverride(
+          color: Colors.blue.shade100,
+        ),
+      },
     ),
     DataPoint(
       x: 7.0,
-      dx: 3.0,
       y: -pi/6,
       dy: pi - pi/3,
+      data: {
+        IPieOffset: PieOffset(3.0)
+      }
     ),
   ],
   borderRadius: 3.0,
@@ -207,11 +239,13 @@ final dxPieT = PieData(
     DataPoint(
       x: 7.0,
       y: pi/2,
-      dx: 3.0,
       dy: pi/2,
-      thickness: ThicknessOverride(
-        color: Colors.blue.shade100,
-      ),
+      data: {
+        IPieOffset: PieOffset(3.0),
+        IThicknessOverride: ThicknessOverride(
+          color: Colors.blue.shade100,
+        )
+      }
     ),
     DataPoint(
       x: 7.0,
@@ -233,9 +267,11 @@ final padPie = PieData(
       x: 18.0,
       y: pi/2,
       dy: pi + pi/3,
-      thickness: ThicknessOverride(
-        color: Colors.blue.shade100,
-      ),
+      data: {
+        IThicknessOverride: ThicknessOverride(
+          color: Colors.blue.shade100,
+        ),
+      },
     ),
     DataPoint(
       x: 18.0,
@@ -258,9 +294,11 @@ final padPieT = PieData(
       x: 18.0,
       y: pi/2,
       dy: pi/2,
-      thickness: ThicknessOverride(
-        color: Colors.blue.shade100,
-      ),
+      data: {
+        IThicknessOverride: ThicknessOverride(
+          color: Colors.blue.shade100,
+        ),
+      },
     ),
     DataPoint(
       x: 18.0,
@@ -365,6 +403,10 @@ final betweenT = BetweenLineData(
     areaColor: Colors.blue.shade100
 );
 
+const DataPointDataMap barsData = {
+  IThicknessOverride: ThicknessOverride(color: Colors.blue)
+};
+
 final bars = BarData(
     origin: const Offset(-150, 100),
     thickness: ThicknessData(size: 24, color: Colors.blue.shade900),
@@ -377,11 +419,11 @@ final bars = BarData(
       DataPoint(x: 70, y: 30, dy: 20),
       DataPoint(x: 90, y: 40, dy: 10),
 
-      DataPoint(x: 10, y: -80, dy: 70, thickness: ThicknessOverride(color: Colors.blue)),
-      DataPoint(x: 30, y: -50, dy: 50, thickness: ThicknessOverride(color: Colors.blue)),
-      DataPoint(x: 50, y: -20, dy: 30, thickness: ThicknessOverride(color: Colors.blue)),
-      DataPoint(x: 70, y: 0, dy: 20, thickness: ThicknessOverride(color: Colors.blue)),
-      DataPoint(x: 90, y: 20, dy: 10, thickness: ThicknessOverride(color: Colors.blue)),
+      DataPoint(x: 10, y: -80, dy: 70, data: barsData),
+      DataPoint(x: 30, y: -50, dy: 50, data: barsData),
+      DataPoint(x: 50, y: -20, dy: 30, data: barsData),
+      DataPoint(x: 70, y: 0, dy: 20, data: barsData),
+      DataPoint(x: 90, y: 20, dy: 10, data: barsData),
     ]);
 
 class _ExamplePageState extends State<_ExamplePage> {

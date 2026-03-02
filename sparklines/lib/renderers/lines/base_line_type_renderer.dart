@@ -215,7 +215,7 @@ abstract class BaseLineTypeRenderer<LD extends ILineTypeData> implements ILineTy
       ..style = PaintingStyle.fill;
   }
 
-  void paintThickness(Paint paint, Rect bounds, ThicknessData thickness, [ThicknessOverride? override]) {
+  void paintThickness(Paint paint, Rect bounds, ThicknessData thickness, [IThicknessOverride? override]) {
 
     final gradient = override?.gradient ?? thickness.gradient;
 

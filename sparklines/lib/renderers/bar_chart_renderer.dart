@@ -1,6 +1,7 @@
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import '../data/bar_data.dart';
+import '../data/data_point.dart';
 import '../interfaces/chart_transform.dart';
 import 'chart_renderer.dart';
 
@@ -21,10 +22,11 @@ class BarChartRenderer extends AChartRenderer<BarData> {
 
     for (final bar in barData.bars) {
 
-      final thicknessSize = bar.thickness?.size ?? barData.thickness.size;
-      final thicknessAlign = bar.thickness?.align ?? barData.thickness.align;
-      final thicknessGradient = bar.thickness?.gradient ?? barData.thickness.gradient;
-      final thicknessColor = bar.thickness?.color ?? barData.thickness.color;
+      final overrides = bar.thickness;
+      final thicknessSize = overrides?.size ?? barData.thickness.size;
+      final thicknessAlign = overrides?.align ?? barData.thickness.align;
+      final thicknessGradient = overrides?.gradient ?? barData.thickness.gradient;
+      final thicknessColor = overrides?.color ?? barData.thickness.color;
 
       final barWidth = transform.scalar(thicknessSize);
       final half = barWidth / 2;

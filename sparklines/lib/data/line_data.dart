@@ -1,3 +1,4 @@
+import 'package:any_sparklines/interfaces/data_point_data.dart';
 import 'package:flutter/material.dart';
 import '../interfaces/chart_rotation.dart';
 import '../interfaces/chart_style.dart';
@@ -155,7 +156,7 @@ class LineData implements ISparklinesData, IChartThickness, IChartDataPointStyle
       areaColor: Color.lerp(areaColor, next.areaColor, t),
       areaFillType: next.areaFillType,
       lineType: next.lineType,
-      pointStyle: ILerpTo.lerp(pointStyle, next.pointStyle, t),
+      pointStyle: ILerpTo.lerp<IDataPointData>(pointStyle, next.pointStyle, t) as IDataPointStyle?,
     );
   }
 }

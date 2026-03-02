@@ -1,3 +1,4 @@
+import 'package:any_sparklines/interfaces/data_point_data.dart';
 import 'package:flutter/material.dart';
 import 'dart:ui' show lerpDouble;
 import '../interfaces/chart_rotation.dart';
@@ -136,7 +137,7 @@ class BarData implements ISparklinesData, IChartBorder, IChartThickness, IChartD
       thickness: thickness.lerpTo(next.thickness, t),
       border: ILerpTo.lerp(border, next.border, t),
       borderRadius: lerpDouble(borderRadius, next.borderRadius, t) ?? next.borderRadius,
-      pointStyle: ILerpTo.lerp(pointStyle, next.pointStyle, t),
+      pointStyle: ILerpTo.lerp<IDataPointData>(pointStyle, next.pointStyle, t) as IDataPointStyle?,
     );
   }
 }
