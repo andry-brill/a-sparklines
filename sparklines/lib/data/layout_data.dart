@@ -25,6 +25,7 @@ class LayoutData implements ILayoutData {
     required this.width,
     required this.height,
   }) :
-    assert(minX < maxX, 'minX must be less than maxX'),
-    assert(minY < maxY, 'minY must be less than maxY');
+    assert(minX <= maxX, 'minX must be <= maxX'),
+    assert(minY <= maxY, 'minY must be <= maxY');
+
 }
