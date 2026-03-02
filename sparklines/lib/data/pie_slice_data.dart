@@ -64,45 +64,46 @@ Offset toCartesian(double radius, DataPoint point) {
 /// - innerRadius = x - thicknessAlignedLeft, outerRadius = x + thicknessAlignedRight based on thicknessAlign.
 /// - space = uniform linear gap between slices, set as spaceOffset (aligned with arc midpoint angle).
 List<PieSliceData> computePies(
-  List<DataPoint> points,
+  List<DataPoint> pies,
   double offset,
   double padAngle,
   ThicknessData thickness,
-  double radius,
+  double? radius,
   ChartTransform? transform
 ) {
 
-  final cornerRadius = transform != null ? transform.scalar(radius) : radius;
-
   List<PieSliceData> layouts = [];
 
-  for (var point in points) {
+  for (var pie in pies) {
 
-    final thicknessAlign = point.thickness?.align ?? thickness.align;
-    double thicknessSize = point.thickness?.size ?? thickness.size;
+    final borderRadius = pie.border?.borderRadius ?? radius ?? 0.0;
+    final cornerRadius = transform != null ? transform.scalar(borderRadius) : borderRadius;
+
+    final thicknessAlign = pie.thickness?.align ?? thickness.align;
+    double thicknessSize = pie.thickness?.size ?? thickness.size;
 
     if (transform != null) {
       thicknessSize = transform.scalar(thicknessSize);
     }
 
-    if (point.x <= 0.0001 || thicknessSize <= 0.0001 || point.dy <= 0.0001) continue;
+    if (pie.x <= 0.0001 || thicknessSize <= 0.0001 || pie.dy <= 0.0001) continue;
 
     final halfInnerThickness = thicknessSize * (1 - thicknessAlign) / 2;
     final halfOuterThickness = thicknessSize * (1 + thicknessAlign) / 2;
 
-    final innerRadius = max(0.0, point.x - halfInnerThickness);
-    final outerRadius = point.x + halfOuterThickness;
+    final innerRadius = max(0.0, pie.x - halfInnerThickness);
+    final outerRadius = pie.x + halfOuterThickness;
 
-    final pointDx = point.pieOffset?.pieOffset  ?? offset;
-    final spaceOffset = toCartesian(pointDx, point);
+    final pointDx = pie.pieOffset?.pieOffset  ?? offset;
+    final spaceOffset = toCartesian(pointDx, pie);
 
     layouts.add(PieSliceData(
-      startAngle: point.y,
-      endAngle: point.fy,
+      startAngle: pie.y,
+      endAngle: pie.fy,
       innerRadius: innerRadius,
       outerRadius: outerRadius,
       offset: spaceOffset,
-      point: point,
+      point: pie,
       cornerRadius: min(cornerRadius, (outerRadius - innerRadius)/2),
       padAngle: padAngle
     ));

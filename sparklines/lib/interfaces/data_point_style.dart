@@ -20,3 +20,7 @@ abstract class IDataPointRenderer {
     Object dataPoint,
   );
 }
+
+abstract class IChartDataPointStyle {
+  IDataPointStyle? get pointStyle;
+}

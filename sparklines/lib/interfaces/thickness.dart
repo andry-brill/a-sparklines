@@ -48,6 +48,7 @@ class ThicknessOverride extends ADataPointData<ThicknessOverride> implements ITh
 }
 
 class ThicknessData implements ILerpTo<ThicknessData> {
+
   final double size;
 
   /// Gradient has higher priority if set then color

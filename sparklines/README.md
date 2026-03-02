@@ -56,7 +56,7 @@ Feature-rich, highly optimized sparklines for Flutter. Line, bar, pie, and betwe
 
 ## Line charts
 
-**LineData** — `points`, `thickness`, `areaColor`/`areaGradient`, `areaFillType`, `lineType`, `pointStyle`.
+**LineData** — `line`, `thickness`, `areaColor`/`areaGradient`, `areaFillType`, `lineType`, `pointStyle`.
 
 ### Line types
 
@@ -64,19 +64,13 @@ Feature-rich, highly optimized sparklines for Flutter. Line, bar, pie, and betwe
 - **SteppedLineData** — Step at fraction between points: `stepJumpAt` 0→prev, 1→next; constructors `.start()`, `.middle()`, `.end()`.
 - **CurvedLineData** — Smooth curve; `smoothness` 0.0–1.0 (default 0.35).
 
----
-
 ## Between-line charts
 
 **BetweenLineData** — Fills the area between two lines. `from`, `to` (both `LineData`), `areaColor`, `areaGradient`, `areaFillType`. Uses same layout; both lines share the same coordinate system.
 
----
-
 ## Bar charts
 
 **BarData** — `bars` (`List<DataPoint>`; `fy` = top, `y` = base), `thickness`, `border`, `borderRadius`, `pointStyle`. Bars are drawn from `y` to `fy`; use **DataPointPipeline** for stacking.
-
----
 
 ## Pie charts
 

@@ -46,7 +46,7 @@ class SteppedLineRenderer extends BaseLineTypeRenderer<SteppedLineData> {
   void renderComplexPath(Canvas canvas, ChartTransform transform, ILineChartData lineData, bool isDynamicStroke, bool isDynamicPaint) {
 
     final lineType = lineData.lineType as SteppedLineData;
-    final points = lineData.points;
+    final points = lineData.line;
     final halfJoin = transform.scalar(lineData.thickness.size) / 2;
     final isCapRound = lineType.isStrokeCapRound;
     final isJoinRound = lineType.isStrokeJoinRound;

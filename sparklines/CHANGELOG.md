@@ -1,3 +1,12 @@
+
+## 2.1.0
+
+* Renaming
+  * LineChart.points => line
+  * PieChart.points => pies
+* Added `IDataPointBorder` and `DataPointBorder`
+* Refactoring
+
 ## 2.0.0
 
 * `DataPoint`

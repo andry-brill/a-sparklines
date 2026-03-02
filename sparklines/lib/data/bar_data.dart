@@ -1,8 +1,8 @@
 import 'package:any_sparklines/interfaces/data_point_data.dart';
 import 'package:flutter/material.dart';
 import 'dart:ui' show lerpDouble;
+import '../interfaces/chart_border.dart';
 import '../interfaces/chart_rotation.dart';
-import '../interfaces/chart_style.dart';
 import '../interfaces/data_point_style.dart';
 import '../interfaces/layout.dart';
 import '../interfaces/lerp.dart';

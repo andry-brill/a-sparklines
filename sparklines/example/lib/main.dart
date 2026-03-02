@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:any_sparklines/any_sparklines.dart';
 
 final bigPie = PieData(
-  points: [
+  pies: [
     DataPoint(x: 100.0, y: 0, dy: pi / 6.0),
     DataPoint(
       x: 100.0,
@@ -42,7 +42,7 @@ final bigPie = PieData(
 
 
 final bigPieT = PieData(
-  points: [
+  pies: [
     DataPoint(x: 100.0, y: 0, dy: pi / 3.0),
     DataPoint(
       x: 100.0,
@@ -80,7 +80,7 @@ final bigPieT = PieData(
 
 
 final smallPie = PieData(
-  points: [
+  pies: [
     DataPoint(
       x: 40.0,
       y: 0,
@@ -142,7 +142,7 @@ final smallPie = PieData(
 
 
 final smallPieT = PieData(
-  points: [
+  pies: [
     DataPoint(
       x: 40.0,
       y: 0,
@@ -205,7 +205,7 @@ final smallPieT = PieData(
 
 final dxPie = PieData(
   origin: Offset(115, 130),
-  points: [
+  pies: [
     DataPoint(
       x: 7.0,
       y: pi/2,
@@ -221,11 +221,12 @@ final dxPie = PieData(
       y: -pi/6,
       dy: pi - pi/3,
       data: {
-        IPieOffset: PieOffset(3.0)
+        IPieOffset: PieOffset(3.0),
+        IDataPointBorder: DataPointBorder(borderRadius: 4.0)
       }
     ),
   ],
-  borderRadius: 3.0,
+  borderRadius: 2.0,
   thickness: ThicknessData(
     size: 26,
     color: Colors.blue,
@@ -235,7 +236,7 @@ final dxPie = PieData(
 
 final dxPieT = PieData(
   origin: Offset(115, 130),
-  points: [
+  pies: [
     DataPoint(
       x: 7.0,
       y: pi/2,
@@ -262,7 +263,7 @@ final dxPieT = PieData(
 
 
 final padPie = PieData(
-  points: [
+  pies: [
     DataPoint(
       x: 18.0,
       y: pi/2,
@@ -289,7 +290,7 @@ final padPie = PieData(
 
 
 final padPieT = PieData(
-  points: [
+  pies: [
     DataPoint(
       x: 18.0,
       y: pi/2,
@@ -319,7 +320,7 @@ final steppedLine = LineData(
     lineType: SteppedLineData.middle(isStrokeCapRound: true, isStrokeJoinRound: true),
     thickness: ThicknessData(size: 8, color: Colors.blue),
     areaGradient: LinearGradient(colors: [Colors.blue.shade200, Colors.blue.shade200.withValues(alpha: 0)], begin: AlignmentGeometry.topCenter, end: AlignmentGeometry.bottomCenter),
-    points: [
+    line: [
   DataPoint(x: -150, dy: 0),
   DataPoint(x: -130, dy: 120),
   DataPoint(x: -100, dy: 40),
@@ -334,7 +335,7 @@ final steppedLineT = LineData(
   lineType: SteppedLineData.middle(isStrokeCapRound: true, isStrokeJoinRound: true),
   thickness: ThicknessData(size: 8, color: Colors.blue),
   areaGradient: LinearGradient(colors: [Colors.blue.shade200, Colors.blue.shade200.withValues(alpha: 0)], begin: AlignmentGeometry.topCenter, end: AlignmentGeometry.bottomCenter),
-  points: [
+  line: [
     DataPoint(x: -150, dy: 0),
     DataPoint(x: -130, dy: 20),
     DataPoint(x: -100, dy: 80),
@@ -349,7 +350,7 @@ final lineTop = LineData(
     origin: const Offset(150, -150),
     lineType: CurvedLineData(isStrokeCapRound: true, isStrokeJoinRound: true, smoothness: 1.0),
     thickness: ThicknessData(size: 8, color: Colors.blue),
-    points: [
+    line: [
       DataPoint(x: -140, dy: 90),
       DataPoint(x: -100, dy: 20),
       DataPoint(x: -50, dy: 100),
@@ -360,7 +361,7 @@ final lineBottom = LineData(
     origin: const Offset(150, -150),
     lineType: CurvedLineData(isStrokeCapRound: true, isStrokeJoinRound: true, smoothness: 1.0),
     thickness: ThicknessData(size: 8, color: Colors.blue.shade900),
-    points: [
+    line: [
       DataPoint(x: -140, dy: 20),
       DataPoint(x: -100, dy: 80),
       DataPoint(x: -50, dy: 40),
@@ -378,7 +379,7 @@ final lineTopT = LineData(
     origin: const Offset(150, -150),
     lineType: CurvedLineData(isStrokeCapRound: true, isStrokeJoinRound: true, smoothness: 1.0),
     thickness: ThicknessData(size: 8, color: Colors.blue),
-    points: [
+    line: [
       DataPoint(x: -140, dy: 20),
       DataPoint(x: -100, dy: 80),
       DataPoint(x: -50, dy: 40),
@@ -389,7 +390,7 @@ final lineBottomT = LineData(
     origin: const Offset(150, -150),
     lineType: CurvedLineData(isStrokeCapRound: true, isStrokeJoinRound: true, smoothness: 1.0),
     thickness: ThicknessData(size: 8, color: Colors.blue.shade900),
-    points: [
+    line: [
       DataPoint(x: -140, dy: 90),
       DataPoint(x: -100, dy: 20),
       DataPoint(x: -50, dy: 100),

@@ -12,7 +12,7 @@ class LineChartRenderer extends AChartRenderer<LineData> {
     LineData lineData,
   ) {
 
-    if (lineData.points.length < 2) return;
+    if (lineData.line.length < 2) return;
 
     final paint = Paint();
 
@@ -37,12 +37,12 @@ class LineChartRenderer extends AChartRenderer<LineData> {
 
     lineData.lineType.renderer.render(canvas, transform, lineData);
 
-    drawDataPoints(canvas, paint, transform, lineData, lineData.points);
+    drawDataPoints(canvas, paint, transform, lineData, lineData.line);
   }
 
   Path? _buildAreaPathBetweenFyAndY(LineData lineData, ChartTransform transform) {
 
-    final points = lineData.points;
+    final points = lineData.line;
     if (points.length < 2) return null;
 
     final renderer = lineData.lineType.renderer;

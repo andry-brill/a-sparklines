@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'dart:math' as math;
 import '../interfaces/chart_rotation.dart';
-import '../interfaces/chart_style.dart';
+import '../interfaces/chart_area.dart';
 import '../interfaces/layout.dart';
 import '../interfaces/sparklines_data.dart';
 import 'line_data.dart';

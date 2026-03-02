@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import '../data/data_point.dart';
-import '../interfaces/chart_style.dart';
+import '../interfaces/chart_border.dart';
 import '../interfaces/chart_transform.dart';
+import '../interfaces/data_point_style.dart';
 import '../interfaces/sparklines_data.dart';
 
 abstract class AChartRenderer<DT extends ISparklinesData> implements IChartRenderer {

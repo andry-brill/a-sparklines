@@ -17,8 +17,8 @@ class BetweenLineRenderer extends AChartRenderer<BetweenLineData> {
     final from = betweenData.from;
     final to = betweenData.to;
 
-    final combinedPath = from.lineType.renderer.toPath(from.lineType, from.points);
-    betweenData.to.lineType.renderer.toPath(to.lineType, to.points, reverse: true, path: combinedPath);
+    final combinedPath = from.lineType.renderer.toPath(from.lineType, from.line);
+    betweenData.to.lineType.renderer.toPath(to.lineType, to.line, reverse: true, path: combinedPath);
     combinedPath
       ..fillType = betweenData.areaFillType ?? PathFillType.evenOdd
       ..close();

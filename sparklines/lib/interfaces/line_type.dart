@@ -6,7 +6,7 @@ import 'thickness.dart';
 
 /// Data interface for line-type rendering (implemented by [LineData] in data/line_data.dart).
 abstract class ILineChartData {
-  List<DataPoint> get points;
+  List<DataPoint> get line;
   ThicknessData get thickness;
   ILineTypeData get lineType;
 }

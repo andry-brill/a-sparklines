@@ -1,7 +1,7 @@
 import 'package:any_sparklines/interfaces/data_point_data.dart';
 import 'package:flutter/material.dart';
 import '../interfaces/chart_rotation.dart';
-import '../interfaces/chart_style.dart';
+import '../interfaces/chart_area.dart';
 import '../interfaces/layout.dart';
 import '../interfaces/line_type.dart';
 import '../interfaces/sparklines_data.dart';
@@ -33,19 +33,19 @@ class LineData implements ISparklinesData, IChartThickness, IChartDataPointStyle
   @override
   LineChartRenderer get renderer => defaultRenderer;
 
-  final List<DataPoint> points;
+  final List<DataPoint> line;
 
   @override
-  double get minX => points.minX;
+  double get minX => line.minX;
 
   @override
-  double get maxX => points.maxX;
+  double get maxX => line.maxX;
 
   @override
-  double get minY => points.minY;
+  double get minY => line.minY;
 
   @override
-  double get maxY => points.maxY;
+  double get maxY => line.maxY;
 
   @override
   final ThicknessData thickness;
@@ -70,7 +70,7 @@ class LineData implements ISparklinesData, IChartThickness, IChartDataPointStyle
     this.origin = Offset.zero,
     this.layout,
     this.crop,
-    required this.points,
+    required this.line,
     this.thickness = const ThicknessData(size: 2.0),
     this.areaGradient,
     this.areaColor,
@@ -85,7 +85,7 @@ class LineData implements ISparklinesData, IChartThickness, IChartDataPointStyle
     Offset? origin,
     IChartLayout? layout,
     bool? crop,
-    List<DataPoint>? points,
+    List<DataPoint>? line,
     ThicknessData? thickness,
     Gradient? areaGradient,
     Color? areaColor,
@@ -99,7 +99,7 @@ class LineData implements ISparklinesData, IChartThickness, IChartDataPointStyle
       origin: origin ?? this.origin,
       layout: layout ?? this.layout,
       crop: crop ?? this.crop,
-      points: points ?? this.points,
+      line: line ?? this.line,
       thickness: thickness ?? this.thickness,
       areaGradient: areaGradient ?? this.areaGradient,
       areaColor: areaColor ?? this.areaColor,
@@ -116,7 +116,7 @@ class LineData implements ISparklinesData, IChartThickness, IChartDataPointStyle
     if (rotation != other.rotation) return true;
     if (origin != other.origin) return true;
     if (layout != other.layout) return true;
-    if (points.length != other.points.length) return true;
+    if (line.length != other.line.length) return true;
     if (thickness != other.thickness) return true;
     if (areaGradient != other.areaGradient) return true;
     if (areaColor != other.areaColor) return true;
@@ -124,8 +124,8 @@ class LineData implements ISparklinesData, IChartThickness, IChartDataPointStyle
     if (lineType != other.lineType) return true;
     if (pointStyle != other.pointStyle) return true;
 
-    for (int i = 0; i < points.length; i++) {
-      if (points[i] != other.points[i]) {
+    for (int i = 0; i < line.length; i++) {
+      if (line[i] != other.line[i]) {
         return true;
       }
     }
@@ -136,12 +136,12 @@ class LineData implements ISparklinesData, IChartThickness, IChartDataPointStyle
   @override
   ISparklinesData lerpTo(ISparklinesData next, double t) {
     if (next is! LineData) return next;
-    if (points.length != next.points.length) return next;
+    if (line.length != next.line.length) return next;
     if (visible != next.visible) return next;
 
     final interpolatedPoints = <DataPoint>[];
-    for (int i = 0; i < points.length; i++) {
-      interpolatedPoints.add(points[i].lerpTo(next.points[i], t));
+    for (int i = 0; i < line.length; i++) {
+      interpolatedPoints.add(line[i].lerpTo(next.line[i], t));
     }
 
     return LineData(
@@ -150,7 +150,7 @@ class LineData implements ISparklinesData, IChartThickness, IChartDataPointStyle
       origin: Offset.lerp(origin, next.origin, t) ?? next.origin,
       layout: next.layout,
       crop: next.crop,
-      points: interpolatedPoints,
+      line: interpolatedPoints,
       thickness: thickness.lerpTo(next.thickness, t),
       areaGradient: Gradient.lerp(areaGradient, next.areaGradient, t),
       areaColor: Color.lerp(areaColor, next.areaColor, t),

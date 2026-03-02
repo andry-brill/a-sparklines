@@ -1,8 +1,8 @@
 import 'package:any_sparklines/interfaces/pie_offset.dart';
 import 'package:flutter/material.dart';
 import 'dart:ui' show lerpDouble;
+import '../interfaces/chart_border.dart';
 import '../interfaces/chart_rotation.dart';
-import '../interfaces/chart_style.dart';
 import '../interfaces/data_point_style.dart';
 import '../interfaces/layout.dart';
 import '../interfaces/lerp.dart';
@@ -31,7 +31,7 @@ class PieData implements ISparklinesData, IChartThickness, IChartBorder, IChartD
   IChartRenderer get renderer => defaultRenderer;
 
   /// Each point (x,y) defines arc, where radius = x, startAngle = y, endAngle = y + dy
-  final List<DataPoint> points;
+  final List<DataPoint> pies;
 
   @override
   final ThicknessData thickness;
@@ -54,11 +54,11 @@ class PieData implements ISparklinesData, IChartThickness, IChartBorder, IChartD
     if (_bounds != null) return _bounds!;
 
     final layouts = computePies(
-      points,
+      pies,
       pieOffset,
       padAngle,
       thickness,
-      borderRadius ?? 0.0,
+      borderRadius,
       null
     );
 
@@ -97,7 +97,7 @@ class PieData implements ISparklinesData, IChartThickness, IChartBorder, IChartD
     this.origin = Offset.zero,
     this.layout,
     this.crop,
-    required this.points,
+    required this.pies,
     this.thickness = const ThicknessData(size: 2.0),
     this.pieOffset = 0.0,
     this.padAngle = 0.0,
@@ -112,7 +112,7 @@ class PieData implements ISparklinesData, IChartThickness, IChartBorder, IChartD
     Offset? origin,
     IChartLayout? layout,
     bool? crop,
-    List<DataPoint>? points,
+    List<DataPoint>? pies,
     ThicknessData? thickness,
     double? pieOffset,
     double? padAngle,
@@ -125,7 +125,7 @@ class PieData implements ISparklinesData, IChartThickness, IChartBorder, IChartD
       origin: origin ?? this.origin,
       layout: layout ?? this.layout,
       crop: crop ?? this.crop,
-      points: points ?? this.points,
+      pies: pies ?? this.pies,
       thickness: thickness ?? this.thickness,
       pieOffset: pieOffset ?? this.pieOffset,
       padAngle: padAngle ?? this.padAngle,
@@ -141,15 +141,15 @@ class PieData implements ISparklinesData, IChartThickness, IChartBorder, IChartD
     if (rotation != other.rotation) return true;
     if (origin != other.origin) return true;
     if (layout != other.layout) return true;
-    if (points.length != other.points.length) return true;
+    if (pies.length != other.pies.length) return true;
     if (thickness != other.thickness) return true;
     if (pieOffset != other.pieOffset) return true;
     if (padAngle != other.padAngle) return true;
     if (border != other.border) return true;
     if (borderRadius != other.borderRadius) return true;
 
-    for (int i = 0; i < points.length; i++) {
-      if (points[i] != other.points[i]) {
+    for (int i = 0; i < pies.length; i++) {
+      if (pies[i] != other.pies[i]) {
         return true;
       }
     }
@@ -160,12 +160,12 @@ class PieData implements ISparklinesData, IChartThickness, IChartBorder, IChartD
   @override
   ISparklinesData lerpTo(ISparklinesData next, double t) {
     if (next is! PieData) return next;
-    if (points.length != next.points.length) return next;
+    if (pies.length != next.pies.length) return next;
     if (visible != next.visible) return next;
 
     final interpolatedPies = <DataPoint>[];
-    for (int i = 0; i < points.length; i++) {
-      interpolatedPies.add(points[i].lerpTo(next.points[i], t));
+    for (int i = 0; i < pies.length; i++) {
+      interpolatedPies.add(pies[i].lerpTo(next.pies[i], t));
     }
 
     return PieData(
@@ -174,7 +174,7 @@ class PieData implements ISparklinesData, IChartThickness, IChartBorder, IChartD
       origin: Offset.lerp(origin, next.origin, t) ?? next.origin,
       layout: next.layout,
       crop: next.crop,
-      points: interpolatedPies,
+      pies: interpolatedPies,
       thickness: thickness.lerpTo(next.thickness, t),
       pieOffset: lerpDouble(pieOffset, next.pieOffset, t) ?? next.pieOffset,
       padAngle: lerpDouble(padAngle, next.padAngle, t) ?? next.padAngle,

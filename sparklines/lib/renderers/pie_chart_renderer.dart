@@ -17,11 +17,11 @@ class PieChartRenderer extends AChartRenderer<PieData> {
   ) {
 
     final layouts = computePies(
-      pieData.points,
+      pieData.pies,
       pieData.pieOffset,
       pieData.padAngle,
       pieData.thickness,
-      pieData.borderRadius ?? 0.0,
+      pieData.borderRadius,
       transform
     );
 
@@ -45,7 +45,7 @@ class PieChartRenderer extends AChartRenderer<PieData> {
 
       canvas.drawPath(pie, paint);
 
-      final border = pieData.border;
+      final border = layout.point.border?.border ?? pieData.border;
       if (border != null) {
         final borderSize = transform.scalar(border.size);
 
@@ -77,7 +77,7 @@ class PieChartRenderer extends AChartRenderer<PieData> {
     }
 
     // Place each data point at the slice mid-angle on the circle, in Cartesian (x, y).
-    var midPoints = pieData.points.map((point) {
+    var midPoints = pieData.pies.map((point) {
       final cart = toCartesian(point.x, point);
       return point.copyWith(x: cart.dx, y: cart.dy, dy: 0.0);
     }).toList();

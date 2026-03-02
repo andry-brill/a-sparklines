@@ -34,7 +34,7 @@ class LinearLineRenderer extends BaseLineTypeRenderer<LinearLineData> {
   void renderComplexPath(Canvas canvas, ChartTransform transform, ILineChartData lineData, bool isDynamicStroke, bool isDynamicPaint) {
     if (!renderDynamicPaint(canvas, transform, lineData, isDynamicStroke, isDynamicPaint)) {
 
-      final points = lineData.points;
+      final points = lineData.line;
 
       final globalSize = lineData.thickness.size;
       final globalHalfScreen = transform.scalar(globalSize) / 2;
@@ -180,7 +180,7 @@ class LinearLineRenderer extends BaseLineTypeRenderer<LinearLineData> {
       final strokePaint = buildStrokePaint(transform, lineData);
 
       if (isDynamicStroke) {
-        Gradient global = globalMixedGradient(lineData.thickness, lineData.points);
+        Gradient global = globalMixedGradient(lineData.thickness, lineData.line);
         strokePaint.shader = fillPaint.shader = global.createShader(bounds);
       } else {
         paintThickness(fillPaint, bounds, lineData.thickness);

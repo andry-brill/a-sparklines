@@ -189,7 +189,7 @@ abstract class BaseLineTypeRenderer<LD extends ILineTypeData> implements ILineTy
   @override
   void render(Canvas canvas, ChartTransform transform, ILineChartData lineData) {
 
-    final points = lineData.points;
+    final points = lineData.line;
     if (points.length < 2) return;
 
     final bool sameStroke = _isSameStrokeSize(lineData.thickness, points);
@@ -231,7 +231,7 @@ abstract class BaseLineTypeRenderer<LD extends ILineTypeData> implements ILineTy
 
     final stroke = lineData.thickness;
 
-    final path = toPath(lineData.lineType, lineData.points);
+    final path = toPath(lineData.lineType, lineData.line);
     final tPath = transform.path(path);
 
     final paint = buildStrokePaint(transform, lineData);
@@ -243,11 +243,11 @@ abstract class BaseLineTypeRenderer<LD extends ILineTypeData> implements ILineTy
 
     if (isDynamicStroke || !isDynamicPaint) return false;
 
-    final path = toPath(lineData.lineType, lineData.points);
+    final path = toPath(lineData.lineType, lineData.line);
     final tPath = transform.path(path);
 
     final paint = buildStrokePaint(transform, lineData);
-    Gradient global = globalMixedGradient(lineData.thickness, lineData.points);
+    Gradient global = globalMixedGradient(lineData.thickness, lineData.line);
     paint.shader = global.createShader(tPath.getBounds());
     canvas.drawPath(tPath, paint);
 
