@@ -6,7 +6,7 @@ repository: https://github.com/andry-brill/a-sparklines
 issue_tracker: https://github.com/andry-brill/a-sparklines/issues
 
 screenshots:
-  - description: 'Examples'
+  - description: 'any-sparklines examples'
     path: example/web/example.png
 
 version: 2.0.0
