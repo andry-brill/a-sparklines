@@ -1,6 +1,5 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
-import 'package:vector_math/vector_math_64.dart';
 import '../interfaces/chart_transform.dart';
 import '../interfaces/thickness.dart';
 import '../layout/circle_arc_builder.dart';
