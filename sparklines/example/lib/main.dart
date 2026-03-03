@@ -84,7 +84,7 @@ final smallPie = PieData(
     DataPoint(
       x: 40.0,
       y: 0,
-      dy: pi,
+      dy: 2 * pi,
       data: {
         IThicknessOverride: ThicknessOverride(
           color: Colors.blue.shade100,
@@ -146,10 +146,10 @@ final smallPieT = PieData(
     DataPoint(
       x: 40.0,
       y: 0,
-      dy: pi,
+      dy: 2 * pi,
       data: {
         IThicknessOverride: ThicknessOverride(
-          color: Colors.blue.shade100,
+          color: Colors.blue.shade100
         ),
       },
     ),

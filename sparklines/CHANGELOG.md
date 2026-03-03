@@ -1,4 +1,8 @@
 
+## 2.1.4
+
+* Fixed `CircleArcBuilder` for angles >= 2 * pi
+
 ## 2.1.3
  
 * Fixed `LayoutData` min/max assert

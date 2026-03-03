@@ -54,12 +54,15 @@ class CircleArcBuilder {
     }
 
     if (da > _tau - _epsilon) {
+
       path.moveTo(r1 * math.cos(a0), r1 * math.sin(a0));
-      _arcSegment(path, 0, 0, r1, a0, a1, !cw);
+      _arcSegment(path, 0, 0, r1, a0, a0 + math.pi, !cw);
+      _arcSegment(path, 0, 0, r1, a0 + math.pi, a0 + 2 * math.pi, !cw);
 
       if (r0 > _epsilon) {
         path.moveTo(r0 * math.cos(a1), r0 * math.sin(a1));
-        _arcSegment(path, 0, 0, r0, a1, a0, cw);
+        _arcSegment(path, 0, 0, r0, a0, a0 + math.pi, cw);
+        _arcSegment(path, 0, 0, r0, a0 + math.pi, a0 + 2 * math.pi, cw);
       }
 
       path.close();
