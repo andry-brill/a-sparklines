@@ -140,21 +140,31 @@ class DataPointPipeline {
     double total = 2.0,
     double? threshold,
     double? spacing,
+    double? spacingDeg,
+    bool? trailingSpacing, // true if total >= 2.0 || total <= -2.0 (full circle)
     DataPoint? thresholdPoint,
-  }) => normalize(total: total * pi, threshold: threshold, spacing: spacing, thresholdPoint: thresholdPoint);
+  }) => normalize(
+      total: total * pi,
+      threshold: threshold,
+      thresholdPoint: thresholdPoint,
+      spacing: spacing ?? (spacingDeg != null ? spacingDeg * pi / 180.0 : null ),
+      trailingSpacing: trailingSpacing ?? total >= 2.0 || total <= -2.0,
+  );
 
   /// Normalize point.dy values
   DataPointPipeline normalize({
     double total = 1.0,
     double? threshold,
-    double? spacing,
     DataPoint? thresholdPoint,
+    double? spacing,
+    bool? trailingSpacing,
   }) {
     _modifiers.add(_NormalizeModifier(
       total: total,
       threshold: threshold,
-      spacing: spacing,
       thresholdPoint: thresholdPoint,
+      spacing: spacing,
+      trailingSpacing: trailingSpacing,
     ));
     return this;
   }
@@ -203,20 +213,25 @@ class _NormalizeModifier implements DataPointModifier {
   /// spacing in normalized units
   final double spacing;
 
+  /// If true = adds one more spacing, useful in case of full pies
+  final bool trailingSpacing;
+
   /// When set, removed (below-threshold) points' dy is accumulated here
   final DataPoint? thresholdPoint;
 
   _NormalizeModifier({
     required this.total,
     double? threshold,
-    double? spacing,
     this.thresholdPoint,
+    double? spacing,
+    bool? trailingSpacing,
   }) :
         assert(total >= 0.0),
         assert(spacing == null || spacing >= 0.0),
         assert(threshold == null || threshold >= 0.0),
     spacing = spacing ?? 0.0,
-    threshold = threshold ?? 0.0
+    threshold = threshold ?? 0.0,
+    trailingSpacing = trailingSpacing == true
   ;
 
   @override
@@ -293,7 +308,8 @@ class _NormalizeModifier implements DataPointModifier {
 
     if (sum == 0) return input;
 
-    double availableTotal = context.snap(max(0.0, total - spacing * (input.length - 1)));
+    double totalSpacing = spacing * (input.length - (trailingSpacing ? 0 : 1));
+    double availableTotal = context.snap(max(0.0, total - totalSpacing));
     sum = context.snap(sum);
 
     final scale = availableTotal / sum;

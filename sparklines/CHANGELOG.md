@@ -1,3 +1,6 @@
+## 2.2.1
+
+* Added `trailingSpacing` and `spacingDeg` to `DataPointPipeline`
 
 ## 2.2.0
  

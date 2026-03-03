@@ -206,6 +206,30 @@ void main() {
       expect(actualSumDy, closeTo(expectedSumDy, 1e-10));
     });
 
+    test('given: pipeline.normalize2pi(spacingDeg: 15), should: use range [0, 2*pi] with two spaces', () {
+
+      final pipeline = DataPointPipeline().normalize2pi(spacingDeg: 15); // Expecting trailingSpacing: true
+      final input = points([(1.0, 0.0, 1.0), (1.0, 0.0, 1.0)]);
+      final out = pipeline.build(input);
+
+      final actualSumDy = out[0].dy + out[1].dy;
+      final expectedSumDy = 2.0 * pi - (15 * 2) * (pi / 180.0);
+
+      expect(actualSumDy, closeTo(expectedSumDy, 1e-10));
+    });
+
+    test('given: pipeline.normalize2pi(total: 1, spacingDeg: 15), should: use range [0, 1*pi] with one space', () {
+
+      final pipeline = DataPointPipeline().normalize2pi(total: 1, spacingDeg: 15); // Expecting trailingSpacing: false
+      final input = points([(1.0, 0.0, 1.0), (1.0, 0.0, 1.0)]);
+      final out = pipeline.build(input);
+
+      final actualSumDy = out[0].dy + out[1].dy;
+      final expectedSumDy = pi - (15 * 1) * (pi / 180.0);
+
+      expect(actualSumDy, closeTo(expectedSumDy, 1e-10));
+    });
+
     test('given: pipeline.normalize(threshold: 2.0) and two equal points, should: remove all and return empty', () {
 
       final pipeline = DataPointPipeline().normalize(total: 1.0, threshold: 2.0);
