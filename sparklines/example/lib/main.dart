@@ -326,8 +326,8 @@ final padPieT = PieData(
 final steppedLine = LineData(
     origin: const Offset(0, -140),
     lineType: SteppedLineData.middle(isStrokeCapRound: true, isStrokeJoinRound: true),
-    pointStyle: CircleDataPointStyle(radius: 9, color: Colors.blue.shade900),
-    thickness: ThicknessData(size: 8, color: Colors.blue),
+    pointStyle: CircleDataPointStyle(radius: 5, color: Colors.blue.shade900),
+    thickness: ThicknessData(size: 5, color: Colors.blue),
     areaGradient: LinearGradient(colors: [Colors.blue.shade200, Colors.blue.shade200.withValues(alpha: 0)], begin: AlignmentGeometry.topCenter, end: AlignmentGeometry.bottomCenter),
     line: [
   DataPoint(x: -150, dy: 0),
@@ -342,8 +342,8 @@ final steppedLine = LineData(
 final steppedLineT = LineData(
   origin: const Offset(0, -140),
   lineType: SteppedLineData.middle(isStrokeCapRound: true, isStrokeJoinRound: true),
-  pointStyle: CircleDataPointStyle(radius: 12, color: Colors.blue),
-  thickness: ThicknessData(size: 8, color: Colors.blue),
+  pointStyle: CircleDataPointStyle(radius: 5, color: Colors.blue),
+  thickness: ThicknessData(size: 5, color: Colors.blue),
   areaGradient: LinearGradient(colors: [Colors.blue.shade200, Colors.blue.shade200.withValues(alpha: 0)], begin: AlignmentGeometry.topCenter, end: AlignmentGeometry.bottomCenter),
   line: [
     DataPoint(x: -150, dy: 0),
@@ -359,7 +359,7 @@ final steppedLineT = LineData(
 final lineTop = LineData(
     origin: const Offset(150, -150),
     lineType: CurvedLineData(isStrokeCapRound: true, isStrokeJoinRound: true, smoothness: 1.0),
-    thickness: ThicknessData(size: 8, color: Colors.blue),
+    thickness: ThicknessData(size: 5, color: Colors.blue),
     line: [
       DataPoint(x: -140, dy: 90),
       DataPoint(x: -100, dy: 20),
@@ -370,7 +370,7 @@ final lineTop = LineData(
 final lineBottom = LineData(
     origin: const Offset(150, -150),
     lineType: CurvedLineData(isStrokeCapRound: true, isStrokeJoinRound: true, smoothness: 1.0),
-    thickness: ThicknessData(size: 8, color: Colors.blue.shade900),
+    thickness: ThicknessData(size: 5, color: Colors.blue.shade900),
     line: [
       DataPoint(x: -140, dy: 20),
       DataPoint(x: -100, dy: 80),
@@ -388,7 +388,7 @@ final between = BetweenLineData(
 final lineTopT = LineData(
     origin: const Offset(150, -150),
     lineType: CurvedLineData(isStrokeCapRound: true, isStrokeJoinRound: true, smoothness: 1.0),
-    thickness: ThicknessData(size: 8, color: Colors.blue),
+    thickness: ThicknessData(size: 5, color: Colors.blue),
     line: [
       DataPoint(x: -140, dy: 20),
       DataPoint(x: -100, dy: 80),
@@ -399,7 +399,7 @@ final lineTopT = LineData(
 final lineBottomT = LineData(
     origin: const Offset(150, -150),
     lineType: CurvedLineData(isStrokeCapRound: true, isStrokeJoinRound: true, smoothness: 1.0),
-    thickness: ThicknessData(size: 8, color: Colors.blue.shade900),
+    thickness: ThicknessData(size: 5, color: Colors.blue.shade900),
     line: [
       DataPoint(x: -140, dy: 90),
       DataPoint(x: -100, dy: 20),
@@ -420,8 +420,8 @@ const DataPointDataMap barsData = {
 
 final bars = BarData(
     origin: const Offset(-150, 100),
-    thickness: ThicknessData(size: 24, color: Colors.blue.shade900),
-    borderRadius: 8,
+    thickness: ThicknessData(size: 12, color: Colors.blue.shade900),
+    borderRadius: 4,
     bars: [
 
       DataPoint(x: 10, dy: 50),
@@ -437,6 +437,26 @@ final bars = BarData(
       DataPoint(x: 90, y: 20, dy: 10, data: barsData),
     ]);
 
+
+final barsT = BarData(
+    origin: const Offset(-150, 100),
+    thickness: ThicknessData(size: 12, color: Colors.blue.shade900),
+    borderRadius: 4,
+    bars: [
+
+      DataPoint(x: 10, y: 40, dy: 10),
+      DataPoint(x: 30, y: 42, dy: 8),
+      DataPoint(x: 50, y: 44, dy: 6),
+      DataPoint(x: 70, y: 46, dy: 4),
+      DataPoint(x: 90, y: 48, dy: 2),
+
+      DataPoint(x: 10, y: 40-16, dy: 14, data: barsData),
+      DataPoint(x: 30, y: 40-10, dy: 10, data: barsData),
+      DataPoint(x: 50, y: 40-4, dy: 6, data: barsData),
+      DataPoint(x: 70, y: 40, dy: 4, data: barsData),
+      DataPoint(x: 90, y: 44, dy: 2, data: barsData),
+    ]);
+
 class _ExamplePageState extends State<_ExamplePage> {
 
   bool _toggled = false;
@@ -446,7 +466,7 @@ class _ExamplePageState extends State<_ExamplePage> {
   ];
 
   static final _toggleCharts = [
-    bigPieT, steppedLineT, smallPieT, betweenT, lineTopT, lineBottomT, dxPieT, padPieT
+    bigPieT, steppedLineT, smallPieT, betweenT, lineTopT, lineBottomT, dxPieT, padPieT, barsT
   ];
 
   @override
@@ -472,6 +492,7 @@ class _ExamplePageState extends State<_ExamplePage> {
               maxX: 150.0,
               minY: -150.0,
               maxY: 150.0,
+              relativeTo: RelativeDimension.width
             ),
             charts: charts,
           ),

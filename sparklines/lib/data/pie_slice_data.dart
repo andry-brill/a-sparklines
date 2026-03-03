@@ -1,5 +1,6 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
+import 'package:vector_math/vector_math_64.dart';
 import '../interfaces/chart_transform.dart';
 import '../interfaces/thickness.dart';
 import '../layout/circle_arc_builder.dart';
@@ -77,13 +78,13 @@ List<PieSliceData> computePies(
   for (var pie in pies) {
 
     final borderRadius = pie.border?.borderRadius ?? radius ?? 0.0;
-    final cornerRadius = transform != null ? transform.scalar(borderRadius) : borderRadius;
+    final cornerRadius = transform != null ? transform.scalar(transform.antiScalar(borderRadius)) : borderRadius;
 
     final thicknessAlign = pie.thickness?.align ?? thickness.align;
     double thicknessSize = pie.thickness?.size ?? thickness.size;
 
     if (transform != null) {
-      thicknessSize = transform.scalar(thicknessSize);
+      thicknessSize = transform.scalar(transform.antiScalar(thicknessSize));
     }
 
     if (pie.x <= 0.0001 || thicknessSize <= 0.0001 || pie.dy <= 0.0001) continue;

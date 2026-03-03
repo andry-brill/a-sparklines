@@ -39,6 +39,24 @@ List<ExampleChart> pieCharts() {
       ],
     ),
     ExampleChart(
+      title: 'Relative signed layout',
+      subtitle: 'Single pie on relative signed layout',
+      initialCharts: [
+        PieData(
+          layout: const RelativeLayout.signed(relativeTo: RelativeDimension.width),
+          pies: [DataPoint(x: 1.0, y: pi/4.0, dy: pi/2.0)],
+          thickness: ThicknessData(size: 0.2, color: Colors.blue),
+        ),
+      ],
+      toggleCharts: [
+        PieData(
+          layout: const RelativeLayout.signed(relativeTo: RelativeDimension.width),
+          pies: [DataPoint(x: 1.0, y: 0, dy: pi/4.0)],
+          thickness: ThicknessData(size: 0.2, color: Colors.deepOrange),
+        ),
+      ],
+    ),
+    ExampleChart(
       title: 'Relative fixed layout',
       initialCharts: [
         PieData(
@@ -50,7 +68,7 @@ List<ExampleChart> pieCharts() {
           ],
           borderRadius: 8.0,
           pointStyle: CircleDataPointStyle(radius: 4, color: Colors.white),
-          thickness: ThicknessData(size: 40, color: Colors.blue),
+          thickness: ThicknessData(size: 30, color: Colors.blue),
         ),
         PieData(
           layout: const RelativeLayout(minX: -gridWidth, maxX: gridWidth, minY: -gridHeight, maxY: gridHeight),
@@ -72,7 +90,7 @@ List<ExampleChart> pieCharts() {
           ],
           borderRadius: 8.0,
           pointStyle: CircleDataPointStyle(radius: 4, color: Colors.white),
-          thickness: ThicknessData(size: 40, color: Colors.blue),
+          thickness: ThicknessData(size: 30, color: Colors.blue),
         ),
         PieData(
           layout: const RelativeLayout(minX: -gridWidth, maxX: gridWidth, minY: -gridHeight, maxY: gridHeight),

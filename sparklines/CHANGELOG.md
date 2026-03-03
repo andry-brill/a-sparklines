@@ -1,4 +1,9 @@
 
+## 2.2.0
+ 
+* Made the radius and thickness properties in `PieData` uniform by default, consistent with `LineData` and `BarData`
+  * Use `RelativeLayout(.., relativeTo: RelativeDimension.width)` to make them relative again
+
 ## 2.1.4
 
 * Fixed `CircleArcBuilder` for angles >= 2 * pi
