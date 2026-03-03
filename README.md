@@ -1,5 +1,7 @@
 # Sparklines
 
+[![Tests](https://github.com/andry-brill/a-sparklines/actions/workflows/test.yml/badge.svg)](https://github.com/andry-brill/a-sparklines/actions/workflows/test.yml)
+
 Feature-rich, highly optimized sparklines for Flutter. Line, bar, pie, and between-line charts with shared layouts, animation, and flexible styling.
 
 ![App Screenshot](https://raw.githubusercontent.com/andry-brill/a-sparklines/main/sparklines/example/web/example.png)
