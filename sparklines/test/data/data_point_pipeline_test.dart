@@ -314,61 +314,59 @@ void main() {
 
   group('RescaleModifier', () {
 
-    test('given: (-2.0, 1.0, 4.0) pipeline.rescale(), should: rescale to (0.0, 0.5, 1.0) ', () {
+    test('given: intervals [0,0], [0,1], [0,2] pipeline.rescale(), should: rescale to [0,1] with dy (0.0, 0.5, 1.0)', () {
 
       final pipeline = DataPointPipeline().rescale();
-      final input = points([(0.0, 0.0, -2.0), (1.0, 1.0, 1.0), (2.0, 2.0, 4.0)]);
+      final input = points([(0.0, 0.0, 0.0), (1.0, 0.0, 1.0), (2.0, 0.0, 2.0)]);
       final out = pipeline.build(input);
 
-      final actualLength = out.length;
-      final expectedLength = 3;
-
-      expect(actualLength, equals(expectedLength));
+      expect(out.length, equals(3));
+      expect(out[0].y, equals(0.0));
+      expect(out[0].fy, equals(0.0));
       expect(out[0].dy, equals(0.0));
+      expect(out[1].y, equals(0.0));
+      expect(out[1].fy, equals(0.5));
       expect(out[1].dy, equals(0.5));
+      expect(out[2].y, equals(0.0));
+      expect(out[2].fy, equals(1.0));
       expect(out[2].dy, equals(1.0));
-
-      for (var p in out) {
-        expect(p.x, equals(p.y)); // No changes
-      }
     });
 
-    test('given: (-2.0, 2.0, 4.0) pipeline.rescale(currentMin: -4.0, targetMin: -1.0), should: rescale to (-0.5, 0.5, 1.0) ', () {
+    test('given: intervals [-4,-4], [-4,-2], [-2,2] pipeline.rescale(currentMin: -4.0, currentMax: 4.0, targetMin: -1.0), should: rescale to [-1,1] with dy (0, 0.5, 1.0)', () {
 
-      final pipeline = DataPointPipeline().rescale(currentMin: -4.0, targetMin: -1.0);
-      final input = points([(0.0, 0.0, -2.0), (1.0, 1.0, 2.0), (2.0, 2.0, 4.0)]);
+      final pipeline = DataPointPipeline().rescale(currentMin: -4.0, currentMax: 4.0, targetMin: -1.0);
+      final input = points([(0.0, -4.0, 0.0), (1.0, -4.0, 2.0), (2.0, -2.0, 4.0)]);
       final out = pipeline.build(input);
 
-      final actualLength = out.length;
-      final expectedLength = 3;
-
-      expect(actualLength, equals(expectedLength));
-      expect(out[0].dy, equals(-0.5));
+      expect(out.length, equals(3));
+      expect(out[0].y, equals(-1.0));
+      expect(out[0].fy, equals(-1.0));
+      expect(out[0].dy, equals(0.0));
+      expect(out[1].y, equals(-1.0));
+      expect(out[1].fy, equals(-0.5));
       expect(out[1].dy, equals(0.5));
+      expect(out[2].y, equals(-0.5));
+      expect(out[2].fy, equals(0.5));
       expect(out[2].dy, equals(1.0));
-
-      for (var p in out) {
-        expect(p.x, equals(p.y)); // No changes
-      }
     });
 
-    test('given: (-2.0, 1.0, 4.0), y=0.0 pipeline.rescale(rescaleY: true), should: rescale to (0.0, 0.5, 1.0), y=1.0 ', () {
+    test('given: intervals [0,-2], [0,1], [0,4] pipeline.rescale(), should: rescale both y and fy to [0,1] (bounds -2..4)', () {
 
-      final pipeline = DataPointPipeline().rescale(rescaleY: true);
+      final pipeline = DataPointPipeline().rescale();
       final input = points([(0.0, 0.0, -2.0), (1.0, 0.0, 1.0), (2.0, 0.0, 4.0)]);
       final out = pipeline.build(input);
 
-      final actualLength = out.length;
-      final expectedLength = 3;
-
-      expect(actualLength, equals(expectedLength));
-      expect(out[0].dy, equals(0.0));
-      expect(out[1].dy, equals(0.5));
-      expect(out[2].dy, equals(1.0));
-
-      for (var p in out) {
-        expect(p.y, closeTo(1 / 3.0, 1e-10));
-      }
+      expect(out.length, equals(3));
+      // Bounds -2..4, span 6 → [0,1]: (v+2)/6
+      expect(out[0].y, closeTo(1 / 3.0, 1e-10));
+      expect(out[0].fy, equals(0.0));
+      expect(out[0].dy, closeTo(-1 / 3.0, 1e-10));
+      expect(out[1].y, closeTo(1 / 3.0, 1e-10));
+      expect(out[1].fy, closeTo(0.5, 1e-10));
+      expect(out[1].dy, closeTo(1 / 6.0, 1e-10));
+      expect(out[2].y, closeTo(1 / 3.0, 1e-10));
+      expect(out[2].fy, equals(1.0));
+      expect(out[2].dy, closeTo(2 / 3.0, 1e-10));
     });
   });
 

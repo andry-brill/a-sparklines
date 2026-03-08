@@ -1,3 +1,7 @@
+## 2.2.3
+
+* **rescale** — Rescale now transforms full intervals `[y..fy]` from source to target bounds; both `y` and `fy` are mapped, and `dy` is set to `fy - y`.  Non-finite `currentMin`/`currentMax` are derived from input interval bounds.
+
 ## 2.2.2
 
 * Added `rescale` to `DataPointPipeline`
@@ -7,7 +11,7 @@
 * Added `trailingSpacing` and `spacingDeg` to `DataPointPipeline`
 
 ## 2.2.0
- 
+
 * Made the radius and thickness properties in `PieData` uniform by default, consistent with `LineData` and `BarData`
   * Use `RelativeLayout(.., relativeTo: RelativeDimension.width)` to make them relative again
 
@@ -16,7 +20,7 @@
 * Fixed `CircleArcBuilder` for angles >= 2 * pi
 
 ## 2.1.3
- 
+
 * Fixed `LayoutData` min/max assert
 
 ## 2.1.2
@@ -53,7 +57,7 @@
   * removed `getYorDy`
 * `DataPointPipeline`
   * fixes and tests
-* `PieData` 
+* `PieData`
   * renamed `space` to `dx`
   * added `padAngle`
 

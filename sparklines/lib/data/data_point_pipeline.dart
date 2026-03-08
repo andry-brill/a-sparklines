@@ -169,18 +169,15 @@ class DataPointPipeline {
     return this;
   }
 
-  /// Linearly rescale values from [currentMin..currentMax] to [targetMin..targetMax].
+  /// Linearly rescale intervals [DataPoint.y..DataPoint.fy]
+  /// from [currentMin..currentMax] to [targetMin..targetMax].
   ///
-  /// By default only [DataPoint.dy] is rescaled.
-  /// If [rescaleY] is true, [DataPoint.y] is also transformed by the same mapping.
-  ///
-  /// If [currentMin] or [currentMax] are not finite, they are computed from input dy values.
+  /// Both y and fy are transformed, and dy is recalculated as (fy - y).
   DataPointPipeline rescale({
     double currentMin = double.negativeInfinity,
     double currentMax = double.infinity,
     double targetMin = 0.0,
     double targetMax = 1.0,
-    bool rescaleY = false,
   }) {
     _modifiers.add(
       _RescaleModifier(
@@ -188,12 +185,12 @@ class DataPointPipeline {
         currentMax: currentMax,
         targetMin: targetMin,
         targetMax: targetMax,
-        rescaleY: rescaleY,
       ),
     );
 
     return this;
   }
+
 }
 
 
@@ -362,24 +359,21 @@ class _NormalizeModifier implements DataPointModifier {
 }
 
 class _RescaleModifier implements DataPointModifier {
-  /// Source dy range.
-  /// If either bound is not finite, it is computed from input dy values.
+
+  /// Source bounds.
+  /// If either bound is not finite, they are computed from input interval bounds.
   final double currentMin;
   final double currentMax;
 
-  /// Target range.
+  /// Target bounds.
   final double targetMin;
   final double targetMax;
-
-  /// If true, apply the same affine transform to DataPoint.y too.
-  final bool rescaleY;
 
   const _RescaleModifier({
     required this.currentMin,
     required this.currentMax,
     required this.targetMin,
     required this.targetMax,
-    this.rescaleY = false,
   });
 
   @override
@@ -389,7 +383,7 @@ class _RescaleModifier implements DataPointModifier {
       ) {
     if (input.isEmpty) return input;
 
-    final computed = _computeMinMaxDY(input);
+    final computed = _computeMinMaxBounds(input);
 
     final curMin = currentMin.isFinite ? currentMin : computed.$1;
     final curMax = currentMax.isFinite ? currentMax : computed.$2;
@@ -408,14 +402,15 @@ class _RescaleModifier implements DataPointModifier {
     final result = <DataPoint>[];
 
     for (final p in input) {
-      final newDy = transform(p.dy);
-      final newY = rescaleY ? transform(p.y) : p.y;
+      final newY = transform(p.y);
+      final newFY = transform(p.fy);
+      final newDY = context.snap(newFY - newY);
 
       result.add(
         p.copyWith(
           y: newY,
-          dy: newDy,
-          fy: context.snap(newY + newDy),
+          dy: newDY,
+          fy: newFY,
         ),
       );
     }
@@ -423,16 +418,18 @@ class _RescaleModifier implements DataPointModifier {
     return result;
   }
 
-  static (double, double) _computeMinMaxDY(List<DataPoint> input) {
-    double minDY = double.infinity;
-    double maxDY = double.negativeInfinity;
+  static (double, double) _computeMinMaxBounds(List<DataPoint> input) {
+    double minBound = double.infinity;
+    double maxBound = double.negativeInfinity;
 
     for (final p in input) {
-      final v = p.dy;
-      if (v < minDY) minDY = v;
-      if (v > maxDY) maxDY = v;
+      final a = min(p.y, p.fy);
+      final b = max(p.y, p.fy);
+
+      if (a < minBound) minBound = a;
+      if (b > maxBound) maxBound = b;
     }
 
-    return (minDY, maxDY);
+    return (minBound, maxBound);
   }
 }
