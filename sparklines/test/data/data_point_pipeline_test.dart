@@ -312,6 +312,66 @@ void main() {
     });
   });
 
+  group('RescaleModifier', () {
+
+    test('given: (-2.0, 1.0, 4.0) pipeline.rescale(), should: rescale to (0.0, 0.5, 1.0) ', () {
+
+      final pipeline = DataPointPipeline().rescale();
+      final input = points([(0.0, 0.0, -2.0), (1.0, 1.0, 1.0), (2.0, 2.0, 4.0)]);
+      final out = pipeline.build(input);
+
+      final actualLength = out.length;
+      final expectedLength = 3;
+
+      expect(actualLength, equals(expectedLength));
+      expect(out[0].dy, equals(0.0));
+      expect(out[1].dy, equals(0.5));
+      expect(out[2].dy, equals(1.0));
+
+      for (var p in out) {
+        expect(p.x, equals(p.y)); // No changes
+      }
+    });
+
+    test('given: (-2.0, 2.0, 4.0) pipeline.rescale(currentMin: -4.0, targetMin: -1.0), should: rescale to (-0.5, 0.5, 1.0) ', () {
+
+      final pipeline = DataPointPipeline().rescale(currentMin: -4.0, targetMin: -1.0);
+      final input = points([(0.0, 0.0, -2.0), (1.0, 1.0, 2.0), (2.0, 2.0, 4.0)]);
+      final out = pipeline.build(input);
+
+      final actualLength = out.length;
+      final expectedLength = 3;
+
+      expect(actualLength, equals(expectedLength));
+      expect(out[0].dy, equals(-0.5));
+      expect(out[1].dy, equals(0.5));
+      expect(out[2].dy, equals(1.0));
+
+      for (var p in out) {
+        expect(p.x, equals(p.y)); // No changes
+      }
+    });
+
+    test('given: (-2.0, 1.0, 4.0), y=0.0 pipeline.rescale(rescaleY: true), should: rescale to (0.0, 0.5, 1.0), y=1.0 ', () {
+
+      final pipeline = DataPointPipeline().rescale(rescaleY: true);
+      final input = points([(0.0, 0.0, -2.0), (1.0, 0.0, 1.0), (2.0, 0.0, 4.0)]);
+      final out = pipeline.build(input);
+
+      final actualLength = out.length;
+      final expectedLength = 3;
+
+      expect(actualLength, equals(expectedLength));
+      expect(out[0].dy, equals(0.0));
+      expect(out[1].dy, equals(0.5));
+      expect(out[2].dy, equals(1.0));
+
+      for (var p in out) {
+        expect(p.y, closeTo(1 / 3.0, 1e-10));
+      }
+    });
+  });
+
   group('Combination', () {
 
     test('given: pipeline.stack().normalize() and two bars at same x, should: stack first then normalize dy only (y unchanged)', () {

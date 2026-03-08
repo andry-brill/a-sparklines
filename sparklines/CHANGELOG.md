@@ -1,3 +1,7 @@
+## 2.2.2
+
+* Added `rescale` to `DataPointPipeline`
+
 ## 2.2.1
 
 * Added `trailingSpacing` and `spacingDeg` to `DataPointPipeline`

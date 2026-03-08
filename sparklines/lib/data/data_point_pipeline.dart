@@ -169,6 +169,31 @@ class DataPointPipeline {
     return this;
   }
 
+  /// Linearly rescale values from [currentMin..currentMax] to [targetMin..targetMax].
+  ///
+  /// By default only [DataPoint.dy] is rescaled.
+  /// If [rescaleY] is true, [DataPoint.y] is also transformed by the same mapping.
+  ///
+  /// If [currentMin] or [currentMax] are not finite, they are computed from input dy values.
+  DataPointPipeline rescale({
+    double currentMin = double.negativeInfinity,
+    double currentMax = double.infinity,
+    double targetMin = 0.0,
+    double targetMax = 1.0,
+    bool rescaleY = false,
+  }) {
+    _modifiers.add(
+      _RescaleModifier(
+        currentMin: currentMin,
+        currentMax: currentMax,
+        targetMin: targetMin,
+        targetMax: targetMax,
+        rescaleY: rescaleY,
+      ),
+    );
+
+    return this;
+  }
 }
 
 
@@ -336,4 +361,78 @@ class _NormalizeModifier implements DataPointModifier {
 
 }
 
+class _RescaleModifier implements DataPointModifier {
+  /// Source dy range.
+  /// If either bound is not finite, it is computed from input dy values.
+  final double currentMin;
+  final double currentMax;
 
+  /// Target range.
+  final double targetMin;
+  final double targetMax;
+
+  /// If true, apply the same affine transform to DataPoint.y too.
+  final bool rescaleY;
+
+  const _RescaleModifier({
+    required this.currentMin,
+    required this.currentMax,
+    required this.targetMin,
+    required this.targetMax,
+    this.rescaleY = false,
+  });
+
+  @override
+  List<DataPoint> apply(
+      List<DataPoint> input,
+      DataPointPipelineContext context,
+      ) {
+    if (input.isEmpty) return input;
+
+    final computed = _computeMinMaxDY(input);
+
+    final curMin = currentMin.isFinite ? currentMin : computed.$1;
+    final curMax = currentMax.isFinite ? currentMax : computed.$2;
+
+    assert(curMin != curMax, 'current min/max must differ');
+    assert(targetMin != targetMax, 'target min/max must differ');
+
+    final curSpan = curMax - curMin;
+    final tgtSpan = targetMax - targetMin;
+
+    double transform(double v) {
+      final t = (v - curMin) / curSpan;
+      return context.snap(targetMin + t * tgtSpan);
+    }
+
+    final result = <DataPoint>[];
+
+    for (final p in input) {
+      final newDy = transform(p.dy);
+      final newY = rescaleY ? transform(p.y) : p.y;
+
+      result.add(
+        p.copyWith(
+          y: newY,
+          dy: newDy,
+          fy: context.snap(newY + newDy),
+        ),
+      );
+    }
+
+    return result;
+  }
+
+  static (double, double) _computeMinMaxDY(List<DataPoint> input) {
+    double minDY = double.infinity;
+    double maxDY = double.negativeInfinity;
+
+    for (final p in input) {
+      final v = p.dy;
+      if (v < minDY) minDY = v;
+      if (v > maxDY) maxDY = v;
+    }
+
+    return (minDY, maxDY);
+  }
+}

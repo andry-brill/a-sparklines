@@ -86,8 +86,9 @@ Feature-rich, highly optimized sparklines for Flutter. Line, bar, pie, and betwe
 **DataPointPipeline** — Build transformed lists for stacking/normalization; reuse one pipeline for multiple series so shared state (e.g. stacking) is consistent.
 
 - **stack({ spacing })** — Stack points by x; each point’s `y` becomes the running sum at that x, `dy` stays the value. Optional `spacing` adds gap between stacked segments.
-- **normalize({ total, threshold?, spacing?, thresholdPoint? })** — Scale `dy` so sum of `abs(dy)` equals `total` (default 1.0). `threshold` repeatedly drops smallest segment until none below threshold; `thresholdPoint` receives accumulated dy of removed points. `spacing` reserves gap between segments.
-- **normalize2pi({ total, threshold?, spacing?, thresholdPoint? })** — Same as `normalize` with default `total` 2π for angles.
+- **normalize({ total, threshold?, spacing?, trailingSpacing?, thresholdPoint? })** — Scale `dy` so sum of `abs(dy)` equals `total` (default 1.0). `threshold` repeatedly drops smallest segment until none below threshold; `thresholdPoint` receives accumulated dy of removed points. `spacing` reserves gap between segments; `trailingSpacing` adds one more spacing (useful for full pies).
+- **normalize2pi({ total, threshold?, spacing?, spacingDeg?, trailingSpacing?, thresholdPoint? })** — Same as `normalize` with default `total` 2π for angles. `spacingDeg` is spacing in degrees (converted to radians); `trailingSpacing` defaults to true when `total >= 2` or `total <= -2`.
+- **rescale({ currentMin?, currentMax?, targetMin, targetMax, rescaleY? })** — Linearly rescale `dy` from `[currentMin..currentMax]` to `[targetMin..targetMax]` (default 0–1). If `currentMin` or `currentMax` are not finite, they are computed from input. Set `rescaleY: true` to apply the same mapping to `y`.
 
 **IThresholdPoints** / **ThresholdPoints** — When `normalize` removes below-threshold points and uses `thresholdPoint`, the aggregate point’s `data` contains `ThresholdPoints(removed)` so you can access the original points via `point.of<IThresholdPoints>()?.thresholdPoints`.
 
