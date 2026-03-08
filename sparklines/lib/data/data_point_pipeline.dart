@@ -234,6 +234,70 @@ class DataPointPipeline {
     return this;
   }
 
+  /// Sort input by x, y, and/or fy.
+  /// [x], [y], [fy]: if true => ascending, if false => descending.
+  /// If all are null, sorts by x ascending by default.
+  DataPointPipeline sort({bool? x, bool? y, bool? fy}) {
+    _modifiers.add(_SortModifier(x: x, y: y, fy: fy));
+    return this;
+  }
+
+  /// Aggregates values (dy) using a window that ends at the current element.
+  ///
+  /// If [window] is `null`, the window includes all elements from the start
+  /// up to and including the current element.
+  ///
+  /// If [window] is `N`, the window includes up to `N` elements ending at
+  /// the current element. For the first elements, the window may contain
+  /// fewer than `N` elements.
+  DataPointPipeline aggregate({Aggregation function = Aggregation.sum, int? window}) {
+    // TODO _AggregationModifier
+    return this;
+  }
+
+}
+
+
+class _SortModifier implements DataPointModifier {
+
+  final bool? x;
+  final bool? y;
+  final bool? fy;
+
+  const _SortModifier({this.x, this.y, this.fy});
+
+  @override
+  List<DataPoint> apply(
+      List<DataPoint> input,
+      DataPointPipelineContext context,
+      ) {
+    if (input.isEmpty) return input;
+
+    final allNull = x == null && y == null && fy == null;
+    final sortX = x ?? (allNull ? true : null);
+    final sortY = y;
+    final sortFy = fy;
+
+    final result = List<DataPoint>.from(input);
+
+    result.sort((a, b) {
+      if (sortX != null) {
+        final c = sortX ? a.x.compareTo(b.x) : b.x.compareTo(a.x);
+        if (c != 0) return c;
+      }
+      if (sortY != null) {
+        final c = sortY ? a.y.compareTo(b.y) : b.y.compareTo(a.y);
+        if (c != 0) return c;
+      }
+      if (sortFy != null) {
+        final c = sortFy ? a.fy.compareTo(b.fy) : b.fy.compareTo(a.fy);
+        if (c != 0) return c;
+      }
+      return 0;
+    });
+
+    return result;
+  }
 }
 
 
@@ -462,4 +526,21 @@ class _RescaleModifier implements DataPointModifier {
 
     return result;
   }
+}
+
+
+enum Aggregation {
+
+  sum,
+  avg,
+
+  min,
+  max,
+
+  /// Using center element when the number of values in the window is odd
+  /// Using average of the two center elements when the number of values in the window is even
+  median,
+
+  /// Standard deviation
+  stddev
 }

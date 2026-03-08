@@ -504,4 +504,68 @@ void main() {
     });
 
   });
+
+  group('SortModifier', () {
+
+    test('given: sort() with no args, should: sort by x ascending by default', () {
+      final pipeline = DataPointPipeline().sort();
+      final input = points([(2.0, 1.0, 1.0), (1.0, 2.0, 1.0)]);
+      final out = pipeline.build(input);
+      expect(out[0].x, equals(1.0));
+      expect(out[1].x, equals(2.0));
+    });
+
+    test('given: sort(x: true), should: sort by x ascending', () {
+      final pipeline = DataPointPipeline().sort(x: true);
+      final input = points([(2.0, 0.0, 1.0), (1.0, 0.0, 1.0), (3.0, 0.0, 1.0)]);
+      final out = pipeline.build(input);
+      expect(out[0].x, equals(1.0));
+      expect(out[1].x, equals(2.0));
+      expect(out[2].x, equals(3.0));
+    });
+
+    test('given: sort(x: false), should: sort by x descending', () {
+      final pipeline = DataPointPipeline().sort(x: false);
+      final input = points([(1.0, 0.0, 1.0), (3.0, 0.0, 1.0), (2.0, 0.0, 1.0)]);
+      final out = pipeline.build(input);
+      expect(out[0].x, equals(3.0));
+      expect(out[1].x, equals(2.0));
+      expect(out[2].x, equals(1.0));
+    });
+
+    test('given: sort(y: true), should: sort by y ascending', () {
+      final pipeline = DataPointPipeline().sort(y: true);
+      final input = points([(0.0, 3.0, 1.0), (0.0, 1.0, 1.0), (0.0, 2.0, 1.0)]);
+      final out = pipeline.build(input);
+      expect(out[0].y, equals(1.0));
+      expect(out[1].y, equals(2.0));
+      expect(out[2].y, equals(3.0));
+    });
+
+    test('given: sort(fy: false), should: sort by fy descending', () {
+      final pipeline = DataPointPipeline().sort(fy: false);
+      final input = points([(0.0, 0.0, 1.0), (0.0, 0.0, 3.0), (0.0, 0.0, 2.0)]);
+      final out = pipeline.build(input);
+      expect(out[0].fy, equals(3.0));
+      expect(out[1].fy, equals(2.0));
+      expect(out[2].fy, equals(1.0));
+    });
+
+    test('given: sort(x: true, y: false), should: sort by x asc then y desc', () {
+      final pipeline = DataPointPipeline().sort(x: true, y: false);
+      final input = points([
+        (1.0, 2.0, 1.0),
+        (1.0, 1.0, 1.0),
+        (0.0, 0.0, 1.0),
+      ]);
+      final out = pipeline.build(input);
+      expect(out[0].x, equals(0.0));
+      expect(out[0].y, equals(0.0));
+      expect(out[1].x, equals(1.0));
+      expect(out[1].y, equals(2.0));
+      expect(out[2].x, equals(1.0));
+      expect(out[2].y, equals(1.0));
+    });
+
+  });
 }
