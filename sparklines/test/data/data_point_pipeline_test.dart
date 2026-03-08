@@ -568,4 +568,146 @@ void main() {
     });
 
   });
+
+  group('AggregationModifier', () {
+    final aggregationInput = points([
+      (0.0, 0.0, 2.0),
+      (1.0, 0.0, 4.0),
+      (2.0, 0.0, 6.0),
+      (3.0, 0.0, 8.0),
+      (4.0, 0.0, 10.0),
+    ]);
+
+    test('sum, no window: cumulative sum of dy', () {
+      final pipeline = DataPointPipeline().aggregate(function: DataAggregation.sum);
+      final out = pipeline.build(aggregationInput);
+      expect(out.length, equals(5));
+      expect(out[0].dy, equals(2.0));
+      expect(out[1].dy, equals(6.0));
+      expect(out[2].dy, equals(12.0));
+      expect(out[3].dy, equals(20.0));
+      expect(out[4].dy, equals(30.0));
+    });
+
+    test('sum, window 2: sum of last two dy', () {
+      final pipeline = DataPointPipeline().aggregate(function: DataAggregation.sum, window: 2);
+      final out = pipeline.build(aggregationInput);
+      expect(out.length, equals(5));
+      expect(out[0].dy, equals(2.0));
+      expect(out[1].dy, equals(6.0));
+      expect(out[2].dy, equals(10.0));
+      expect(out[3].dy, equals(14.0));
+      expect(out[4].dy, equals(18.0));
+    });
+
+    test('avg, no window: cumulative average of dy', () {
+      final pipeline = DataPointPipeline().aggregate(function: DataAggregation.avg);
+      final out = pipeline.build(aggregationInput);
+      expect(out.length, equals(5));
+      expect(out[0].dy, equals(2.0));
+      expect(out[1].dy, equals(3.0));
+      expect(out[2].dy, equals(4.0));
+      expect(out[3].dy, equals(5.0));
+      expect(out[4].dy, equals(6.0));
+    });
+
+    test('avg, window 2: average of last two dy', () {
+      final pipeline = DataPointPipeline().aggregate(function: DataAggregation.avg, window: 2);
+      final out = pipeline.build(aggregationInput);
+      expect(out.length, equals(5));
+      expect(out[0].dy, equals(2.0));
+      expect(out[1].dy, equals(3.0));
+      expect(out[2].dy, equals(5.0));
+      expect(out[3].dy, equals(7.0));
+      expect(out[4].dy, equals(9.0));
+    });
+
+    test('min, no window: running minimum of dy', () {
+      final pipeline = DataPointPipeline().aggregate(function: DataAggregation.min);
+      final out = pipeline.build(aggregationInput);
+      expect(out.length, equals(5));
+      expect(out[0].dy, equals(2.0));
+      expect(out[1].dy, equals(2.0));
+      expect(out[2].dy, equals(2.0));
+      expect(out[3].dy, equals(2.0));
+      expect(out[4].dy, equals(2.0));
+    });
+
+    test('min, window 2: min of last two dy', () {
+      final pipeline = DataPointPipeline().aggregate(function: DataAggregation.min, window: 2);
+      final out = pipeline.build(aggregationInput);
+      expect(out.length, equals(5));
+      expect(out[0].dy, equals(2.0));
+      expect(out[1].dy, equals(2.0));
+      expect(out[2].dy, equals(4.0));
+      expect(out[3].dy, equals(6.0));
+      expect(out[4].dy, equals(8.0));
+    });
+
+    test('max, no window: running maximum of dy', () {
+      final pipeline = DataPointPipeline().aggregate(function: DataAggregation.max);
+      final out = pipeline.build(aggregationInput);
+      expect(out.length, equals(5));
+      expect(out[0].dy, equals(2.0));
+      expect(out[1].dy, equals(4.0));
+      expect(out[2].dy, equals(6.0));
+      expect(out[3].dy, equals(8.0));
+      expect(out[4].dy, equals(10.0));
+    });
+
+    test('max, window 2: max of last two dy', () {
+      final pipeline = DataPointPipeline().aggregate(function: DataAggregation.max, window: 2);
+      final out = pipeline.build(aggregationInput);
+      expect(out.length, equals(5));
+      expect(out[0].dy, equals(2.0));
+      expect(out[1].dy, equals(4.0));
+      expect(out[2].dy, equals(6.0));
+      expect(out[3].dy, equals(8.0));
+      expect(out[4].dy, equals(10.0));
+    });
+
+    test('median, no window: cumulative median of dy', () {
+      final pipeline = DataPointPipeline().aggregate(function: DataAggregation.median);
+      final out = pipeline.build(aggregationInput);
+      expect(out.length, equals(5));
+      expect(out[0].dy, equals(2.0));
+      expect(out[1].dy, equals(3.0)); // [2,4] -> 3
+      expect(out[2].dy, equals(4.0)); // [2,4,6] -> 4
+      expect(out[3].dy, equals(5.0)); // [2,4,6,8] -> 5
+      expect(out[4].dy, equals(6.0)); // [2,4,6,8,10] -> 6
+    });
+
+    test('median, window 2: median of last two dy', () {
+      final pipeline = DataPointPipeline().aggregate(function: DataAggregation.median, window: 2);
+      final out = pipeline.build(aggregationInput);
+      expect(out.length, equals(5));
+      expect(out[0].dy, equals(2.0));
+      expect(out[1].dy, equals(3.0));
+      expect(out[2].dy, equals(5.0));
+      expect(out[3].dy, equals(7.0));
+      expect(out[4].dy, equals(9.0));
+    });
+
+    test('std, no window: cumulative sample std of dy', () {
+      final pipeline = DataPointPipeline().aggregate(function: DataAggregation.std);
+      final out = pipeline.build(aggregationInput);
+      expect(out.length, equals(5));
+      expect(out[0].dy, equals(0.0)); // single value
+      expect(out[1].dy, closeTo(sqrt(2.0), 1e-9)); // [2,4] std = sqrt(2)
+      expect(out[2].dy, equals(2.0)); // [2,4,6] mean=4, var=4, std=2
+      expect(out[3].dy, closeTo(sqrt(20 / 3), 1e-9));
+      expect(out[4].dy, closeTo(sqrt(10.0), 1e-9));
+    });
+
+    test('std, window 2: sample std of last two dy', () {
+      final pipeline = DataPointPipeline().aggregate(function: DataAggregation.std, window: 2);
+      final out = pipeline.build(aggregationInput);
+      expect(out.length, equals(5));
+      expect(out[0].dy, equals(0.0));
+      expect(out[1].dy, closeTo(sqrt(2.0), 1e-9));
+      expect(out[2].dy, closeTo(sqrt(2.0), 1e-9));
+      expect(out[3].dy, closeTo(sqrt(2.0), 1e-9));
+      expect(out[4].dy, closeTo(sqrt(2.0), 1e-9));
+    });
+  });
 }
