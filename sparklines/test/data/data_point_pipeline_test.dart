@@ -368,6 +368,36 @@ void main() {
       expect(out[2].fy, equals(1.0));
       expect(out[2].dy, closeTo(2 / 3.0, 1e-10));
     });
+
+    test('given: points [0,-2], [0,1] and points [0,1], [0,4] pipeline.rescale(), should: rescale both y and fy to [0,1] (bounds -2..4)', () {
+
+      final pipeline = DataPointPipeline().rescale();
+      final input1 = points([(0.0, 0.0, -2.0), (1.0, 0.0, 1.0)]);
+      final input2 = points([(1.0, 0.0, 1.0), (2.0, 0.0, 4.0)]);
+
+      final out1 = pipeline.build(input1);
+      final out2 = pipeline.build(input2);
+
+      expect(out1.length, equals(2));
+      expect(out2.length, equals(2));
+
+      // Bounds -2..4, span 6 → [0,1]: (v+2)/6
+      expect(out1[0].y, closeTo(1 / 3.0, 1e-10));
+      expect(out1[0].fy, equals(0.0));
+      expect(out1[0].dy, closeTo(-1 / 3.0, 1e-10));
+
+      expect(out1[1].y, closeTo(1 / 3.0, 1e-10));
+      expect(out1[1].fy, closeTo(0.5, 1e-10));
+      expect(out1[1].dy, closeTo(1 / 6.0, 1e-10));
+
+      expect(out2[0].y, closeTo(1 / 3.0, 1e-10));
+      expect(out2[0].fy, closeTo(0.5, 1e-10));
+      expect(out2[0].dy, closeTo(1 / 6.0, 1e-10));
+
+      expect(out2[1].y, closeTo(1 / 3.0, 1e-10));
+      expect(out2[1].fy, equals(1.0));
+      expect(out2[1].dy, closeTo(2 / 3.0, 1e-10));
+    });
   });
 
   group('Combination', () {

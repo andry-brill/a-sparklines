@@ -53,9 +53,23 @@ class DataPointPipelineContext {
   double globalMinY = double.infinity;
   double globalMaxY = double.negativeInfinity;
 
+  /// Bounds used by [RescaleModifier] when currentMin/currentMax are not finite.
+  /// Accumulated across all input lists (similar to stacking).
+  double rescaleMinY = double.infinity;
+  double rescaleMaxY = double.negativeInfinity;
+
   void updateBounds(Iterable<DataPoint> points) {
     globalMinY = min(globalMinY, points.minY);
     globalMaxY = max(globalMaxY, points.maxY);
+  }
+
+  void updateRescaleBounds(Iterable<DataPoint> points) {
+    for (final p in points) {
+      final a = min(p.y, p.fy);
+      final b = max(p.y, p.fy);
+      if (a < rescaleMinY) rescaleMinY = a;
+      if (b > rescaleMaxY) rescaleMaxY = b;
+    }
   }
 
 
@@ -104,9 +118,38 @@ class DataPointPipeline {
     });
   }
 
+  bool _hasRescaleWithAutoBounds() {
+    for (final m in _modifiers) {
+      if (m is _RescaleModifier &&
+          (!m.currentMin.isFinite || !m.currentMax.isFinite)) {
+        return true;
+      }
+    }
+    return false;
+  }
+
   void _computeIfNeeded() {
 
     if (_computed) return;
+
+    final needRescaleBoundsPass = _hasRescaleWithAutoBounds();
+
+    if (needRescaleBoundsPass) {
+      context.rescaleMinY = double.infinity;
+      context.rescaleMaxY = double.negativeInfinity;
+      for (final input in _inputs) {
+        var result = input;
+        for (final modifier in _modifiers) {
+          if (modifier is _RescaleModifier &&
+              (!modifier.currentMin.isFinite ||
+                  !modifier.currentMax.isFinite)) {
+            context.updateRescaleBounds(result);
+            break;
+          }
+          result = modifier.apply(result, context);
+        }
+      }
+    }
 
     final outputs = <List<DataPoint>>[];
 
@@ -383,10 +426,12 @@ class _RescaleModifier implements DataPointModifier {
       ) {
     if (input.isEmpty) return input;
 
-    final computed = _computeMinMaxBounds(input);
-
-    final curMin = currentMin.isFinite ? currentMin : computed.$1;
-    final curMax = currentMax.isFinite ? currentMax : computed.$2;
+    final curMin = currentMin.isFinite
+        ? currentMin
+        : context.rescaleMinY;
+    final curMax = currentMax.isFinite
+        ? currentMax
+        : context.rescaleMaxY;
 
     assert(curMin != curMax, 'current min/max must differ');
     assert(targetMin != targetMax, 'target min/max must differ');
@@ -416,20 +461,5 @@ class _RescaleModifier implements DataPointModifier {
     }
 
     return result;
-  }
-
-  static (double, double) _computeMinMaxBounds(List<DataPoint> input) {
-    double minBound = double.infinity;
-    double maxBound = double.negativeInfinity;
-
-    for (final p in input) {
-      final a = min(p.y, p.fy);
-      final b = max(p.y, p.fy);
-
-      if (a < minBound) minBound = a;
-      if (b > maxBound) maxBound = b;
-    }
-
-    return (minBound, maxBound);
   }
 }
