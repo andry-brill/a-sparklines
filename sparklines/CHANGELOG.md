@@ -1,3 +1,9 @@
+## 2.2.4
+
+* **DataPointPipeline**
+  * **sort({ x?, y?, fy? })** — Sort input by x, y, and/or fy. Each flag: `true` = ascending, `false` = descending. If all null, sorts by x ascending.
+  * **aggregate({ function?, window? })** — Aggregate `dy` over a window ending at each point. `DataAggregation`: `sum`, `avg`, `min`, `max`, `median`, `std`. `window`: null = cumulative from start, N = last N elements. Updates `dy` and `fy` per point.
+
 ## 2.2.3
 
 * **rescale** — Rescale now transforms full intervals `[y..fy]` from source to target bounds; both `y` and `fy` are mapped, and `dy` is set to `fy - y`.  Non-finite `currentMin`/`currentMax` are derived from input interval bounds.

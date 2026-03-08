@@ -4,7 +4,7 @@ import 'package:any_sparklines/interfaces/data_point_data.dart';
 import 'package:test/test.dart';
 
 import 'package:any_sparklines/data/data_point.dart';
-import 'package:any_sparklines/data/data_point_pipeline.dart';
+import 'package:any_sparklines/data/point_pipeline/data_point_pipeline.dart';
 
 
 List<DataPoint> pointList(double x, double y, double dy) =>

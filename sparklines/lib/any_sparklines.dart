@@ -4,7 +4,7 @@ export 'chart/sparklines_chart.dart';
 export 'data/bar_data.dart';
 export 'data/between_line_data.dart';
 export 'data/data_point.dart';
-export 'data/data_point_pipeline.dart';
+export 'data/point_pipeline/data_point_pipeline.dart';
 export 'data/line_data.dart';
 export 'data/pie_data.dart';
 export 'interfaces/chart_area.dart';
