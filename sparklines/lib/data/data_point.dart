@@ -82,6 +82,19 @@ class DataPoint implements ILerpTo<DataPoint> {
 
     return this.y == other.y && this.x == other.x && this.dy == other.dy;
   }
+
+  @override
+  int get hashCode {
+
+    var dataHash = 0;
+
+    for (final entry in data.entries) {
+      dataHash ^= Object.hash(entry.key, entry.value);
+    }
+
+    return Object.hash(x, y, dy, dataHash);
+  }
+
 }
 
 extension DataPointExtension on DataPoint {
@@ -95,7 +108,7 @@ extension DataPointExtension on DataPoint {
 
 }
 
-/// Extension on Iterable<DataPoint> for calculating bounds
+/// Extension on `Iterable<DataPoint>` for calculating bounds
 extension DataPointBounds on Iterable<DataPoint> {
   /// Minimum X coordinate
   double get minX {
