@@ -3,8 +3,9 @@ part of 'data_point_pipeline.dart';
 
 class _StackModifier implements DataPointModifier {
 
+  final double offset;
   final double spacing;
-  const _StackModifier(this.spacing);
+  const _StackModifier({required this.spacing, required this.offset});
 
   @override
   List<DataPoint> apply(
@@ -15,7 +16,7 @@ class _StackModifier implements DataPointModifier {
 
     for (final p in input) {
 
-      final base = context.cumulativeByX[p.x] ?? 0.0;
+      final base = context.cumulativeByX[p.x] ?? offset;
 
       result.add(p.copyWith(
           y: base,

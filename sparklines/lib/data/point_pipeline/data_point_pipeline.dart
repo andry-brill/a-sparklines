@@ -180,8 +180,9 @@ class DataPointPipeline {
   // builder methods
 
   /// Stack points on point.y by point.x with point.dy values
-  DataPointPipeline stack({ double spacing = 0.0 }) {
-    _modifiers.add(_StackModifier(spacing));
+  /// [offset] - initial offset for the first point on point.x
+  DataPointPipeline stack({ double offset = 0.0, double spacing = 0.0 }) {
+    _modifiers.add(_StackModifier(offset: offset, spacing: spacing));
     return this;
   }
 

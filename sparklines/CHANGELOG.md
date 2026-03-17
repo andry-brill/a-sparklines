@@ -1,3 +1,8 @@
+## 2.2.5
+
+* **DataPointPipeline**
+  * **stack({ offset?, spacing? })** — Added `offset` to set the initial stacked base for each `x` (default 0.0).
+
 ## 2.2.4
 
 * **DataPointPipeline**
