@@ -45,6 +45,10 @@ class ThicknessOverride extends ADataPointData<ThicknessOverride> implements ITh
         gradient == other.gradient &&
         align == other.align;
   }
+
+  @override
+  int get hashCode => Object.hash(size, gradient, align, color);
+
 }
 
 class ThicknessData implements ILerpTo<ThicknessData> {
@@ -64,6 +68,18 @@ class ThicknessData implements ILerpTo<ThicknessData> {
     this.gradient,
     this.align = alignCenter,
   });
+
+  const ThicknessData.inside({
+    required this.size,
+    this.color = const Color(0xFF000000),
+    this.gradient,
+  }) : this.align = alignInside;
+
+  const ThicknessData.outside({
+    required this.size,
+    this.color = const Color(0xFF000000),
+    this.gradient,
+  }) : this.align = alignOutside;
 
   static const double alignInside = -1.0;
   static const double alignCenter = 0.0;
@@ -88,6 +104,10 @@ class ThicknessData implements ILerpTo<ThicknessData> {
         gradient == other.gradient &&
         align == other.align;
   }
+
+  @override
+  int get hashCode => Object.hash(size, gradient, align, color);
+
 }
 
 abstract class IChartThickness {
