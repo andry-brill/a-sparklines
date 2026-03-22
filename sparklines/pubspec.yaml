@@ -16,7 +16,7 @@ screenshots:
   - description: 'any-sparklines examples'
     path: example/web/example.png
 
-version: 2.2.5
+version: 2.2.6
 
 environment:
   sdk: '>=3.0.0 <4.0.0'
