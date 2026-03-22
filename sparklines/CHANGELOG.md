@@ -1,3 +1,8 @@
+## 2.2.6
+
+- Improved `pubspec.yaml`
+- Fixed lint warnings
+
 ## 2.2.5
 
 * **DataPointPipeline**
