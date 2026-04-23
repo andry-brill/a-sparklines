@@ -6,6 +6,8 @@ Feature-rich, highly optimized sparklines for Flutter. Line, bar, pie, and betwe
 
 ![App Screenshot](https://raw.githubusercontent.com/andry-brill/a-sparklines/main/sparklines/example/web/example.png)
 
+> You might also like my other package: [any_borders](https://pub.dev/packages/any_borders)
+
 ---
 
 ## Core concepts
