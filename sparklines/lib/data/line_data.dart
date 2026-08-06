@@ -5,6 +5,7 @@ import '../interfaces/chart_rotation.dart';
 import '../interfaces/chart_area.dart';
 import '../interfaces/layout.dart';
 import '../interfaces/line_type.dart';
+import '../interfaces/length_value.dart';
 import '../interfaces/sparklines_data.dart';
 import '../interfaces/thickness.dart';
 import '../interfaces/data_point_style.dart';
@@ -75,7 +76,7 @@ class LineData implements ISparklinesData, IChartThickness, IChartDataPointStyle
     this.layout,
     this.crop,
     required this.line,
-    this.thickness = const ThicknessData(size: 2.0),
+    this.thickness = const ThicknessData(size: Px(2.0)),
     this.areaGradient,
     this.areaColor,
     this.lineType = const LinearLineData(),

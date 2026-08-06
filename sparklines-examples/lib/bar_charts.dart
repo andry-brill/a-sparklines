@@ -47,8 +47,8 @@ final orangeBarsMod = [
   dpI(15, 2),
 ];
 
-const thicknessBar1 = ThicknessData(size: 6, color: Colors.blue);
-const thicknessBar2 = ThicknessData(size: 6, color: Colors.deepOrange);
+const thicknessBar1 = ThicknessData(size: Px(6), color: Colors.blue);
+const thicknessBar2 = ThicknessData(size: Px(6), color: Colors.deepOrange);
 
 final barSimpleInitial = [
   BarData(bars: blueBars, thickness: thicknessBar1),
@@ -123,15 +123,15 @@ List<ExampleChart> barCharts() {
       title: 'Border and borderRadius',
       subtitle: 'Bars with an outline and rounded corners.',
       modifier: (c) => c.copyWith(
-        border: const ThicknessData(size: 2, color: Color(0xFFff00FF)),
-        borderRadius: 5,
+        border: const ThicknessData(size: Px(2), color: Color(0xFFff00FF)),
+        borderRadius: Px(5),
       ),
     ),
     barFull.modify(
       title: 'Data points',
       modifier: (c) => c.copyWith(
-          borderRadius: 4,
-          pointStyle: CircleDataPointStyle(radius: 3, color: Color(0xFF272727))
+          borderRadius: Px(4),
+          pointStyle: CircleDataPointStyle(radius: Px(3), color: Color(0xFF272727))
       ),
     ),
     ExampleChart<BarData>(
@@ -141,24 +141,24 @@ List<ExampleChart> barCharts() {
         BarData(
           thickness: thickness1,
             bars: [
-          dpI(0, 1, size: 2, color: Colors.blue.shade100),
-          dpI(2, 6, size: 4, color: Colors.blue.shade300),
-          dpI(4, 3, size: 8, color: Colors.blue.shade500),
-          dpI(6, 8, size: 16, color: Colors.blue.shade700),
-          dpI(8, 2, size: 8, color: Colors.blue.shade900),
-          dpI(10, 1, size: 4, color: Colors.blue),
+          dpI(0, 1, size: Px(2), color: Colors.blue.shade100),
+          dpI(2, 6, size: Px(4), color: Colors.blue.shade300),
+          dpI(4, 3, size: Px(8), color: Colors.blue.shade500),
+          dpI(6, 8, size: Px(16), color: Colors.blue.shade700),
+          dpI(8, 2, size: Px(8), color: Colors.blue.shade900),
+          dpI(10, 1, size: Px(4), color: Colors.blue),
         ])
       ],
       toggleCharts: [
         BarData(
             thickness: thickness1,
             bars: [
-              dpI(0, 3, size: 2, color: Colors.blue.shade100),
-              dpI(2, 1, size: 4, color: Colors.blue.shade300),
-              dpI(4, 8, size: 8, color: Colors.blue.shade500),
-              dpI(6, 1, size: 16, color: Colors.blue.shade700),
-              dpI(8, 5, size: 8, color: Colors.blue.shade900),
-              dpI(10, 2, size: 4, color: Colors.blue),
+              dpI(0, 3, size: Px(2), color: Colors.blue.shade100),
+              dpI(2, 1, size: Px(4), color: Colors.blue.shade300),
+              dpI(4, 8, size: Px(8), color: Colors.blue.shade500),
+              dpI(6, 1, size: Px(16), color: Colors.blue.shade700),
+              dpI(8, 5, size: Px(8), color: Colors.blue.shade900),
+              dpI(10, 2, size: Px(4), color: Colors.blue),
         ])
       ]
     ),

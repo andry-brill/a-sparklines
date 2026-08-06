@@ -21,7 +21,7 @@ List<DataPoint> dpR(Iterable<DataPoint> point) => point.map((p) => DataPoint(x: 
 
 double xI(int i) => (gridWidth / 10.0) * i;
 double yI(int i) => (gridHeight / 10.0) * i;
-DataPoint dpI(int xi, int yi, {double? size, Color? color}) => DataPoint(
+DataPoint dpI(int xi, int yi, {ILengthValue? size, Color? color}) => DataPoint(
     x: xI(xi),
     y: 0,
     dy: yI(yi),

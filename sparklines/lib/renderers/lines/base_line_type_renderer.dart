@@ -205,7 +205,7 @@ abstract class BaseLineTypeRenderer<LD extends ILineTypeData> implements ILineTy
   Paint buildStrokePaint(ChartTransform transform, ILineChartData lineData, [ThicknessOverride? override]) {
     return Paint()
       ..style = PaintingStyle.stroke
-      ..strokeWidth = transform.scalar(override?.size ?? lineData.thickness.size)
+      ..strokeWidth = transform.length(override?.size ?? lineData.thickness.size)
       ..strokeCap = lineData.lineType.isStrokeCapRound ? StrokeCap.round : StrokeCap.butt
       ..strokeJoin = lineData.lineType.isStrokeJoinRound ? StrokeJoin.round : StrokeJoin.miter;
   }

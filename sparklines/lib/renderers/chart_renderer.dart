@@ -19,10 +19,11 @@ abstract class AChartRenderer<DT extends ISparklinesData> implements IChartRende
   void renderData(Canvas canvas, ChartTransform transform, DT data);
 
   RRect? roundedRect(ChartTransform transform, IChartBorder border, Rect rect) {
-    if (border.borderRadius == null || border.borderRadius == 0.0) {
+    if (border.borderRadius == null) {
       return null;
     }
-    final r = transform.scalar(border.borderRadius!);
+    final r = transform.length(border.borderRadius!);
+    if (r == 0.0) return null;
     return RRect.fromRectXY(rect, r, r);
   }
 

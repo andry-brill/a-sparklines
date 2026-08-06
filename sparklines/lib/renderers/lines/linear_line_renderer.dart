@@ -37,7 +37,7 @@ class LinearLineRenderer extends BaseLineTypeRenderer<LinearLineData> {
       final points = lineData.line;
 
       final globalSize = lineData.thickness.size;
-      final globalHalfScreen = transform.scalar(globalSize) / 2;
+      final globalHalfScreen = transform.length(globalSize) / 2;
 
       // ---- transform centerline to screen space ----
 
@@ -53,7 +53,7 @@ class LinearLineRenderer extends BaseLineTypeRenderer<LinearLineData> {
       final halfExtra = List<double>.generate(count, (i) {
 
         final localSize = points[i].thickness?.size ?? globalSize;
-        final localHalf = transform.scalar(localSize) / 2;
+        final localHalf = transform.length(localSize) / 2;
 
         return (localHalf - globalHalfScreen).clamp(0.0, double.infinity);
       });

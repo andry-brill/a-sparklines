@@ -12,7 +12,7 @@ final bigPie = PieData(
       dy: pi / 6.0,
       data: {
         IThicknessOverride: ThicknessOverride(
-          size: 30,
+          size: Dx(30),
           align: ThicknessData.alignOutside,
           color: Colors.blue.shade600,
         ),
@@ -24,17 +24,17 @@ final bigPie = PieData(
       dy: pi / 6.0,
       data: {
         IThicknessOverride: ThicknessOverride(
-          size: 40,
+          size: Dx(40),
           align: ThicknessData.alignOutside,
           color: Colors.blue.shade900,
         ),
       },
     ),
   ],
-  borderRadius: 4.0,
+  borderRadius: Dx(4.0),
   pieOffset: 12,
   thickness: ThicknessData(
-    size: 20,
+    size: Dx(20),
     color: Colors.blue.shade300,
     align: ThicknessData.alignOutside,
   ),
@@ -50,7 +50,7 @@ final bigPieT = PieData(
       dy: pi / 3.0,
       data: {
         IThicknessOverride: ThicknessOverride(
-          size: 30,
+          size: Dx(30),
           align: ThicknessData.alignOutside,
           color: Colors.blue.shade600,
         ),
@@ -62,17 +62,17 @@ final bigPieT = PieData(
       dy: pi / 3.0,
       data: {
         IThicknessOverride: ThicknessOverride(
-          size: 40,
+          size: Dx(40),
           align: ThicknessData.alignOutside,
           color: Colors.blue.shade900,
         ),
       },
     ),
   ],
-  borderRadius: 4.0,
+  borderRadius: Dx(4.0),
   pieOffset: 12,
   thickness: ThicknessData(
-    size: 20,
+    size: Dx(20),
     color: Colors.blue.shade300,
     align: ThicknessData.alignOutside,
   ),
@@ -133,9 +133,9 @@ final smallPie = PieData(
       },
     ),
   ],
-  borderRadius: 6.0,
+  borderRadius: Dx(6.0),
   thickness: ThicknessData(
-    size: 12,
+    size: Dx(12),
     color: Colors.blue.shade300,
   ),
 );
@@ -195,9 +195,9 @@ final smallPieT = PieData(
       },
     ),
   ],
-  borderRadius: 6.0,
+  borderRadius: Dx(6.0),
   thickness: ThicknessData(
-    size: 12,
+    size: Dx(12),
     color: Colors.blue.shade300,
   ),
 );
@@ -225,13 +225,13 @@ final dxPie = PieData(
       dy: pi/2 - pi/6,
       data: {
         IPieOffset: PieOffset(4.0),
-        IDataPointBorder: DataPointBorder(borderRadius: 4.0)
+        IDataPointBorder: DataPointBorder(borderRadius: Dx(4.0))
       }
     ),
   ],
-  borderRadius: 2.0,
+  borderRadius: Dx(2.0),
   thickness: ThicknessData(
-    size: 26,
+    size: Dx(26),
     color: Colors.blue,
   ),
 );
@@ -262,9 +262,9 @@ final dxPieT = PieData(
       }
     ),
   ],
-  borderRadius: 3.0,
+  borderRadius: Dx(3.0),
   thickness: ThicknessData(
-    size: 26,
+    size: Dx(26),
     color: Colors.blue,
   ),
 );
@@ -288,10 +288,10 @@ final padPie = PieData(
       dy: pi - pi/3,
     ),
   ],
-  borderRadius: 3.0,
+  borderRadius: Dx(3.0),
   padAngle: pi / 30,
   thickness: ThicknessData(
-    size: 16,
+    size: Dx(16),
     color: Colors.blue,
   ),
 );
@@ -315,10 +315,10 @@ final padPieT = PieData(
       dy: pi + pi/2,
     ),
   ],
-  borderRadius: 3.0,
+  borderRadius: Dx(3.0),
   padAngle: pi / 30,
   thickness: ThicknessData(
-    size: 16,
+    size: Dx(16),
     color: Colors.blue,
   ),
 );
@@ -326,8 +326,8 @@ final padPieT = PieData(
 final steppedLine = LineData(
     origin: const Offset(0, -140),
     lineType: SteppedLineData.middle(isStrokeCapRound: true, isStrokeJoinRound: true),
-    pointStyle: CircleDataPointStyle(radius: 5, color: Colors.blue.shade900),
-    thickness: ThicknessData(size: 5, color: Colors.blue),
+    pointStyle: CircleDataPointStyle(radius: Dx(5), color: Colors.blue.shade900),
+    thickness: ThicknessData(size: Dx(5), color: Colors.blue),
     areaGradient: LinearGradient(colors: [Colors.blue.shade200, Colors.blue.shade200.withValues(alpha: 0)], begin: AlignmentGeometry.topCenter, end: AlignmentGeometry.bottomCenter),
     line: [
   DataPoint(x: -150, dy: 0),
@@ -342,8 +342,8 @@ final steppedLine = LineData(
 final steppedLineT = LineData(
   origin: const Offset(0, -140),
   lineType: SteppedLineData.middle(isStrokeCapRound: true, isStrokeJoinRound: true),
-  pointStyle: CircleDataPointStyle(radius: 5, color: Colors.blue),
-  thickness: ThicknessData(size: 5, color: Colors.blue),
+  pointStyle: CircleDataPointStyle(radius: Dx(5), color: Colors.blue),
+  thickness: ThicknessData(size: Dx(5), color: Colors.blue),
   areaGradient: LinearGradient(colors: [Colors.blue.shade200, Colors.blue.shade200.withValues(alpha: 0)], begin: AlignmentGeometry.topCenter, end: AlignmentGeometry.bottomCenter),
   line: [
     DataPoint(x: -150, dy: 0),
@@ -359,7 +359,7 @@ final steppedLineT = LineData(
 final lineTop = LineData(
     origin: const Offset(150, -150),
     lineType: CurvedLineData(isStrokeCapRound: true, isStrokeJoinRound: true, smoothness: 1.0),
-    thickness: ThicknessData(size: 5, color: Colors.blue),
+    thickness: ThicknessData(size: Dx(5), color: Colors.blue),
     line: [
       DataPoint(x: -140, dy: 90),
       DataPoint(x: -100, dy: 20),
@@ -370,7 +370,7 @@ final lineTop = LineData(
 final lineBottom = LineData(
     origin: const Offset(150, -150),
     lineType: CurvedLineData(isStrokeCapRound: true, isStrokeJoinRound: true, smoothness: 1.0),
-    thickness: ThicknessData(size: 5, color: Colors.blue.shade900),
+    thickness: ThicknessData(size: Dx(5), color: Colors.blue.shade900),
     line: [
       DataPoint(x: -140, dy: 20),
       DataPoint(x: -100, dy: 80),
@@ -388,7 +388,7 @@ final between = BetweenLineData(
 final lineTopT = LineData(
     origin: const Offset(150, -150),
     lineType: CurvedLineData(isStrokeCapRound: true, isStrokeJoinRound: true, smoothness: 1.0),
-    thickness: ThicknessData(size: 5, color: Colors.blue),
+    thickness: ThicknessData(size: Dx(5), color: Colors.blue),
     line: [
       DataPoint(x: -140, dy: 20),
       DataPoint(x: -100, dy: 80),
@@ -399,7 +399,7 @@ final lineTopT = LineData(
 final lineBottomT = LineData(
     origin: const Offset(150, -150),
     lineType: CurvedLineData(isStrokeCapRound: true, isStrokeJoinRound: true, smoothness: 1.0),
-    thickness: ThicknessData(size: 5, color: Colors.blue.shade900),
+    thickness: ThicknessData(size: Dx(5), color: Colors.blue.shade900),
     line: [
       DataPoint(x: -140, dy: 90),
       DataPoint(x: -100, dy: 20),
@@ -420,8 +420,8 @@ const DataPointDataMap barsData = {
 
 final bars = BarData(
     origin: const Offset(-150, 100),
-    thickness: ThicknessData(size: 12, color: Colors.blue.shade900),
-    borderRadius: 4,
+    thickness: ThicknessData(size: Dx(12), color: Colors.blue.shade900),
+    borderRadius: Dx(4),
     bars: [
 
       DataPoint(x: 10, dy: 50),
@@ -440,8 +440,8 @@ final bars = BarData(
 
 final barsT = BarData(
     origin: const Offset(-150, 100),
-    thickness: ThicknessData(size: 12, color: Colors.blue.shade900),
-    borderRadius: 4,
+    thickness: ThicknessData(size: Dx(12), color: Colors.blue.shade900),
+    borderRadius: Dx(4),
     bars: [
 
       DataPoint(x: 10, y: 40, dy: 10),
@@ -492,7 +492,6 @@ class _ExamplePageState extends State<_ExamplePage> {
               maxX: 150.0,
               minY: -150.0,
               maxY: 150.0,
-              relativeTo: RelativeDimension.width
             ),
             charts: charts,
           ),

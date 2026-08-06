@@ -10,12 +10,11 @@ import '../../data/line_data.dart';
 import 'base_line_type_renderer.dart';
 
 class SteppedLineRenderer extends BaseLineTypeRenderer<SteppedLineData> {
-
   const SteppedLineRenderer();
 
   @override
-  Path toLinePath(SteppedLineData lineType, Path path, List<DataPoint> points, {bool reverse = false}) {
-
+  Path toLinePath(SteppedLineData lineType, Path path, List<DataPoint> points,
+      {bool reverse = false}) {
     if (reverse) {
       for (int i = points.length - 1; i >= 1; i--) {
         final curr = points[i];
@@ -43,11 +42,11 @@ class SteppedLineRenderer extends BaseLineTypeRenderer<SteppedLineData> {
   ///   Joins - vertical lines (jumps between prev.fy and next.fy) - using "global" thickness
   ///   Values - horizontal lines (value lines) - using "local" thickness
   @override
-  void renderComplexPath(Canvas canvas, ChartTransform transform, ILineChartData lineData, bool isDynamicStroke, bool isDynamicPaint) {
-
+  void renderComplexPath(Canvas canvas, ChartTransform transform,
+      ILineChartData lineData, bool isDynamicStroke, bool isDynamicPaint) {
     final lineType = lineData.lineType as SteppedLineData;
     final points = lineData.line;
-    final halfJoin = transform.scalar(lineData.thickness.size) / 2;
+    final halfJoinScreen = transform.length(lineData.thickness.size) / 2;
     final isCapRound = lineType.isStrokeCapRound;
     final isJoinRound = lineType.isStrokeJoinRound;
 
@@ -59,14 +58,12 @@ class SteppedLineRenderer extends BaseLineTypeRenderer<SteppedLineData> {
       stepX.add(prev.x + (curr.x - prev.x) * lineType.stepJumpAt);
     }
 
-
     // Drawing joins (vertical lines) with global thickness
     // When isStrokeCapRound: offset from top and bottom by halfJoin to align with rounded value line ends
     final Paint joinsPaint = buildStrokePaint(transform, lineData);
     if (!isDynamicPaint) {
-
       final globalSize = lineData.thickness.size;
-      final globalHalfScreen = transform.scalar(globalSize) / 2;
+      final globalHalfScreen = transform.length(globalSize) / 2;
 
       // ---- Build centerline in data space ----
       final ctrl = <Vector3>[
@@ -91,20 +88,23 @@ class SteppedLineRenderer extends BaseLineTypeRenderer<SteppedLineData> {
       final halfScreen = <double>[];
 
       for (int i = 0; i < stepX.length; i++) {
-
         // Expecting that local half >= global half
-        final localHalf0 = max(globalHalfScreen, transform.scalar(
-          (points[i].thickness?.size ?? globalSize) / 2,
-        ));
+        final localHalf0 = max(
+          globalHalfScreen,
+          transform.length(points[i].thickness?.size ?? globalSize) / 2,
+        );
 
-        final localHalf1 = max(globalHalfScreen, transform.scalar(
-          (points[i + 1].thickness?.size ?? globalSize) / 2,
-        ));
+        final localHalf1 = max(
+          globalHalfScreen,
+          transform.length(points[i + 1].thickness?.size ?? globalSize) / 2,
+        );
 
         // subtract global half
-        halfScreen.add((localHalf0 - globalHalfScreen).clamp(0.0, double.infinity));
+        halfScreen
+            .add((localHalf0 - globalHalfScreen).clamp(0.0, double.infinity));
         halfScreen.add(0); // vertical join uses only global stroke
-        halfScreen.add((localHalf1 - globalHalfScreen).clamp(0.0, double.infinity));
+        halfScreen
+            .add((localHalf1 - globalHalfScreen).clamp(0.0, double.infinity));
       }
 
       final topPoints = <Offset>[];
@@ -115,18 +115,14 @@ class SteppedLineRenderer extends BaseLineTypeRenderer<SteppedLineData> {
         final dy = b.dy - a.dy;
 
         if (dx.abs() > dy.abs()) {
-          return dx > 0
-              ? const Offset(0, -1)
-              : const Offset(0, 1);
+          return dx > 0 ? const Offset(0, -1) : const Offset(0, 1);
         } else {
-          return dy > 0
-              ? const Offset(1, 0)
-              : const Offset(-1, 0);
+          return dy > 0 ? const Offset(1, 0) : const Offset(-1, 0);
         }
       }
 
       // ---- First segment ----
-          {
+      {
         final n = normalOf(screen[0], screen[1]);
         final h = halfScreen[0];
 
@@ -136,7 +132,6 @@ class SteppedLineRenderer extends BaseLineTypeRenderer<SteppedLineData> {
 
       // ---- Interior vertices ----
       for (int i = 1; i < segCount; i++) {
-
         final pPrev = screen[i - 1];
         final pCurr = screen[i];
         final pNext = screen[i + 1];
@@ -169,7 +164,7 @@ class SteppedLineRenderer extends BaseLineTypeRenderer<SteppedLineData> {
       }
 
       // ---- Last segment ----
-          {
+      {
         final n = normalOf(screen[segCount - 1], screen[segCount]);
         final h = halfScreen[segCount - 1];
 
@@ -202,31 +197,44 @@ class SteppedLineRenderer extends BaseLineTypeRenderer<SteppedLineData> {
       return;
     }
 
-
     final joinsPath = Path();
     for (int i = 0; i < stepX.length; i++) {
-      final yMin = points[i].fy < points[i + 1].fy ? points[i].fy : points[i + 1].fy;
-      final yMax = points[i].fy < points[i + 1].fy ? points[i + 1].fy : points[i].fy;
-      final top = isCapRound ? yMin + halfJoin : yMin;
-      final bottom = isCapRound ? yMax - halfJoin : yMax;
-      if (bottom > top) {
-        joinsPath.moveTo(stepX[i], top);
-        joinsPath.lineTo(stepX[i], bottom);
+      final yMin =
+          points[i].fy < points[i + 1].fy ? points[i].fy : points[i + 1].fy;
+      final yMax =
+          points[i].fy < points[i + 1].fy ? points[i + 1].fy : points[i].fy;
+      var top = transform.xy(stepX[i], yMin);
+      var bottom = transform.xy(stepX[i], yMax);
+      final delta = bottom - top;
+      final distance = delta.distance;
+      if (isCapRound && distance > 0) {
+        final inset = min(halfJoinScreen, distance / 2);
+        final direction = delta / distance;
+        top += direction * inset;
+        bottom -= direction * inset;
+      }
+      if ((bottom - top).distance > 0) {
+        joinsPath.moveTo(top.dx, top.dy);
+        joinsPath.lineTo(bottom.dx, bottom.dy);
       }
     }
-    final tJoinsPath = transform.path(joinsPath);
-    paintThickness(joinsPaint, tJoinsPath.getBounds(), lineData.thickness);
-    canvas.drawPath(tJoinsPath, joinsPaint);
+    paintThickness(joinsPaint, joinsPath.getBounds(), lineData.thickness);
+    canvas.drawPath(joinsPath, joinsPaint);
 
     // Draw value lines as filled rectangles with rounded corners (uniform thickness in screen space)
     for (int i = 0; i < points.length; i++) {
       final valueSize = points[i].thickness?.size ?? lineData.thickness.size;
-      final leftEnd = i == 0 ? points[0].x : stepX[i - 1] - halfJoin;
-      final rightEnd = i == points.length - 1 ? points[i].x : stepX[i] + halfJoin;
-
-      final left = transform.xy(leftEnd, points[i].fy);
-      final right = transform.xy(rightEnd, points[i].fy);
-      final screenHeight = transform.scalar(valueSize);
+      var left =
+          transform.xy(i == 0 ? points[0].x : stepX[i - 1], points[i].fy);
+      var right = transform.xy(
+          i == points.length - 1 ? points[i].x : stepX[i], points[i].fy);
+      final delta = right - left;
+      if (delta.distance > 0) {
+        final direction = delta / delta.distance;
+        if (i > 0) left -= direction * halfJoinScreen;
+        if (i < points.length - 1) right += direction * halfJoinScreen;
+      }
+      final screenHeight = transform.length(valueSize);
       final halfScreen = screenHeight / 2;
       final centerY = (left.dy + right.dy) / 2;
 
@@ -237,9 +245,10 @@ class SteppedLineRenderer extends BaseLineTypeRenderer<SteppedLineData> {
         centerY + halfScreen,
       );
 
-      final screenRadius = transform.scalar(halfJoin).clamp(0.0, halfScreen);
+      final screenRadius = halfJoinScreen.clamp(0.0, halfScreen);
       final leftRounded = (i == 0 && isCapRound) || (i > 0 && isJoinRound);
-      final rightRounded = (i == points.length - 1 && isCapRound) || (i < points.length - 1 && isJoinRound);
+      final rightRounded = (i == points.length - 1 && isCapRound) ||
+          (i < points.length - 1 && isJoinRound);
 
       final rrect = RRect.fromRectAndCorners(
         rect,

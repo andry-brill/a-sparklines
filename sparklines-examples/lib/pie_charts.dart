@@ -10,13 +10,13 @@ List<ExampleChart> pieCharts() {
       initialCharts: [
         PieData(
           pies: [DataPoint(x: 72.0, y: pi/4.0, dy: pi/2.0)],
-          thickness: ThicknessData(size: 18, color: Colors.blue),
+          thickness: ThicknessData(size: Px(18), color: Colors.blue),
         ),
       ],
       toggleCharts: [
         PieData(
           pies: [DataPoint(x: 72.0, y: 0, dy: pi/4.0)],
-          thickness: ThicknessData(size: 30, color: Colors.deepOrange),
+          thickness: ThicknessData(size: Px(30), color: Colors.deepOrange),
         ),
       ],
     ),
@@ -27,14 +27,14 @@ List<ExampleChart> pieCharts() {
         PieData(
           layout: const RelativeLayout.full(),
           pies: [DataPoint(x: 72.0, y: pi/4.0, dy: pi/2.0)],
-          thickness: ThicknessData(size: 30, color: Colors.blue),
+          thickness: ThicknessData(size: Px(30), color: Colors.blue),
         ),
       ],
       toggleCharts: [
         PieData(
           layout: const RelativeLayout.full(),
           pies: [DataPoint(x: 75.0, y: 0, dy: pi/4.0)],
-          thickness: ThicknessData(size: 30, color: Colors.deepOrange),
+          thickness: ThicknessData(size: Px(30), color: Colors.deepOrange),
         ),
       ],
     ),
@@ -43,16 +43,16 @@ List<ExampleChart> pieCharts() {
       subtitle: 'Single pie on relative signed layout',
       initialCharts: [
         PieData(
-          layout: const RelativeLayout.signed(relativeTo: RelativeDimension.width),
+          layout: const RelativeLayout.signed(),
           pies: [DataPoint(x: 1.0, y: pi/4.0, dy: pi/2.0)],
-          thickness: ThicknessData(size: 0.2, color: Colors.blue),
+          thickness: ThicknessData(size: Dx(0.2), color: Colors.blue),
         ),
       ],
       toggleCharts: [
         PieData(
-          layout: const RelativeLayout.signed(relativeTo: RelativeDimension.width),
+          layout: const RelativeLayout.signed(),
           pies: [DataPoint(x: 1.0, y: 0, dy: pi/4.0)],
-          thickness: ThicknessData(size: 0.2, color: Colors.deepOrange),
+          thickness: ThicknessData(size: Dx(0.2), color: Colors.deepOrange),
         ),
       ],
     ),
@@ -66,9 +66,9 @@ List<ExampleChart> pieCharts() {
             DataPoint(x: 100.0, y: pi/3.0, dy: pi/6.0),
             DataPoint(x: 100.0, y: 2 * pi/3.0, dy: pi/3.0)
           ],
-          borderRadius: 8.0,
-          pointStyle: CircleDataPointStyle(radius: 4, color: Colors.white),
-          thickness: ThicknessData(size: 30, color: Colors.blue),
+          borderRadius: Px(8.0),
+          pointStyle: CircleDataPointStyle(radius: Px(4), color: Colors.white),
+          thickness: ThicknessData(size: Px(30), color: Colors.blue),
         ),
         PieData(
           layout: const RelativeLayout(minX: -gridWidth, maxX: gridWidth, minY: -gridHeight, maxY: gridHeight),
@@ -76,8 +76,8 @@ List<ExampleChart> pieCharts() {
             DataPoint(x: 50.0, y: 0, dy: pi/3.0),
             DataPoint(x: 50.0, y: 1.5 * pi/3.0, dy: pi/3.0)
           ],
-          borderRadius: 5.0,
-          thickness: ThicknessData(size: 10, color: Colors.pink),
+          borderRadius: Px(5.0),
+          thickness: ThicknessData(size: Px(10), color: Colors.pink),
         ),
       ],
       toggleCharts: [
@@ -88,9 +88,9 @@ List<ExampleChart> pieCharts() {
             DataPoint(x: 100.0, y: 2 * pi/3.0, dy: pi/3.0),
             DataPoint(x: 100.0, y: 4 * pi/3.0, dy: pi/3.0)
           ],
-          borderRadius: 8.0,
-          pointStyle: CircleDataPointStyle(radius: 4, color: Colors.white),
-          thickness: ThicknessData(size: 30, color: Colors.blue),
+          borderRadius: Px(8.0),
+          pointStyle: CircleDataPointStyle(radius: Px(4), color: Colors.white),
+          thickness: ThicknessData(size: Px(30), color: Colors.blue),
         ),
         PieData(
           layout: const RelativeLayout(minX: -gridWidth, maxX: gridWidth, minY: -gridHeight, maxY: gridHeight),
@@ -98,8 +98,8 @@ List<ExampleChart> pieCharts() {
             DataPoint(x: 50.0, y: 0, dy: pi),
             DataPoint(x: 50.0, y: pi + pi/6.0, dy: pi - pi/3.0)
           ],
-          borderRadius: 5.0,
-          thickness: ThicknessData(size: 10, color: Colors.pink),
+          borderRadius: Px(5.0),
+          thickness: ThicknessData(size: Px(10), color: Colors.pink),
         ),
       ],
     ),
@@ -110,12 +110,12 @@ List<ExampleChart> pieCharts() {
           layout: const RelativeLayout(minX: -0, maxX: gridWidth, minY: -0, maxY: gridHeight),
           pies: [
             DataPoint(x: 100.0, y: 0, dy: pi/6.0),
-            DataPoint(x: 100.0, y: pi/6.0, dy: pi/6.0, data: {IThicknessOverride: ThicknessOverride(size: 30, align: ThicknessData.alignOutside, color: Colors.blue.shade600)}),
-            DataPoint(x: 100.0, y: pi/3.0, dy: pi/6.0, data: {IThicknessOverride: ThicknessOverride(size: 40, align: ThicknessData.alignOutside, color: Colors.blue.shade900)})
+            DataPoint(x: 100.0, y: pi/6.0, dy: pi/6.0, data: {IThicknessOverride: ThicknessOverride(size: Px(30), align: ThicknessData.alignOutside, color: Colors.blue.shade600)}),
+            DataPoint(x: 100.0, y: pi/3.0, dy: pi/6.0, data: {IThicknessOverride: ThicknessOverride(size: Px(40), align: ThicknessData.alignOutside, color: Colors.blue.shade900)})
           ],
-          borderRadius: 4.0,
+          borderRadius: Px(4.0),
           padAngle: pi / 90,
-          thickness: ThicknessData(size: 20, color: Colors.blue.shade300, align: ThicknessData.alignOutside),
+          thickness: ThicknessData(size: Px(20), color: Colors.blue.shade300, align: ThicknessData.alignOutside),
         ),
       ],
       toggleCharts: [
@@ -123,12 +123,12 @@ List<ExampleChart> pieCharts() {
           layout: const RelativeLayout(minX: -0, maxX: gridWidth, minY: -0, maxY: gridHeight),
           pies: [
             DataPoint(x: 100.0, y: 0, dy: pi/3.0),
-            DataPoint(x: 100.0, y: pi/3.0, dy: pi/3.0, data: {IThicknessOverride: ThicknessOverride(size: 30, align: ThicknessData.alignOutside, color: Colors.blue.shade600)}),
-            DataPoint(x: 100.0, y: 2 * pi/3.0, dy: pi/3.0, data: {IThicknessOverride: ThicknessOverride(size: 40, align: ThicknessData.alignOutside, color: Colors.blue.shade900)})
+            DataPoint(x: 100.0, y: pi/3.0, dy: pi/3.0, data: {IThicknessOverride: ThicknessOverride(size: Px(30), align: ThicknessData.alignOutside, color: Colors.blue.shade600)}),
+            DataPoint(x: 100.0, y: 2 * pi/3.0, dy: pi/3.0, data: {IThicknessOverride: ThicknessOverride(size: Px(40), align: ThicknessData.alignOutside, color: Colors.blue.shade900)})
           ],
-          borderRadius: 4.0,
+          borderRadius: Px(4.0),
           padAngle: pi / 90,
-          thickness: ThicknessData(size: 20, color: Colors.blue.shade300, align: ThicknessData.alignOutside),
+          thickness: ThicknessData(size: Px(20), color: Colors.blue.shade300, align: ThicknessData.alignOutside),
         ),
       ],
     ),

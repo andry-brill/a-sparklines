@@ -3,10 +3,11 @@ import 'dart:ui' show lerpDouble;
 import 'package:flutter/material.dart';
 
 import 'data_point_data.dart';
+import 'length_value.dart';
 import 'lerp.dart';
 
 abstract class IThicknessOverride {
-  double? get size;
+  ILengthValue? get size;
   Gradient? get gradient;
   double? get align;
   Color? get color;
@@ -14,7 +15,7 @@ abstract class IThicknessOverride {
 
 class ThicknessOverride extends ADataPointData<ThicknessOverride> implements IThicknessOverride {
 
-  @override final double? size;
+  @override final ILengthValue? size;
   @override final Gradient? gradient;
   @override final double? align;
   @override final Color? color;
@@ -29,7 +30,7 @@ class ThicknessOverride extends ADataPointData<ThicknessOverride> implements ITh
   @override
   ThicknessOverride lerp(ThicknessOverride next, double t) {
     return ThicknessOverride(
-      size: lerpDouble(size, next.size, t),
+      size: ILengthValue.lerp(size, next.size, t),
       align: lerpDouble(align, next.align, t),
       color: Color.lerp(color, next.color, t),
       gradient: Gradient.lerp(gradient, next.gradient, t),
@@ -53,7 +54,7 @@ class ThicknessOverride extends ADataPointData<ThicknessOverride> implements ITh
 
 class ThicknessData implements ILerpTo<ThicknessData> {
 
-  final double size;
+  final ILengthValue size;
 
   /// Gradient has higher priority if set then color
   final Gradient? gradient;
@@ -88,7 +89,7 @@ class ThicknessData implements ILerpTo<ThicknessData> {
   @override
   ThicknessData lerpTo(ThicknessData next, double t) {
     return ThicknessData(
-      size: lerpDouble(size, next.size, t) ?? next.size,
+      size: ILengthValue.lerp(size, next.size, t)!,
       color: Color.lerp(color, next.color, t) ?? next.color,
       gradient: Gradient.lerp(gradient, next.gradient, t) ?? next.gradient,
       align: lerpDouble(align, next.align, t) ?? next.align,

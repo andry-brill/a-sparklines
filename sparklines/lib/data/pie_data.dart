@@ -6,6 +6,7 @@ import '../interfaces/chart_flip.dart';
 import '../interfaces/chart_rotation.dart';
 import '../interfaces/data_point_style.dart';
 import '../interfaces/layout.dart';
+import '../interfaces/length_value.dart';
 import '../interfaces/lerp.dart';
 import '../interfaces/sparklines_data.dart';
 import '../interfaces/thickness.dart';
@@ -48,7 +49,7 @@ class PieData implements ISparklinesData, IChartThickness, IChartBorder, IChartD
   final ThicknessData? border;
 
   @override
-  final double? borderRadius;
+  final ILengthValue? borderRadius;
 
   Rect? _bounds;
 
@@ -56,27 +57,7 @@ class PieData implements ISparklinesData, IChartThickness, IChartBorder, IChartD
 
     if (_bounds != null) return _bounds!;
 
-    final layouts = computePies(
-      pies,
-      pieOffset,
-      padAngle,
-      thickness,
-      borderRadius,
-      null
-    );
-
-    if (layouts.isEmpty) return _bounds = Rect.fromLTRB(0, 0, 1, 1);
-    if (layouts.length == 1) return _bounds = layouts.first.toPath().getBounds();
-
-    for (var layout in layouts) {
-      if (_bounds == null) {
-        _bounds = layout.toPath().getBounds();
-      } else {
-        _bounds = _bounds!.expandToInclude(layout.toPath().getBounds());
-      }
-    }
-
-    return _bounds!;
+    return _bounds = computePieDataBounds(pies, pieOffset);
   }
 
   @override
@@ -107,7 +88,7 @@ class PieData implements ISparklinesData, IChartThickness, IChartBorder, IChartD
     this.layout,
     this.crop,
     required this.pies,
-    this.thickness = const ThicknessData(size: 2.0),
+    this.thickness = const ThicknessData(size: Px(2.0)),
     this.pieOffset = 0.0,
     this.padAngle = 0.0,
     this.border,
@@ -126,7 +107,7 @@ class PieData implements ISparklinesData, IChartThickness, IChartBorder, IChartD
     this.layout,
     this.crop,
     required this.pies,
-    this.thickness = const ThicknessData(size: 2.0),
+    this.thickness = const ThicknessData(size: Px(2.0)),
     this.pieOffset = 0.0,
     this.padAngle = 0.0,
     this.border,
@@ -146,7 +127,7 @@ class PieData implements ISparklinesData, IChartThickness, IChartBorder, IChartD
     double? pieOffset,
     double? padAngle,
     ThicknessData? border,
-    double? borderRadius,
+    ILengthValue? borderRadius,
   }) {
     return PieData(
       visible: visible ?? this.visible,
@@ -211,7 +192,7 @@ class PieData implements ISparklinesData, IChartThickness, IChartBorder, IChartD
       pieOffset: lerpDouble(pieOffset, next.pieOffset, t) ?? next.pieOffset,
       padAngle: lerpDouble(padAngle, next.padAngle, t) ?? next.padAngle,
       border: ILerpTo.lerp(border, next.border, t),
-      borderRadius: lerpDouble(borderRadius, next.borderRadius, t) ?? next.borderRadius,
+      borderRadius: ILengthValue.lerp(borderRadius, next.borderRadius, t),
     );
   }
 

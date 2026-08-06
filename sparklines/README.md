@@ -6,7 +6,7 @@ Feature-rich, highly optimized sparklines for Flutter. Line, bar, pie, and betwe
 
 ![App Screenshot](https://raw.githubusercontent.com/andry-brill/a-sparklines/main/sparklines/example/web/example.png)
 
-> You might also like my other package: [any_borders](https://pub.dev/packages/any_borders)
+> You might also like my other packages: [any_timeago](https://pub.dev/packages/any_timeago), [any_borders](https://pub.dev/packages/any_borders)
 
 ---
 
@@ -16,7 +16,44 @@ Feature-rich, highly optimized sparklines for Flutter. Line, bar, pie, and betwe
 
 - **AbsoluteLayout** — Data coordinates map 1:1 to pixels; origin bottom-left, Y up.
 - **RelativeLayout** — Data is scaled to explicit bounds. Use `RelativeLayout.normalized()` (0–1), `RelativeLayout.signed()` (-1–1), or `RelativeLayout.full()` (auto from data). Set `minX`/`maxX`/`minY`/`maxY` to `double.infinity` or `double.negativeInfinity` to derive from chart data. **Identical layout instances are resolved once and shared** across all charts using them.
-- **RelativeDimension** — For `RelativeLayout`, use `relativeTo: RelativeDimension.width` or `RelativeDimension.height` so lengths (e.g. stroke width) scale with chart size; `none` uses absolute values.
+
+Layouts transform plotted coordinates only. Visual dimensions choose their own units independently.
+
+### Visual lengths
+
+Thicknesses, marker radii, borders, and corner radii use **ILengthValue**:
+
+- **Px(2)** — Flutter logical pixels.
+- **Vw(1)** / **Vh(1)** — CSS-style viewport percentages; `1` means 1%.
+- **Dx(0.1)** / **Dy(0.1)** — X/Y data-space intervals converted through the chart transform.
+
+```dart
+LineData(
+  layout: const RelativeLayout.normalized(),
+  line: points,
+  thickness: const ThicknessData(size: Px(2)),
+  pointStyle: const CircleDataPointStyle(radius: Vw(1), color: Colors.blue),
+)
+```
+
+Custom units implement `ILengthValue.resolve(ILengthContext)`:
+
+```dart
+final class VMin implements ILengthValue {
+  final double percentage;
+  const VMin(this.percentage);
+
+  @override
+  double resolve(ILengthContext context) {
+    final side = context.viewportWidth < context.viewportHeight
+        ? context.viewportWidth
+        : context.viewportHeight;
+    return side * percentage / 100;
+  }
+}
+```
+
+Unit changes animate smoothly because both endpoints are resolved in the current viewport before interpolation.
 
 ### Rotation, flip, and origin
 
@@ -45,12 +82,12 @@ Feature-rich, highly optimized sparklines for Flutter. Line, bar, pie, and betwe
 
 ### Thickness (global and per-point)
 
-- **ThicknessData** — `size`, `color`, optional `gradient` (overrides color), `align`: `ThicknessData.alignInside` (-1), `alignCenter` (0), `alignOutside` (1).
+- **ThicknessData** — `size` (`ILengthValue`), `color`, optional `gradient` (overrides color), `align`: `ThicknessData.alignInside` (-1), `alignCenter` (0), `alignOutside` (1).
 - **ThicknessOverride** on `DataPoint` — Same fields; overrides chart thickness for that point.
 
 ### Border and border radius
 
-- **IChartBorder** — `border` (`ThicknessData?`), `borderRadius` (`double?`). Used by **BarData** and **PieData**.
+- **IChartBorder** — `border` (`ThicknessData?`), `borderRadius` (`ILengthValue?`). Used by **BarData** and **PieData**.
 
 ### Area fill (line charts)
 
@@ -126,4 +163,5 @@ Charts implement `ILerpTo` for smooth transitions when data changes.
 - **IDataPointStyle** + **IDataPointRenderer** — Custom point markers.
 - **IChartRenderer** — Custom chart types.
 - **ILineTypeData** + **ILineTypeRenderer** — Custom line path and stroke.
-- **IChartLayout** — Custom coordinate systems; implement `resolve()`, `transform()`, `transformScalar()`.
+- **IChartLayout** — Custom coordinate systems; implement `resolve()` and `transform()`.
+- **ILengthValue** — Custom visual units; implement `resolve(ILengthContext)`.

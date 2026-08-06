@@ -4,6 +4,7 @@ import '../data/data_point.dart';
 import '../interfaces/chart_transform.dart';
 import '../interfaces/data_point_data.dart';
 import '../interfaces/data_point_style.dart';
+import '../interfaces/length_value.dart';
 import 'data_point_renderer.dart';
 
 
@@ -12,7 +13,7 @@ class CircleDataPointStyle extends ADataPointData<CircleDataPointStyle> implemen
 
   static IDataPointRenderer defaultRenderer = CircleDataPointRenderer();
 
-  final double radius;
+  final ILengthValue radius;
   final Color color;
 
   const CircleDataPointStyle({
@@ -23,7 +24,7 @@ class CircleDataPointStyle extends ADataPointData<CircleDataPointStyle> implemen
   @override
   CircleDataPointStyle lerp(CircleDataPointStyle next, double t) {
     return CircleDataPointStyle(
-      radius: lerpDouble(radius, next.radius, t) ?? next.radius,
+      radius: ILengthValue.lerp(radius, next.radius, t)!,
       color: Color.lerp(color, next.color, t) ?? next.color,
     );
   }
@@ -42,7 +43,7 @@ class CircleDataPointRenderer extends ADataPointRenderer<CircleDataPointStyle> {
     paint.color = style.color;
     paint.shader = null;
 
-    final radius = transform.scalar(style.radius);
+    final radius = transform.length(style.radius);
     canvas.drawCircle(transform.xy(dataPoint.x, dataPoint.fy), radius, paint);
   }
 

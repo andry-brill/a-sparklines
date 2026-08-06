@@ -28,7 +28,7 @@ class BarChartRenderer extends AChartRenderer<BarData> {
       final thicknessGradient = overrides?.gradient ?? barData.thickness.gradient;
       final thicknessColor = overrides?.color ?? barData.thickness.color;
 
-      final barWidth = transform.scalar(thicknessSize);
+      final barWidth = transform.length(thicknessSize);
       final half = barWidth / 2;
       final a = half * (1 + thicknessAlign);
       final b = half * (1 - thicknessAlign);
@@ -59,7 +59,7 @@ class BarChartRenderer extends AChartRenderer<BarData> {
       final border = barData.border;
       if (border != null) {
 
-        final borderSize = transform.scalar(border.size);
+        final borderSize = transform.length(border.size);
         final borderRect = rect.inflate(borderSize * border.align);
 
         RRect? borderRoundedRect = this.roundedRect(transform, barData, borderRect);

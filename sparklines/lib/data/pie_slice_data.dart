@@ -1,14 +1,13 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
 import '../interfaces/chart_transform.dart';
+import '../interfaces/length_value.dart';
 import '../interfaces/thickness.dart';
 import '../layout/circle_arc_builder.dart';
 import 'data_point.dart';
 
-
 /// Result of computing layout for a single pie slice (angle order, radii, space).
 class PieSliceData {
-
   final double startAngle;
   final double endAngle;
   final double innerRadius;
@@ -32,12 +31,11 @@ class PieSliceData {
 
   /// Builds filled arc path using [CircleArcBuilder] with uniform thickness in screen space.
   Path toPath() {
-
     final arcBuilder = CircleArcBuilder(
       innerRadius: innerRadius,
       outerRadius: outerRadius,
-      startAngle: startAngle + pi/2,
-      endAngle: endAngle + pi/2,
+      startAngle: startAngle + pi / 2,
+      endAngle: endAngle + pi / 2,
       padAngle: padAngle,
       cornerRadius: cornerRadius,
     );
@@ -68,25 +66,24 @@ List<PieSliceData> computePies(
   double offset,
   double padAngle,
   ThicknessData thickness,
-  double? radius,
-  ChartTransform? transform
+  ILengthValue? radius,
+  ChartTransform transform,
 ) {
-
   List<PieSliceData> layouts = [];
 
   for (var pie in pies) {
-
-    final borderRadius = pie.border?.borderRadius ?? radius ?? 0.0;
-    final cornerRadius = transform != null ? transform.scalar(transform.antiScalar(borderRadius)) : borderRadius;
+    final borderRadius = pie.border?.borderRadius ?? radius;
+    final cornerRadius = borderRadius == null
+        ? 0.0
+        : transform.antiScalar(transform.length(borderRadius));
 
     final thicknessAlign = pie.thickness?.align ?? thickness.align;
-    double thicknessSize = pie.thickness?.size ?? thickness.size;
+    final thicknessValue = pie.thickness?.size ?? thickness.size;
+    final thicknessSize =
+        transform.antiScalar(transform.length(thicknessValue));
 
-    if (transform != null) {
-      thicknessSize = transform.scalar(transform.antiScalar(thicknessSize));
-    }
-
-    if (pie.x <= 0.0001 || thicknessSize <= 0.0001 || pie.dy <= 0.0001) continue;
+    if (pie.x <= 0.0001 || thicknessSize <= 0.0001 || pie.dy <= 0.0001)
+      continue;
 
     final halfInnerThickness = thicknessSize * (1 - thicknessAlign) / 2;
     final halfOuterThickness = thicknessSize * (1 + thicknessAlign) / 2;
@@ -94,22 +91,55 @@ List<PieSliceData> computePies(
     final innerRadius = max(0.0, pie.x - halfInnerThickness);
     final outerRadius = pie.x + halfOuterThickness;
 
-    final pointDx = pie.pieOffset?.pieOffset  ?? offset;
+    final pointDx = pie.pieOffset?.pieOffset ?? offset;
     final spaceOffset = toCartesian(pointDx, pie);
 
     layouts.add(PieSliceData(
-      startAngle: pie.y,
-      endAngle: pie.fy,
-      innerRadius: innerRadius,
-      outerRadius: outerRadius,
-      offset: spaceOffset,
-      point: pie,
-      cornerRadius: min(cornerRadius, (outerRadius - innerRadius)/2),
-      padAngle: padAngle
-    ));
-
+        startAngle: pie.y,
+        endAngle: pie.fy,
+        innerRadius: innerRadius,
+        outerRadius: outerRadius,
+        offset: spaceOffset,
+        point: pie,
+        cornerRadius: min(cornerRadius, (outerRadius - innerRadius) / 2),
+        padAngle: padAngle));
   }
 
   return layouts;
+}
 
+/// Data-space bounds of pie centerlines and offsets.
+///
+/// Visual thickness, borders, corner radii, and markers are intentionally not
+/// included, matching the bounds behavior of line and bar charts.
+Rect computePieDataBounds(List<DataPoint> pies, double offset) {
+  Rect? bounds;
+
+  for (final pie in pies) {
+    if (pie.x <= 0.0001 || pie.dy <= 0.0001) continue;
+
+    final center = toCartesian(pie.pieOffset?.pieOffset ?? offset, pie);
+    final start = pie.y;
+    final end = pie.fy;
+    final angles = <double>[start, end];
+
+    if (end - start >= 2 * pi) {
+      angles.addAll(const [0.0, pi / 2, pi, 3 * pi / 2]);
+    } else {
+      final firstQuarter = (start / (pi / 2)).ceil();
+      final lastQuarter = (end / (pi / 2)).floor();
+      for (var quarter = firstQuarter; quarter <= lastQuarter; quarter++) {
+        angles.add(quarter * pi / 2);
+      }
+    }
+
+    for (final angle in angles) {
+      final point = center + Offset(pie.x * cos(angle), pie.x * sin(angle));
+      final pointBounds = Rect.fromLTWH(point.dx, point.dy, 0, 0);
+      bounds =
+          bounds == null ? pointBounds : bounds.expandToInclude(pointBounds);
+    }
+  }
+
+  return bounds ?? const Rect.fromLTRB(0, 0, 1, 1);
 }

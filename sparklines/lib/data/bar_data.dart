@@ -1,11 +1,11 @@
 import 'package:any_sparklines/interfaces/data_point_data.dart';
 import 'package:flutter/material.dart';
-import 'dart:ui' show lerpDouble;
 import '../interfaces/chart_border.dart';
 import '../interfaces/chart_flip.dart';
 import '../interfaces/chart_rotation.dart';
 import '../interfaces/data_point_style.dart';
 import '../interfaces/layout.dart';
+import '../interfaces/length_value.dart';
 import '../interfaces/lerp.dart';
 import '../interfaces/sparklines_data.dart';
 import '../interfaces/thickness.dart';
@@ -53,7 +53,7 @@ class BarData implements ISparklinesData, IChartBorder, IChartThickness, IChartD
   final ThicknessData? border;
 
   @override
-  final double? borderRadius;
+  final ILengthValue? borderRadius;
 
   @override
   final IDataPointStyle? pointStyle;
@@ -66,7 +66,7 @@ class BarData implements ISparklinesData, IChartBorder, IChartThickness, IChartD
     this.layout,
     this.crop,
     required this.bars,
-    this.thickness = const ThicknessData(size: 2.0),
+    this.thickness = const ThicknessData(size: Px(2.0)),
     this.border,
     this.borderRadius,
     this.pointStyle
@@ -82,7 +82,7 @@ class BarData implements ISparklinesData, IChartBorder, IChartThickness, IChartD
     List<DataPoint>? bars,
     ThicknessData? thickness,
     ThicknessData? border,
-    double? borderRadius,
+    ILengthValue? borderRadius,
     IDataPointStyle? pointStyle
   }) {
     return BarData(
@@ -144,7 +144,7 @@ class BarData implements ISparklinesData, IChartBorder, IChartThickness, IChartD
       bars: interpolatedBars,
       thickness: thickness.lerpTo(next.thickness, t),
       border: ILerpTo.lerp(border, next.border, t),
-      borderRadius: lerpDouble(borderRadius, next.borderRadius, t) ?? next.borderRadius,
+      borderRadius: ILengthValue.lerp(borderRadius, next.borderRadius, t),
       pointStyle: ILerpTo.lerp<IDataPointData>(pointStyle, next.pointStyle, t) as IDataPointStyle?,
     );
   }

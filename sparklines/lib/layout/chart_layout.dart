@@ -3,7 +3,6 @@ import 'dart:math';
 import 'package:vector_math/vector_math_64.dart';
 
 import '../interfaces/layout.dart';
-import 'relative_dimension.dart';
 
 /// Math-oriented coordinates: origin at bottom-left, Y up.
 /// Prepares canvas by offsetting by height and scaling (1, -1).
@@ -12,11 +11,6 @@ class AbsoluteLayout implements IChartLayout {
 
   @override
   IChartLayout resolve(List<ILayoutData> dimensions) => this;
-
-  @override
-  double transformScalar(double value, ILayoutData dimensions) {
-    return value;
-  }
 
   @override
   Matrix4 transform(ILayoutData dimensions) {
@@ -29,19 +23,15 @@ class AbsoluteLayout implements IChartLayout {
 /// Relative transformation to explicit bounds
 /// Can use infinity values for auto-calculation from data
 class RelativeLayout implements IChartLayout {
-
   final double minX;
   final double maxX;
   final double minY;
   final double maxY;
-  final RelativeDimension relativeTo;
-
   const RelativeLayout({
     this.minX = 0,
     required this.maxX,
     this.minY = 0,
     required this.maxY,
-    this.relativeTo = RelativeDimension.none,
   });
 
   const RelativeLayout.normalized({
@@ -49,7 +39,6 @@ class RelativeLayout implements IChartLayout {
     this.maxX = 1.0,
     this.minY = 0.0,
     this.maxY = 1.0,
-    this.relativeTo = RelativeDimension.none,
   });
 
   const RelativeLayout.signed({
@@ -57,7 +46,6 @@ class RelativeLayout implements IChartLayout {
     this.maxX = 1.0,
     this.minY = -1.0,
     this.maxY = 1.0,
-    this.relativeTo = RelativeDimension.none,
   });
 
   /// Full cover from min to max data
@@ -66,7 +54,6 @@ class RelativeLayout implements IChartLayout {
     this.maxX = double.infinity,
     this.minY = double.negativeInfinity,
     this.maxY = double.infinity,
-    this.relativeTo = RelativeDimension.none,
   });
 
   @override
@@ -83,17 +70,20 @@ class RelativeLayout implements IChartLayout {
     final resolvedMinY = minY.isFinite ? minY : effectiveMinY;
     final resolvedMaxY = maxY.isFinite ? maxY : effectiveMaxY;
 
-    final finalMinX = resolvedMinX == resolvedMaxX ? resolvedMinX - 1.0 : resolvedMinX;
-    final finalMaxX = resolvedMinX == resolvedMaxX ? resolvedMaxX + 1.0 : resolvedMaxX;
-    final finalMinY = resolvedMinY == resolvedMaxY ? resolvedMinY - 1.0 : resolvedMinY;
-    final finalMaxY = resolvedMinY == resolvedMaxY ? resolvedMaxY + 1.0 : resolvedMaxY;
+    final finalMinX =
+        resolvedMinX == resolvedMaxX ? resolvedMinX - 1.0 : resolvedMinX;
+    final finalMaxX =
+        resolvedMinX == resolvedMaxX ? resolvedMaxX + 1.0 : resolvedMaxX;
+    final finalMinY =
+        resolvedMinY == resolvedMaxY ? resolvedMinY - 1.0 : resolvedMinY;
+    final finalMaxY =
+        resolvedMinY == resolvedMaxY ? resolvedMaxY + 1.0 : resolvedMaxY;
 
     return RelativeLayout(
       minX: finalMinX,
       maxX: finalMaxX,
       minY: finalMinY,
       maxY: finalMaxY,
-      relativeTo: relativeTo
     );
   }
 
@@ -102,24 +92,8 @@ class RelativeLayout implements IChartLayout {
     return Matrix4.identity()
       ..translateByVector3(Vector3(0.0, dimensions.height, 0.0))
       ..scaleByVector3(Vector3(1.0, -1.0, 1.0))
-      ..scaleByVector3(Vector3(dimensions.width / (maxX - minX), dimensions.height / (maxY - minY), 1.0))
-      ..translateByVector3(Vector3(-minX, -minY, 0.0))
-    ;
-  }
-
-  @override
-  double transformScalar(double value, ILayoutData dimensions) {
-    switch (relativeTo) {
-      case RelativeDimension.none:
-        return value;
-      case RelativeDimension.width:
-        if (value == double.negativeInfinity) return 0;
-        if (value == double.infinity) return dimensions.width;
-        return value * (dimensions.width / (maxX - minX));
-      case RelativeDimension.height:
-        if (value == double.negativeInfinity) return 0;
-        if (value == double.infinity) return dimensions.height;
-        return value * (dimensions.height / (maxY - minY));
-    }
+      ..scaleByVector3(Vector3(dimensions.width / (maxX - minX),
+          dimensions.height / (maxY - minY), 1.0))
+      ..translateByVector3(Vector3(-minX, -minY, 0.0));
   }
 }

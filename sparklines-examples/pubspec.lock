@@ -7,7 +7,7 @@ packages:
       path: "../sparklines"
       relative: true
     source: path
-    version: "2.1.1"
+    version: "3.0.0"
   async:
     dependency: transitive
     description:

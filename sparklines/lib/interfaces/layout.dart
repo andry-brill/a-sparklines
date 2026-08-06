@@ -17,7 +17,4 @@ abstract class IChartLayout {
   IChartLayout resolve(List<ILayoutData> dimensions);
 
   Matrix4 transform(ILayoutData dimensions);
-
-  /// Apply transformation to scalar values like stroke width, radius, etc.
-  double transformScalar(double value, ILayoutData dimensions);
 }

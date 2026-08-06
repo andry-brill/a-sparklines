@@ -4,23 +4,38 @@ import 'package:flutter/material.dart';
 import 'package:vector_math/vector_math_64.dart';
 
 import 'layout.dart';
+import 'length_value.dart';
 
-class ChartTransform {
-
+class ChartTransform implements ILengthContext {
   final Matrix4 _transform;
-  final IChartLayout _layout;
   final ILayoutData _dimensions;
 
   ChartTransform({
-    required IChartLayout layout,
     required ILayoutData dimensions,
     required Matrix4 pathTransform,
   })  : _dimensions = dimensions,
-        _layout = layout,
         _transform = pathTransform;
 
-  /// Apply transformation to scalar values like stroke width, radius, etc.
-  double scalar(double value) => _layout.transformScalar(value, _dimensions);
+  /// Resolves a visual length in the current viewport and data transform.
+  double length(ILengthValue value) => value.resolve(this);
+
+  @override
+  double get viewportWidth => _dimensions.width;
+
+  @override
+  double get viewportHeight => _dimensions.height;
+
+  @override
+  double dataX(double value) => _dataDistance(value, 0.0);
+
+  @override
+  double dataY(double value) => _dataDistance(0.0, value);
+
+  double _dataDistance(double x, double y) {
+    final origin = v3(Vector3.zero());
+    final endpoint = v3(Vector3(x, y, 0.0));
+    return (endpoint - origin).length;
+  }
 
   Vector3 v3(Vector3 v3) => _transform.transform3(v3);
   Path path(Path path) => path.transform(_transform.storage);
@@ -36,7 +51,6 @@ class ChartTransform {
   double? _uniformK;
 
   double get _antiScalarK {
-
     if (_uniformK != null) return _uniformK!;
 
     Matrix4 m = _transform;

@@ -22,7 +22,7 @@ class PieChartRenderer extends AChartRenderer<PieData> {
       pieData.padAngle,
       pieData.thickness,
       pieData.borderRadius,
-      transform
+      transform,
     );
 
     final paint = Paint();
@@ -47,12 +47,13 @@ class PieChartRenderer extends AChartRenderer<PieData> {
 
       final border = layout.point.border?.border ?? pieData.border;
       if (border != null) {
-        final borderSize = transform.scalar(border.size);
+        final borderSize = transform.length(border.size);
+        final borderSizeData = transform.antiScalar(borderSize);
 
         final borderLayout = PieSliceData(
           offset: layout.offset,
-          innerRadius: max(0, layout.innerRadius - borderSize * border.align),
-          outerRadius: layout.outerRadius + borderSize * border.align,
+          innerRadius: max(0, layout.innerRadius - borderSizeData * border.align),
+          outerRadius: layout.outerRadius + borderSizeData * border.align,
           startAngle: layout.startAngle,
           endAngle: layout.endAngle,
           point: layout.point,
@@ -60,7 +61,7 @@ class PieChartRenderer extends AChartRenderer<PieData> {
           padAngle: layout.padAngle
         );
 
-        Path pieBorderPath = borderLayout.toPath();
+        final pieBorderPath = transform.path(borderLayout.toPath());
 
         paint.style = PaintingStyle.stroke;
         paint.strokeWidth = borderSize;

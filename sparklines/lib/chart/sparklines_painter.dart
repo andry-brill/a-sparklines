@@ -70,7 +70,6 @@ class SparklinesPainter extends CustomPainter {
       }
 
       final transform = ChartTransform(
-          layout: chartLayout,
           dimensions: dimensions,
           pathTransform: chartLayout.transform(dimensions),
       );

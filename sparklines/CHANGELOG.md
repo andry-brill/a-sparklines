@@ -1,3 +1,27 @@
+## 3.0.0
+
+* **Breaking: unit-aware visual lengths**
+  * `ThicknessData.size`, `ThicknessOverride.size`, marker radius, and chart/data-point border radius now use `ILengthValue`.
+  * Added `Px`, `Vw`, `Vh`, `Dx`, and `Dy`; viewport units follow CSS percentage semantics (`Vw(1)` is 1%).
+  * Added deferred cross-unit interpolation and support for custom length implementations through `ILengthContext`.
+* **Breaking: simplified layouts**
+  * Removed `RelativeDimension`, `RelativeLayout.relativeTo`, and `IChartLayout.transformScalar()`.
+  * `ChartTransform` no longer accepts an `IChartLayout`; it resolves lengths from its dimensions and path matrix.
+  * Layouts now transform plot coordinates only; each visual value owns its sizing policy.
+  * Pie auto-bounds are derived from data geometry and no longer include visual thickness, borders, corners, or markers.
+
+### Migration
+
+| 2.x | 3.0 |
+| --- | --- |
+| `ThicknessData(size: 2)` | `ThicknessData(size: Px(2))` |
+| `CircleDataPointStyle(radius: 4, ...)` | `CircleDataPointStyle(radius: Px(4), ...)` |
+| `borderRadius: 4` | `borderRadius: Px(4)` |
+| `relativeTo: RelativeDimension.width` with a scalar `0.1` | Remove `relativeTo`; use `Dx(0.1)` on that visual property |
+| `relativeTo: RelativeDimension.height` with a scalar `0.1` | Remove `relativeTo`; use `Dy(0.1)` on that visual property |
+| Custom `IChartLayout.transformScalar()` | Remove it; custom units implement `ILengthValue.resolve()` |
+| `ChartTransform(layout: layout, dimensions: d, pathTransform: m)` | `ChartTransform(dimensions: d, pathTransform: m)` |
+
 ## 2.2.6
 
 - Improved `pubspec.yaml`

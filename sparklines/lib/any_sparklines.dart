@@ -15,11 +15,12 @@ export 'interfaces/chart_transform.dart';
 export 'interfaces/data_point_data.dart';
 export 'interfaces/data_point_style.dart';
 export 'interfaces/layout.dart';
+export 'interfaces/length_value.dart'
+    show ILengthContext, ILengthValue, Px, Vw, Vh, Dx, Dy;
 export 'interfaces/lerp.dart';
 export 'interfaces/line_type.dart';
 export 'interfaces/pie_offset.dart';
 export 'interfaces/sparklines_data.dart';
 export 'interfaces/thickness.dart';
 export 'layout/chart_layout.dart';
-export 'layout/relative_dimension.dart';
 export 'renderers/circle_data_point.dart';
