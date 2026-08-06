@@ -84,6 +84,23 @@ class LineData implements ISparklinesData, IChartThickness, IChartDataPointStyle
     this.areaFillType,
   });
 
+  /// Creates marker-only x/y data without a connected line or area fill.
+  const LineData.scatter({
+    this.visible = true,
+    this.rotation = ChartRotation.d0,
+    this.flip = ChartFlip.none,
+    this.origin = Offset.zero,
+    this.layout,
+    this.crop,
+    required List<DataPoint> points,
+    this.pointStyle,
+  })  : line = points,
+        thickness = const ThicknessData(size: Px(2.0)),
+        areaGradient = null,
+        areaColor = null,
+        areaFillType = null,
+        lineType = const ScatterLineData();
+
   LineData copyWith({
     bool? visible,
     ChartRotation? rotation,
@@ -174,6 +191,12 @@ class LineData implements ISparklinesData, IChartThickness, IChartDataPointStyle
 class LinearLineData implements ILineTypeData {
 
   @override
+  bool get drawLine => true;
+
+  @override
+  int get minPoints => 2;
+
+  @override
   final bool isStrokeCapRound;
   @override
   final bool isStrokeJoinRound;
@@ -187,6 +210,12 @@ class LinearLineData implements ILineTypeData {
 }
 
 class SteppedLineData implements ILineTypeData {
+
+  @override
+  bool get drawLine => true;
+
+  @override
+  int get minPoints => 2;
 
   /// 0.0 → previous point, 1.0 → next point
   final double stepJumpAt;
@@ -209,6 +238,12 @@ class SteppedLineData implements ILineTypeData {
 
 class CurvedLineData implements ILineTypeData {
 
+  @override
+  bool get drawLine => true;
+
+  @override
+  int get minPoints => 2;
+
   /// Curve smoothness (0.0 to 1.0)
   final double smoothness;
 
@@ -223,5 +258,28 @@ class CurvedLineData implements ILineTypeData {
 
   @override
   ILineTypeRenderer get renderer => _renderer;
+
+}
+
+/// Marker-only line type used by scatter plots.
+class ScatterLineData implements ILineTypeData {
+
+  const ScatterLineData();
+
+  @override
+  bool get drawLine => false;
+
+  @override
+  int get minPoints => 1;
+
+  @override
+  bool get isStrokeCapRound => false;
+
+  @override
+  bool get isStrokeJoinRound => false;
+
+  @override
+  ILineTypeRenderer get renderer =>
+      throw UnsupportedError('ScatterLineData does not draw line geometry.');
 
 }

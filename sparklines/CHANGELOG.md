@@ -1,3 +1,12 @@
+## 3.1.0
+
+* **LineData**
+  * Added `LineData.scatter(points: ...)` for marker-only x/y plots without connected lines or area fills.
+  * Added `ScatterLineData`; scatter rendering is selected through `lineType` and can be changed with `copyWith(lineType: ...)`.
+  * Single-point line and scatter data now render their point marker.
+* **Breaking: custom line types**
+  * `ILineTypeData` now requires `drawLine` and `minPoints` so renderers can determine whether and when to draw connected geometry.
+
 ## 3.0.1
 
 * **DataPointPipeline**

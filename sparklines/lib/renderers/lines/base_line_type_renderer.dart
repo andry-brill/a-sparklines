@@ -190,7 +190,7 @@ abstract class BaseLineTypeRenderer<LD extends ILineTypeData> implements ILineTy
   void render(Canvas canvas, ChartTransform transform, ILineChartData lineData) {
 
     final points = lineData.line;
-    if (points.length < 2) return;
+    if (!lineData.lineType.drawLine || points.length < lineData.lineType.minPoints) return;
 
     final bool sameStroke = _isSameStrokeSize(lineData.thickness, points);
     final bool samePaint = _isSameStrokePainter(lineData.thickness, points);

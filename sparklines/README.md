@@ -2,7 +2,7 @@
 
 [![Tests](https://github.com/andry-brill/a-sparklines/actions/workflows/test.yml/badge.svg)](https://github.com/andry-brill/a-sparklines/actions/workflows/test.yml)
 
-Feature-rich, highly optimized sparklines for Flutter. Line, bar, pie, and between-line charts with shared layouts, animation, and flexible styling.
+Feature-rich, highly optimized sparklines for Flutter. Line, scatter, bar, pie, and between-line charts with shared layouts, animation, and flexible styling.
 
 ![App Screenshot](https://raw.githubusercontent.com/andry-brill/a-sparklines/main/sparklines/example/web/example.png)
 
@@ -100,11 +100,27 @@ Unit changes animate smoothly because both endpoints are resolved in the current
 
 **LineData** — `line`, `thickness`, `areaColor`/`areaGradient`, `areaFillType`, `lineType`, `pointStyle`.
 
+**LineData.scatter** — Marker-only x/y data without connected lines or area fills. It uses `const ScatterLineData()` internally. Scatter points are stored in `line`; use `y` for the vertical coordinate and set `dy` to zero so `fy = y`.
+
+```dart
+LineData.scatter(
+  points: const [
+    DataPoint(x: 0.0, y: 0.25, dy: 0.0),
+    DataPoint(x: 0.5, y: 0.75, dy: 0.0),
+    DataPoint(x: 1.0, y: 0.5, dy: 0.0),
+  ],
+  pointStyle: const CircleDataPointStyle(radius: Px(4), color: Colors.blue),
+)
+```
+
 ### Line types
 
 - **LinearLineData** — Straight segments; optional `isStrokeCapRound`, `isStrokeJoinRound`.
 - **SteppedLineData** — Step at fraction between points: `stepJumpAt` 0→prev, 1→next; constructors `.start()`, `.middle()`, `.end()`.
 - **CurvedLineData** — Smooth curve; `smoothness` 0.0–1.0 (default 0.35).
+- **ScatterLineData** — Marker-only points; `drawLine` is false and `minPoints` is 1.
+
+Custom `ILineTypeData` implementations define `drawLine` and `minPoints`. Line and area geometry is rendered only when `drawLine` is true and the series contains at least `minPoints`; point markers render independently.
 
 ## Between-line charts
 

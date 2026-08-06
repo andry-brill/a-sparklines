@@ -12,30 +12,34 @@ class LineChartRenderer extends AChartRenderer<LineData> {
     LineData lineData,
   ) {
 
-    if (lineData.line.length < 2) return;
+    if (lineData.line.isEmpty) return;
 
     final paint = Paint();
 
-    final hasAreaFill = lineData.areaGradient != null || lineData.areaColor != null;
-    if (hasAreaFill) {
-      final areaPath = _buildAreaPathBetweenFyAndY(lineData, transform);
-      if (areaPath != null) {
+    final lineType = lineData.lineType;
 
-        final tAreaPath = transform.path(areaPath);
+    if (lineType.drawLine && lineData.line.length >= lineType.minPoints) {
+      final hasAreaFill = lineData.areaGradient != null || lineData.areaColor != null;
+      if (hasAreaFill) {
+        final areaPath = _buildAreaPathBetweenFyAndY(lineData, transform);
+        if (areaPath != null) {
 
-        if (lineData.areaGradient != null) {
-          paint.shader = lineData.areaGradient!.createShader(tAreaPath.getBounds());
-        } else {
-          paint.shader = null;
-          paint.color = lineData.areaColor!;
+          final tAreaPath = transform.path(areaPath);
+
+          if (lineData.areaGradient != null) {
+            paint.shader = lineData.areaGradient!.createShader(tAreaPath.getBounds());
+          } else {
+            paint.shader = null;
+            paint.color = lineData.areaColor!;
+          }
+
+          paint.style = PaintingStyle.fill;
+          canvas.drawPath(tAreaPath, paint);
         }
-
-        paint.style = PaintingStyle.fill;
-        canvas.drawPath(tAreaPath, paint);
       }
-    }
 
-    lineData.lineType.renderer.render(canvas, transform, lineData);
+      lineData.lineType.renderer.render(canvas, transform, lineData);
+    }
 
     drawDataPoints(canvas, paint, transform, lineData, lineData.line);
   }
@@ -43,7 +47,7 @@ class LineChartRenderer extends AChartRenderer<LineData> {
   Path? _buildAreaPathBetweenFyAndY(LineData lineData, ChartTransform transform) {
 
     final points = lineData.line;
-    if (points.length < 2) return null;
+    if (points.length < lineData.lineType.minPoints) return null;
 
     final renderer = lineData.lineType.renderer;
 

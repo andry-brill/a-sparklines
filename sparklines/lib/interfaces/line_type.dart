@@ -18,8 +18,14 @@ abstract class ILineTypeRenderer {
   void render(Canvas canvas, ChartTransform transform, ILineChartData lineData);
 }
 
-/// Marker interface for line type data
+/// Rendering configuration for a line type.
 abstract class ILineTypeData {
+  /// Whether this type draws connected line geometry and area fills.
+  bool get drawLine;
+
+  /// Minimum number of points required by this line type renderer.
+  int get minPoints;
+
   bool get isStrokeCapRound;
   bool get isStrokeJoinRound;
   ILineTypeRenderer get renderer;
