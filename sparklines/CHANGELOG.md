@@ -1,3 +1,8 @@
+## 3.0.1
+
+* **DataPointPipeline**
+  * Added optional `groupingStep` to `stack()`. When provided, nearby x values are grouped into rounded buckets of that size; the default remains exact x matching.
+
 ## 3.0.0
 
 * **Breaking: unit-aware visual lengths**

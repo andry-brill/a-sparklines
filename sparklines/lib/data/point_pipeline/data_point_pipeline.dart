@@ -38,7 +38,6 @@ class _LazyList<T> extends ListBase<T> {
       throw UnsupportedError('LazyList is read-only');
 
 }
-
 abstract class DataPointModifier {
 
   List<DataPoint> apply(
@@ -179,10 +178,29 @@ class DataPointPipeline {
 
   // builder methods
 
-  /// Stack points on point.y by point.x with point.dy values
-  /// [offset] - initial offset for the first point on point.x
-  DataPointPipeline stack({ double offset = 0.0, double spacing = 0.0 }) {
-    _modifiers.add(_StackModifier(offset: offset, spacing: spacing));
+  /// Stack points on point.y by point.x with point.dy values.
+  ///
+  /// [offset] is the initial offset for the first point on point.x.
+  /// When [groupingStep] is provided, x values are grouped by rounding them
+  /// to buckets of this size. By default, x values must match exactly.
+  DataPointPipeline stack({
+    double offset = 0.0,
+    double spacing = 0.0,
+    double? groupingStep,
+  }) {
+    if (groupingStep != null &&
+        (!groupingStep.isFinite || groupingStep <= 0.0)) {
+      throw ArgumentError.value(
+        groupingStep,
+        'groupingStep',
+        'must be finite and greater than zero',
+      );
+    }
+    _modifiers.add(_StackModifier(
+      offset: offset,
+      spacing: spacing,
+      groupingStep: groupingStep,
+    ));
     return this;
   }
 

@@ -124,7 +124,7 @@ Unit changes animate smoothly because both endpoints are resolved in the current
 
 **DataPointPipeline** — Build transformed lists for stacking/normalization; reuse one pipeline for multiple series so shared state (e.g. stacking) is consistent.
 
-- **stack({ offset?, spacing? })** — Stack points by x; each point’s `y` becomes the running sum at that x, `dy` stays the value. `offset` sets the initial base for each x (default 0.0). Optional `spacing` adds gap between stacked segments.
+- **stack({ offset?, spacing?, groupingStep? })** — Stack points by x; each point’s `y` becomes the running sum at that x, `dy` stays the value. `offset` sets the initial base for each x (default 0.0), and `spacing` adds a gap between stacked segments. By default, x values must match exactly. When `groupingStep` is provided, x values are grouped by rounding them to buckets of that size, which is useful for coordinates affected by floating-point arithmetic.
 - **normalize({ total, threshold?, spacing?, trailingSpacing?, thresholdPoint? })** — Scale `dy` so sum of `abs(dy)` equals `total` (default 1.0). `threshold` repeatedly drops smallest segment until none below threshold; `thresholdPoint` receives accumulated dy of removed points. `spacing` reserves gap between segments; `trailingSpacing` adds one more spacing (useful for full pies).
 - **normalize2pi({ total, threshold?, spacing?, spacingDeg?, trailingSpacing?, thresholdPoint? })** — Same as `normalize` with default `total` 2π for angles. `spacingDeg` is spacing in degrees (converted to radians); `trailingSpacing` defaults to true when `total >= 2` or `total <= -2`.
 - **rescale({ currentMin?, currentMax?, targetMin, targetMax })** — Linearly rescale intervals `[DataPoint.y..DataPoint.fy]` from `[currentMin..currentMax]` to `[targetMin..targetMax]` (default 0–1). Both `y` and `fy` are transformed; `dy` is recalculated as `fy - y`. If `currentMin` or `currentMax` are not finite, they are computed from input interval bounds.
@@ -138,6 +138,8 @@ final pipeline = DataPointPipeline().stack().normalize(total: 1.0);
 final seriesA = pipeline.build(rawPointsA);
 final seriesB = pipeline.build(rawPointsB);
 ```
+
+For example, `stack(groupingStep: 1e-9)` groups `0.1 + 0.2` and `0.3` at the same x position.
 
 ---
 

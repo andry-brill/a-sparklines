@@ -5,7 +5,12 @@ class _StackModifier implements DataPointModifier {
 
   final double offset;
   final double spacing;
-  const _StackModifier({required this.spacing, required this.offset});
+  final double? groupingStep;
+  const _StackModifier({
+    required this.spacing,
+    required this.offset,
+    required this.groupingStep,
+  });
 
   @override
   List<DataPoint> apply(
@@ -16,7 +21,10 @@ class _StackModifier implements DataPointModifier {
 
     for (final p in input) {
 
-      final base = context.cumulativeByX[p.x] ?? offset;
+      final groupKey = groupingStep == null
+          ? p.x
+          : (p.x / groupingStep!).roundToDouble();
+      final base = context.cumulativeByX[groupKey] ?? offset;
 
       result.add(p.copyWith(
           y: base,
@@ -24,7 +32,7 @@ class _StackModifier implements DataPointModifier {
           fy: context.snap(base + p.dy)
       ));
 
-      context.cumulativeByX[p.x] = context.snap(base + p.dy + spacing);
+      context.cumulativeByX[groupKey] = context.snap(base + p.dy + spacing);
     }
 
     return result;

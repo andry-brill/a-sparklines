@@ -101,6 +101,56 @@ void main() {
       expect(actualSecondY, equals(expectedSecondY));
     });
 
+    test('given: pipeline.stack() and arithmetically close x values, should: keep exact grouping by default', () {
+
+      final pipeline = DataPointPipeline().stack();
+      final input = points([(0.1 + 0.2, 0.0, 6.0), (0.3, 0.0, 4.0)]);
+      final out = pipeline.build(input);
+
+      expect(out[0].y, equals(0.0));
+      expect(out[1].y, equals(0.0));
+    });
+
+    test('given: pipeline.stack(groupingStep) and arithmetically close x values, should: stack them in the same bucket', () {
+
+      final pipeline = DataPointPipeline().stack(groupingStep: 1e-9);
+      final input = points([(0.1 + 0.2, 0.0, 6.0), (0.3, 0.0, 4.0)]);
+      final out = pipeline.build(input);
+
+      expect(out[0].y, equals(0.0));
+      expect(out[1].y, equals(6.0));
+    });
+
+    test('given: pipeline.stack(groupingStep) and x values in different buckets, should: stack them independently', () {
+
+      final pipeline = DataPointPipeline().stack(groupingStep: 1e-9);
+      final input = points([(0.3, 0.0, 6.0), (0.300000002, 0.0, 4.0)]);
+      final out = pipeline.build(input);
+
+      expect(out[0].y, equals(0.0));
+      expect(out[1].y, equals(0.0));
+    });
+
+    test('given: pipeline.stack(groupingStep) and close x values in separate inputs, should: share the same bucket', () {
+
+      final pipeline = DataPointPipeline().stack(groupingStep: 1e-9);
+      final outA = pipeline.build(points([(0.1 + 0.2, 0.0, 6.0)]));
+      final outB = pipeline.build(points([(0.3, 0.0, 4.0)]));
+
+      expect(outA[0].y, equals(0.0));
+      expect(outB[0].y, equals(6.0));
+    });
+
+    test('given: pipeline.stack(groupingStep) with a non-positive or non-finite step, should: reject it', () {
+
+      for (final groupingStep in [0.0, -1.0, double.infinity, double.nan]) {
+        expect(
+          () => DataPointPipeline().stack(groupingStep: groupingStep),
+          throwsArgumentError,
+        );
+      }
+    });
+
     test('given: pipeline.stack(spacing: 1.0) and two bars at same x, should: add spacing between stacked values', () {
 
       final pipeline = DataPointPipeline().stack(spacing: 1.0);
