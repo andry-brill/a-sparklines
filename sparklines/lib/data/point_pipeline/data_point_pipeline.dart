@@ -11,6 +11,7 @@ part '_sort_modifier.dart';
 part '_stack_modifier.dart';
 part '_normalize_modifier.dart';
 part '_rescale_modifier.dart';
+part '_rescale_z_modifier.dart';
 part '_aggregation_modifier.dart';
 
 class _LazyList<T> extends ListBase<T> {
@@ -64,6 +65,11 @@ class DataPointPipelineContext {
   double rescaleMinY = double.infinity;
   double rescaleMaxY = double.negativeInfinity;
 
+  /// Bounds used by [_RescaleZModifier] when currentMin/currentMax are not finite.
+  /// Accumulated across all registered input lists.
+  double rescaleMinZ = double.infinity;
+  double rescaleMaxZ = double.negativeInfinity;
+
   void updateBounds(Iterable<DataPoint> points) {
     globalMinY = min(globalMinY, points.minY);
     globalMaxY = max(globalMaxY, points.maxY);
@@ -75,6 +81,16 @@ class DataPointPipelineContext {
       final b = max(p.y, p.fy);
       if (a < rescaleMinY) rescaleMinY = a;
       if (b > rescaleMaxY) rescaleMaxY = b;
+    }
+  }
+
+  void updateRescaleZBounds(Iterable<DataPoint> points) {
+    for (final p in points) {
+      if (!p.z.isFinite) {
+        throw ArgumentError.value(p.z, 'DataPoint.z', 'must be finite');
+      }
+      if (p.z < rescaleMinZ) rescaleMinZ = p.z;
+      if (p.z > rescaleMaxZ) rescaleMaxZ = p.z;
     }
   }
 
@@ -134,9 +150,29 @@ class DataPointPipeline {
     return false;
   }
 
+  bool _hasRescaleZWithAutoBounds() {
+    for (final m in _modifiers) {
+      if (m is _RescaleZModifier &&
+          (!m.currentMin.isFinite || !m.currentMax.isFinite)) {
+        return true;
+      }
+    }
+    return false;
+  }
+
   void _computeIfNeeded() {
 
     if (_computed) return;
+
+    final needRescaleZBoundsPass = _hasRescaleZWithAutoBounds();
+
+    if (needRescaleZBoundsPass) {
+      context.rescaleMinZ = double.infinity;
+      context.rescaleMaxZ = double.negativeInfinity;
+      for (final input in _inputs) {
+        context.updateRescaleZBounds(input);
+      }
+    }
 
     final needRescaleBoundsPass = _hasRescaleWithAutoBounds();
 
@@ -260,11 +296,50 @@ class DataPointPipeline {
     return this;
   }
 
-  /// Sort input by x, y, and/or fy.
-  /// [x], [y], [fy]: if true => ascending, if false => descending.
+  /// Linearly rescale point.z from [currentMin..currentMax]
+  /// to [targetMin..targetMax].
+  ///
+  /// Non-finite source bounds are computed across all registered input lists.
+  /// When the resolved source bounds are equal, z maps to the target midpoint.
+  DataPointPipeline rescaleZ({
+    double currentMin = double.negativeInfinity,
+    double currentMax = double.infinity,
+    double targetMin = 0.0,
+    double targetMax = 1.0,
+    bool clamp = true,
+  }) {
+    if (currentMin.isNaN) {
+      throw ArgumentError.value(currentMin, 'currentMin', 'must not be NaN');
+    }
+    if (currentMax.isNaN) {
+      throw ArgumentError.value(currentMax, 'currentMax', 'must not be NaN');
+    }
+    if (currentMin.isFinite && currentMax.isFinite && currentMin > currentMax) {
+      throw ArgumentError.value(currentMax, 'currentMax', 'must be greater than or equal to currentMin');
+    }
+    if (!targetMin.isFinite) {
+      throw ArgumentError.value(targetMin, 'targetMin', 'must be finite');
+    }
+    if (!targetMax.isFinite) {
+      throw ArgumentError.value(targetMax, 'targetMax', 'must be finite');
+    }
+
+    _modifiers.add(_RescaleZModifier(
+      currentMin: currentMin,
+      currentMax: currentMax,
+      targetMin: targetMin,
+      targetMax: targetMax,
+      clamp: clamp,
+    ));
+
+    return this;
+  }
+
+  /// Sort input by x, y, fy, and/or z.
+  /// [x], [y], [fy], [z]: if true => ascending, if false => descending.
   /// If all are null, sorts by x ascending by default.
-  DataPointPipeline sort({bool? x, bool? y, bool? fy}) {
-    _modifiers.add(_SortModifier(x: x, y: y, fy: fy));
+  DataPointPipeline sort({bool? x, bool? y, bool? fy, bool? z}) {
+    _modifiers.add(_SortModifier(x: x, y: y, fy: fy, z: z));
     return this;
   }
 

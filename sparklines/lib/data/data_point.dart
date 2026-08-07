@@ -26,6 +26,9 @@ class DataPoint implements ILerpTo<DataPoint> {
   /// Value
   final double dy;
 
+  /// Third dimension used by visual builders, without affecting layout bounds
+  final double z;
+
   /// Full Y (y + dy)
   final double fy;
 
@@ -35,6 +38,7 @@ class DataPoint implements ILerpTo<DataPoint> {
     required this.x,
     this.y = 0.0,
     required this.dy,
+    this.z = 0.0,
     this.data = const {},
     /// Can be used in case need in snap function
     double? fy
@@ -45,12 +49,14 @@ class DataPoint implements ILerpTo<DataPoint> {
     double? dx,
     double? y,
     double? dy,
+    double? z,
     double? fy,
     DataPointDataMap? data,
   }) => DataPoint(
     x: x ?? this.x,
     y: y ?? this.y,
     dy: dy ?? this.dy,
+    z: z ?? this.z,
     fy: fy, // NB! Must be without ?? this.fy,
     data: data != null ? this.data.copyWith(data) : this.data,
   );
@@ -61,6 +67,7 @@ class DataPoint implements ILerpTo<DataPoint> {
       x: lerpDouble(x, next.x, t) ?? next.x,
       y: lerpDouble(y, next.y, t) ?? next.y,
       dy: lerpDouble(dy, next.dy, t) ?? next.dy,
+      z: lerpDouble(z, next.z, t) ?? next.z,
       data: data.lerpTo(next.data, t)
     );
   }
@@ -81,7 +88,7 @@ class DataPoint implements ILerpTo<DataPoint> {
       }
     }
 
-    return this.y == other.y && this.x == other.x && this.dy == other.dy;
+    return this.y == other.y && this.x == other.x && this.dy == other.dy && this.z == other.z;
   }
 
   @override
@@ -93,7 +100,7 @@ class DataPoint implements ILerpTo<DataPoint> {
       dataHash ^= Object.hash(entry.key, entry.value);
     }
 
-    return Object.hash(x, y, dy, dataHash);
+    return Object.hash(x, y, dy, z, dataHash);
   }
 
 }

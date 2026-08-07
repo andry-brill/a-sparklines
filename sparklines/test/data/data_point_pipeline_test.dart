@@ -17,6 +17,22 @@ List<DataPoint> points(List<(double x, double y, double dy)> coords) =>
 
 void main() {
 
+  group('DataPoint z', () {
+
+    test('defaults to zero and participates in copy, interpolation, and equality', () {
+      const point = DataPoint(x: 1.0, y: 2.0, dy: 3.0);
+      final copied = point.copyWith(z: 4.0);
+      final interpolated = point.lerpTo(copied, 0.25);
+
+      expect(point.z, equals(0.0));
+      expect(copied.z, equals(4.0));
+      expect(interpolated.z, equals(1.0));
+      expect(copied, equals(const DataPoint(x: 1.0, y: 2.0, dy: 3.0, z: 4.0)));
+      expect(copied, isNot(point));
+      expect(copied.hashCode, equals(const DataPoint(x: 1.0, y: 2.0, dy: 3.0, z: 4.0).hashCode));
+    });
+  });
+
   group('DataPointPipeline', () {
 
     test('given: no modifiers and one input list, should: return same points as unmodifiable list', () {
@@ -450,6 +466,78 @@ void main() {
     });
   });
 
+  group('RescaleZModifier', () {
+
+    test('given: explicit z bounds, should: rescale z and preserve point coordinates and data', () {
+      const meta = DataPointMeta(key: 'middle');
+      final pipeline = DataPointPipeline().rescaleZ(currentMin: 10.0, currentMax: 30.0);
+      final input = [
+        const DataPoint(x: 1.0, y: 2.0, dy: 3.0, z: 10.0),
+        const DataPoint(x: 2.0, y: 3.0, dy: 4.0, z: 20.0, data: {IDataPointMeta: meta}),
+        const DataPoint(x: 3.0, y: 4.0, dy: 5.0, z: 30.0),
+      ];
+      final out = pipeline.build(input);
+
+      expect(out.map((p) => p.z), orderedEquals([0.0, 0.5, 1.0]));
+      expect(out[1].x, equals(2.0));
+      expect(out[1].y, equals(3.0));
+      expect(out[1].dy, equals(4.0));
+      expect(out[1].fy, equals(7.0));
+      expect(out[1].of<IDataPointMeta>(), same(meta));
+    });
+
+    test('given: automatic z bounds and multiple inputs, should: share bounds across every input', () {
+      final pipeline = DataPointPipeline().rescaleZ();
+      final outA = pipeline.build(const [
+        DataPoint(x: 0.0, dy: 0.0, z: 10.0),
+        DataPoint(x: 1.0, dy: 0.0, z: 20.0),
+      ]);
+      final outB = pipeline.build(const [
+        DataPoint(x: 2.0, dy: 0.0, z: 30.0),
+      ]);
+
+      expect(outA.map((p) => p.z), orderedEquals([0.0, 0.5]));
+      expect(outB.map((p) => p.z), orderedEquals([1.0]));
+    });
+
+    test('given: equal automatic z bounds, should: map every z to the target midpoint', () {
+      final pipeline = DataPointPipeline().rescaleZ(targetMin: 2.0, targetMax: 6.0);
+      final out = pipeline.build(const [
+        DataPoint(x: 0.0, dy: 0.0, z: 4.0),
+        DataPoint(x: 1.0, dy: 0.0, z: 4.0),
+      ]);
+
+      expect(out.map((p) => p.z), orderedEquals([4.0, 4.0]));
+    });
+
+    test('given: explicit z bounds and clamp enabled, should: clamp values to the target range', () {
+      final pipeline = DataPointPipeline().rescaleZ(currentMin: 0.0, currentMax: 10.0);
+      final out = pipeline.build(const [
+        DataPoint(x: 0.0, dy: 0.0, z: -5.0),
+        DataPoint(x: 1.0, dy: 0.0, z: 15.0),
+      ]);
+
+      expect(out.map((p) => p.z), orderedEquals([0.0, 1.0]));
+    });
+
+    test('given: explicit z bounds and clamp disabled, should: extrapolate outside the target range', () {
+      final pipeline = DataPointPipeline().rescaleZ(currentMin: 0.0, currentMax: 10.0, clamp: false);
+      final out = pipeline.build(const [
+        DataPoint(x: 0.0, dy: 0.0, z: -5.0),
+        DataPoint(x: 1.0, dy: 0.0, z: 15.0),
+      ]);
+
+      expect(out.map((p) => p.z), orderedEquals([-0.5, 1.5]));
+    });
+
+    test('given: a non-finite z, should: reject it during lazy evaluation', () {
+      final pipeline = DataPointPipeline().rescaleZ();
+      final out = pipeline.build(const [DataPoint(x: 0.0, dy: 0.0, z: double.nan)]);
+
+      expect(() => out.length, throwsArgumentError);
+    });
+  });
+
   group('Combination', () {
 
     test('given: pipeline.stack().normalize() and two bars at same x, should: stack first then normalize dy only (y unchanged)', () {
@@ -599,6 +687,18 @@ void main() {
       expect(out[0].fy, equals(3.0));
       expect(out[1].fy, equals(2.0));
       expect(out[2].fy, equals(1.0));
+    });
+
+    test('given: sort(z: true), should: sort by z ascending', () {
+      final pipeline = DataPointPipeline().sort(z: true);
+      final input = const [
+        DataPoint(x: 0.0, dy: 0.0, z: 3.0),
+        DataPoint(x: 1.0, dy: 0.0, z: 1.0),
+        DataPoint(x: 2.0, dy: 0.0, z: 2.0),
+      ];
+      final out = pipeline.build(input);
+
+      expect(out.map((p) => p.z), orderedEquals([1.0, 2.0, 3.0]));
     });
 
     test('given: sort(x: true, y: false), should: sort by x asc then y desc', () {

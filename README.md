@@ -105,6 +105,7 @@ SparklinesChart(
 - **x** — X coordinate.
 - **y** — Base Y (e.g. stacked base).
 - **dy** — Delta from base; **fy = y + dy** is the value used for drawing.
+- **z** — Third dimension for weights and other visual mappings; defaults to `0` and does not affect layout bounds.
 - **data** — Extensible `Map<Type, IDataPointData?>` for per-point metadata. Keys are type tokens; values implement `IDataPointData` (supports `lerpTo` for animation). Use `point.of<M>()` for type-safe access.
 
 **Common data entries** (via extension getters or `of<M>()`):
@@ -181,7 +182,8 @@ Custom `ILineTypeData` implementations define `drawLine` and `minPoints`. Line a
 - **normalize({ total, threshold?, spacing?, trailingSpacing?, thresholdPoint? })** — Scale `dy` so sum of `abs(dy)` equals `total` (default 1.0). `threshold` repeatedly drops smallest segment until none below threshold; `thresholdPoint` receives accumulated dy of removed points. `spacing` reserves gap between segments; `trailingSpacing` adds one more spacing (useful for full pies).
 - **normalize2pi({ total, threshold?, spacing?, spacingDeg?, trailingSpacing?, thresholdPoint? })** — Same as `normalize` with default `total` 2π for angles. `spacingDeg` is spacing in degrees (converted to radians); `trailingSpacing` defaults to true when `total >= 2` or `total <= -2`.
 - **rescale({ currentMin?, currentMax?, targetMin, targetMax })** — Linearly rescale intervals `[DataPoint.y..DataPoint.fy]` from `[currentMin..currentMax]` to `[targetMin..targetMax]` (default 0–1). Both `y` and `fy` are transformed; `dy` is recalculated as `fy - y`. If `currentMin` or `currentMax` are not finite, they are computed from input interval bounds.
-- **sort({ x?, y?, fy? })** — Sort input by x, y, and/or fy. Each: `true` = ascending, `false` = descending. If all null, sorts by x ascending.
+- **rescaleZ({ currentMin?, currentMax?, targetMin, targetMax, clamp })** — Linearly rescale `DataPoint.z` into a target range (default 0–1). Automatic bounds are shared across every input registered with the pipeline. Values clamp to the source range by default, and an equal source range maps to the target midpoint.
+- **sort({ x?, y?, fy?, z? })** — Sort input by x, y, fy, and/or z. Each: `true` = ascending, `false` = descending. If all null, sorts by x ascending.
 - **aggregate({ function, window? })** — Aggregate `dy` over a window ending at each point. `function`: `DataAggregation.sum`, `.avg`, `.min`, `.max`, `.median`, `.std` (default `sum`). `window`: null = cumulative from start, N = last N elements. Updates `dy` and `fy` per point.
 
 **IThresholdPoints** / **ThresholdPoints** — When `normalize` removes below-threshold points and uses `thresholdPoint`, the aggregate point’s `data` contains `ThresholdPoints(removed)` so you can access the original points via `point.of<IThresholdPoints>()?.thresholdPoints`.

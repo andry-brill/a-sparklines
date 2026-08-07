@@ -6,6 +6,10 @@
   * Single-point line and scatter data now render their point marker.
 * **Breaking: custom line types**
   * `ILineTypeData` now requires `drawLine` and `minPoints` so renderers can determine whether and when to draw connected geometry.
+* **DataPoint and DataPointPipeline**
+  * Added `DataPoint.z` as an interpolated third dimension that does not affect layout bounds.
+  * Added `rescaleZ()` with shared automatic bounds, optional clamping, and target-midpoint handling for equal z values.
+  * Added optional z ordering to `sort()`.
 * **Chart insets and point fitting**
   * Added reusable `ChartInsets` with optional `left`, `top`, `right`, and `bottom` `ILengthValue`s for global widget padding and local per-chart padding.
   * `ChartInsets` implements `IDataPointExtent` and can be stored in `DataPoint.data` for automatic, position-aware visual overflow fitting around `(x, fy)`.
