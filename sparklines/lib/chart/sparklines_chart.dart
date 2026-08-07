@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../interfaces/chart_padding.dart';
 import '../interfaces/layout.dart';
 import '../interfaces/sparklines_data.dart';
 import '../layout/chart_layout.dart';
@@ -13,6 +14,7 @@ class SparklinesChart extends StatefulWidget {
 
   final IChartLayout layout;
   final bool crop;
+  final ChartPadding padding;
 
   final Duration animationDuration;
   final Curve animationCurve;
@@ -27,6 +29,7 @@ class SparklinesChart extends StatefulWidget {
     this.aspectRatio,
     this.layout = const AbsoluteLayout(),
     this.crop = false,
+    this.padding = const ChartPadding(),
     this.animationDuration = const Duration(milliseconds: 300),
     this.animationCurve = Curves.easeInOut,
     this.animate = true,
@@ -132,6 +135,7 @@ class _SparklinesChartState extends State<SparklinesChart>
       aspectRatio: widget.aspectRatio,
       layout: widget.layout,
       crop: widget.crop,
+      padding: widget.padding,
       animation: widget.animate ? _animation : const AlwaysStoppedAnimation(1.0),
       getCharts: _getInterpolatedCharts,
     );
@@ -144,6 +148,7 @@ class _SparklinesRenderWidget extends StatelessWidget {
   final double? aspectRatio;
   final IChartLayout layout;
   final bool crop;
+  final ChartPadding padding;
   final Animation<double> animation;
   final List<ISparklinesData> Function(double) getCharts;
 
@@ -153,6 +158,7 @@ class _SparklinesRenderWidget extends StatelessWidget {
     required this.aspectRatio,
     required this.layout,
     required this.crop,
+    required this.padding,
     required this.animation,
     required this.getCharts,
   });
@@ -256,6 +262,7 @@ class _SparklinesRenderWidget extends StatelessWidget {
             charts: charts,
             defaultLayout: layout,
             defaultCrop: crop,
+            padding: padding,
             width: w,
             height: h,
           ),

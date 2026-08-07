@@ -6,6 +6,10 @@
   * Single-point line and scatter data now render their point marker.
 * **Breaking: custom line types**
   * `ILineTypeData` now requires `drawLine` and `minPoints` so renderers can determine whether and when to draw connected geometry.
+* **Chart padding**
+  * Added widget-level `ChartPadding` with optional `left`, `top`, `right`, and `bottom` `ILengthValue`s.
+  * Padding composes a screen-space matrix after the layout matrix without changing source data or layout bounds.
+  * Over-constrained horizontal or vertical padding collapses every point to the same coordinate on that axis.
 
 ## 3.0.1
 

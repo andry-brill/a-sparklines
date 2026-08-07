@@ -66,6 +66,24 @@ Unit changes animate smoothly because both endpoints are resolved in the current
 - **crop** — When `true`, rendering is clipped to chart bounds. Chart-level `crop` overrides the widget default.
 - **visible** — Per-chart; when `false`, the chart is skipped.
 
+### Chart padding
+
+`ChartPadding` reserves screen-space room inside the chart viewport without changing data points or layout bounds. Each side accepts any `ILengthValue` and omitted sides have no padding.
+
+```dart
+SparklinesChart(
+  charts: charts,
+  padding: const ChartPadding(
+    left: Px(8),
+    top: Px(4),
+    right: Px(8),
+    bottom: Px(4),
+  ),
+)
+```
+
+`Px`, `Vw`, `Vh`, `Dx`, and `Dy` values are resolved with the preliminary chart transform, then `paddingMatrix × layoutMatrix` is used for rendering. Negative resolved values are treated as zero. If left plus right padding consumes the viewport, every point has the same screen-space x coordinate; the same applies to top plus bottom and y.
+
 ### DataPoint
 
 - **x** — X coordinate.
@@ -166,6 +184,7 @@ For example, `stack(groupingStep: 1e-9)` groups `0.1 + 0.2` and `0.3` at the sam
 - **charts** — List of `ISparklinesData` (e.g. `LineData`, `BarData`, `PieData`, `BetweenLineData`).
 - **layout** — Default `IChartLayout` (e.g. `AbsoluteLayout()`, `RelativeLayout.full()`).
 - **crop** — Default clip-to-bounds.
+- **padding** — Screen-space chart padding; defaults to `const ChartPadding()` (no padding).
 - **width** / **height** — Fixed size; one can be null and filled by layout.
 - **aspectRatio** — Used when both width and height are null.
 - **animate** — Enable data-driven animation (default `true`).

@@ -10,6 +10,7 @@ export 'data/pie_data.dart';
 export 'interfaces/chart_area.dart';
 export 'interfaces/chart_border.dart';
 export 'interfaces/chart_flip.dart';
+export 'interfaces/chart_padding.dart';
 export 'interfaces/chart_rotation.dart';
 export 'interfaces/chart_transform.dart';
 export 'interfaces/data_point_data.dart';
