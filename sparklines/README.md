@@ -66,23 +66,39 @@ Unit changes animate smoothly because both endpoints are resolved in the current
 - **crop** — When `true`, rendering is clipped to chart bounds. Chart-level `crop` overrides the widget default.
 - **visible** — Per-chart; when `false`, the chart is skipped.
 
-### Chart padding
+### Chart insets and point fitting
 
-`ChartPadding` reserves screen-space room inside the chart viewport without changing data points or layout bounds. Each side accepts any `ILengthValue` and omitted sides have no padding.
+`ChartInsets` reserves screen-space room inside the chart viewport without changing data points or layout bounds. Each side accepts any `ILengthValue` and omitted sides have no inset. Set global insets on `SparklinesChart.padding` or additional local insets on any built-in chart data object.
 
 ```dart
 SparklinesChart(
-  charts: charts,
-  padding: const ChartPadding(
+  padding: const ChartInsets(
     left: Px(8),
     top: Px(4),
     right: Px(8),
     bottom: Px(4),
   ),
+  charts: [
+    LineData.scatter(
+      padding: const ChartInsets(left: Px(2), right: Px(2)),
+      points: const [
+        DataPoint(
+          x: 0,
+          y: 0.5,
+          dy: 0,
+          data: {
+            IDataPointExtent: ChartInsets(left: Px(6), top: Px(6), right: Px(6), bottom: Px(6)),
+          },
+        ),
+      ],
+    ),
+  ],
 )
 ```
 
-`Px`, `Vw`, `Vh`, `Dx`, and `Dy` values are resolved with the preliminary chart transform, then `paddingMatrix × layoutMatrix` is used for rendering. Negative resolved values are treated as zero. If left plus right padding consumes the viewport, every point has the same screen-space x coordinate; the same applies to top plus bottom and y.
+`ChartInsets` also implements `IDataPointExtent`, so it can describe a visual centered on a point's `(x, fy)` anchor. Point fitting is automatic: only the part of an extent that would cross a viewport edge is added. Global padding, local padding, and point overflow are combined, while charts sharing a layout use the largest requirement on each side so they remain aligned.
+
+`Px`, `Vw`, `Vh`, `Dx`, and `Dy` values are resolved once with the preliminary chart transform, then `insetsMatrix × layoutMatrix` is used for rendering. Negative or non-finite resolved values are treated as zero. If opposing insets consume the viewport, every point collapses to a weighted position on that axis. For example, left `10` and right `40` in a width of `10` collapse x at `2`.
 
 ### DataPoint
 
@@ -95,8 +111,11 @@ SparklinesChart(
 
 - **style** — `IDataPointStyle?` (e.g. `CircleDataPointStyle`) for point markers.
 - **thickness** — `IThicknessOverride?` (size, color, gradient, align) to override chart thickness for this point.
+- **extent** — `IDataPointExtent?`; use `ChartInsets` to automatically fit a visual centered on `(x, fy)` inside the viewport.
 - **pieOffset** — `IPieOffset?` for pie slice offset.
 - **DataPointMeta** — `id`, `key`, `label` for tooltips or identification.
+
+Every `ISparklinesData` is iterable over its source points. Line, scatter, bar, and pie data iterate their corresponding point list. `BetweenLineData` iterates its `from` points followed by its `to` points, but reports `supportsPointExtents == false`, so metadata on those child points does not affect fitting.
 
 ### Thickness (global and per-point)
 
@@ -184,7 +203,7 @@ For example, `stack(groupingStep: 1e-9)` groups `0.1 + 0.2` and `0.3` at the sam
 - **charts** — List of `ISparklinesData` (e.g. `LineData`, `BarData`, `PieData`, `BetweenLineData`).
 - **layout** — Default `IChartLayout` (e.g. `AbsoluteLayout()`, `RelativeLayout.full()`).
 - **crop** — Default clip-to-bounds.
-- **padding** — Screen-space chart padding; defaults to `const ChartPadding()` (no padding).
+- **padding** — Global chart insets; defaults to `const ChartInsets()` (no insets).
 - **width** / **height** — Fixed size; one can be null and filled by layout.
 - **aspectRatio** — Used when both width and height are null.
 - **animate** — Enable data-driven animation (default `true`).
@@ -202,3 +221,5 @@ Charts implement `ILerpTo` for smooth transitions when data changes.
 - **ILineTypeData** + **ILineTypeRenderer** — Custom line path and stroke.
 - **IChartLayout** — Custom coordinate systems; implement `resolve()` and `transform()`.
 - **ILengthValue** — Custom visual units; implement `resolve(ILengthContext)`.
+
+Custom `ISparklinesData` implementations must expose `ChartInsets get padding`, implement `Iterable<DataPoint>`, and report `supportsPointExtents`. Use `IterableMixin<DataPoint>` to implement iteration from an existing point list. Return `const ChartInsets()` and `false` to opt out of local insets and automatic point-extent fitting.

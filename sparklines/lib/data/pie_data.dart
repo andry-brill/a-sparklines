@@ -1,8 +1,11 @@
+import 'dart:collection';
+
 import 'package:any_sparklines/interfaces/pie_offset.dart';
 import 'package:flutter/material.dart';
 import 'dart:ui' show lerpDouble;
 import '../interfaces/chart_border.dart';
 import '../interfaces/chart_flip.dart';
+import '../interfaces/chart_insets.dart';
 import '../interfaces/chart_rotation.dart';
 import '../interfaces/data_point_style.dart';
 import '../interfaces/layout.dart';
@@ -15,7 +18,7 @@ import 'data_point.dart';
 import 'pie_slice_data.dart';
 
 
-class PieData implements ISparklinesData, IChartThickness, IChartBorder, IChartDataPointStyle, IChartPieOffset {
+class PieData with IterableMixin<DataPoint> implements ISparklinesData, IChartThickness, IChartBorder, IChartDataPointStyle, IChartPieOffset {
   static final IChartRenderer defaultRenderer = PieChartRenderer();
 
   @override
@@ -30,12 +33,19 @@ class PieData implements ISparklinesData, IChartThickness, IChartBorder, IChartD
   final IChartLayout? layout;
   @override
   final bool? crop;
+  @override
+  final ChartInsets padding;
 
   @override
   IChartRenderer get renderer => defaultRenderer;
 
   /// Each point (x,y) defines arc, where radius = x, startAngle = y, endAngle = y + dy
   final List<DataPoint> pies;
+
+  @override
+  Iterator<DataPoint> get iterator => pies.iterator;
+  @override
+  bool get supportsPointExtents => true;
 
   @override
   final ThicknessData thickness;
@@ -87,6 +97,7 @@ class PieData implements ISparklinesData, IChartThickness, IChartBorder, IChartD
     this.origin = Offset.zero,
     this.layout,
     this.crop,
+    this.padding = const ChartInsets(),
     required this.pies,
     this.thickness = const ThicknessData(size: Px(2.0)),
     this.pieOffset = 0.0,
@@ -106,6 +117,7 @@ class PieData implements ISparklinesData, IChartThickness, IChartBorder, IChartD
     this.origin = Offset.zero,
     this.layout,
     this.crop,
+    this.padding = const ChartInsets(),
     required this.pies,
     this.thickness = const ThicknessData(size: Px(2.0)),
     this.pieOffset = 0.0,
@@ -122,6 +134,7 @@ class PieData implements ISparklinesData, IChartThickness, IChartBorder, IChartD
     Offset? origin,
     IChartLayout? layout,
     bool? crop,
+    ChartInsets? padding,
     List<DataPoint>? pies,
     ThicknessData? thickness,
     double? pieOffset,
@@ -136,6 +149,7 @@ class PieData implements ISparklinesData, IChartThickness, IChartBorder, IChartD
       origin: origin ?? this.origin,
       layout: layout ?? this.layout,
       crop: crop ?? this.crop,
+      padding: padding ?? this.padding,
       pies: pies ?? this.pies,
       thickness: thickness ?? this.thickness,
       pieOffset: pieOffset ?? this.pieOffset,
@@ -153,6 +167,7 @@ class PieData implements ISparklinesData, IChartThickness, IChartBorder, IChartD
     if (flip != other.flip) return true;
     if (origin != other.origin) return true;
     if (layout != other.layout) return true;
+    if (padding != other.padding) return true;
     if (pies.length != other.pies.length) return true;
     if (thickness != other.thickness) return true;
     if (pieOffset != other.pieOffset) return true;
@@ -187,6 +202,7 @@ class PieData implements ISparklinesData, IChartThickness, IChartBorder, IChartD
       origin: Offset.lerp(origin, next.origin, t) ?? next.origin,
       layout: next.layout,
       crop: next.crop,
+      padding: padding.lerp(next.padding, t),
       pies: interpolatedPies,
       thickness: thickness.lerpTo(next.thickness, t),
       pieOffset: lerpDouble(pieOffset, next.pieOffset, t) ?? next.pieOffset,

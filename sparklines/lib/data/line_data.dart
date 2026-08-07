@@ -1,6 +1,9 @@
+import 'dart:collection';
+
 import 'package:any_sparklines/interfaces/data_point_data.dart';
 import 'package:flutter/material.dart';
 import '../interfaces/chart_flip.dart';
+import '../interfaces/chart_insets.dart';
 import '../interfaces/chart_rotation.dart';
 import '../interfaces/chart_area.dart';
 import '../interfaces/layout.dart';
@@ -17,7 +20,7 @@ import '../renderers/lines/stepped_line_renderer.dart';
 import 'data_point.dart';
 
 
-class LineData implements ISparklinesData, IChartThickness, IChartDataPointStyle, IChartArea, ILineChartData {
+class LineData with IterableMixin<DataPoint> implements ISparklinesData, IChartThickness, IChartDataPointStyle, IChartArea, ILineChartData {
 
   static final LineChartRenderer defaultRenderer = LineChartRenderer();
 
@@ -33,11 +36,18 @@ class LineData implements ISparklinesData, IChartThickness, IChartDataPointStyle
   final IChartLayout? layout;
   @override
   final bool? crop;
+  @override
+  final ChartInsets padding;
 
   @override
   LineChartRenderer get renderer => defaultRenderer;
 
   final List<DataPoint> line;
+
+  @override
+  Iterator<DataPoint> get iterator => line.iterator;
+  @override
+  bool get supportsPointExtents => true;
 
   @override
   double get minX => line.minX;
@@ -75,6 +85,7 @@ class LineData implements ISparklinesData, IChartThickness, IChartDataPointStyle
     this.origin = Offset.zero,
     this.layout,
     this.crop,
+    this.padding = const ChartInsets(),
     required this.line,
     this.thickness = const ThicknessData(size: Px(2.0)),
     this.areaGradient,
@@ -92,6 +103,7 @@ class LineData implements ISparklinesData, IChartThickness, IChartDataPointStyle
     this.origin = Offset.zero,
     this.layout,
     this.crop,
+    this.padding = const ChartInsets(),
     required List<DataPoint> points,
     this.pointStyle,
   })  : line = points,
@@ -108,6 +120,7 @@ class LineData implements ISparklinesData, IChartThickness, IChartDataPointStyle
     Offset? origin,
     IChartLayout? layout,
     bool? crop,
+    ChartInsets? padding,
     List<DataPoint>? line,
     ThicknessData? thickness,
     Gradient? areaGradient,
@@ -123,6 +136,7 @@ class LineData implements ISparklinesData, IChartThickness, IChartDataPointStyle
       origin: origin ?? this.origin,
       layout: layout ?? this.layout,
       crop: crop ?? this.crop,
+      padding: padding ?? this.padding,
       line: line ?? this.line,
       thickness: thickness ?? this.thickness,
       areaGradient: areaGradient ?? this.areaGradient,
@@ -141,6 +155,7 @@ class LineData implements ISparklinesData, IChartThickness, IChartDataPointStyle
     if (flip != other.flip) return true;
     if (origin != other.origin) return true;
     if (layout != other.layout) return true;
+    if (padding != other.padding) return true;
     if (line.length != other.line.length) return true;
     if (thickness != other.thickness) return true;
     if (areaGradient != other.areaGradient) return true;
@@ -176,6 +191,7 @@ class LineData implements ISparklinesData, IChartThickness, IChartDataPointStyle
       origin: Offset.lerp(origin, next.origin, t) ?? next.origin,
       layout: next.layout,
       crop: next.crop,
+      padding: padding.lerp(next.padding, t),
       line: interpolatedPoints,
       thickness: thickness.lerpTo(next.thickness, t),
       areaGradient: Gradient.lerp(areaGradient, next.areaGradient, t),

@@ -2,6 +2,7 @@ import 'dart:ui' show lerpDouble;
 import 'dart:math' as math;
 
 import 'package:any_sparklines/interfaces/chart_border.dart';
+import 'package:any_sparklines/interfaces/chart_insets.dart';
 import 'package:any_sparklines/interfaces/pie_offset.dart';
 
 import '../interfaces/data_point_data.dart';
@@ -103,6 +104,7 @@ extension DataPointExtension on DataPoint {
 
   IThicknessOverride? get thickness => of<IThicknessOverride>();
   IDataPointStyle? get style => of<IDataPointStyle>();
+  IDataPointExtent? get extent => of<IDataPointExtent>();
   IPieOffset? get pieOffset => of<IPieOffset>();
   IDataPointBorder? get border => of<IDataPointBorder>();
 

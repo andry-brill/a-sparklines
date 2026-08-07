@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 
+import '../data/data_point.dart';
 import 'chart_flip.dart';
+import 'chart_insets.dart';
 import 'chart_rotation.dart';
 import 'chart_transform.dart';
 import 'layout.dart';
@@ -16,7 +18,7 @@ abstract class IChartRenderer {
 }
 
 /// Base interface for all chart data types
-abstract class ISparklinesData implements ILerpTo<ISparklinesData> {
+abstract class ISparklinesData implements Iterable<DataPoint>, ILerpTo<ISparklinesData> {
   /// Whether this chart is visible
   bool get visible;
 
@@ -34,6 +36,12 @@ abstract class ISparklinesData implements ILerpTo<ISparklinesData> {
 
   /// Whether to crop rendering to bounds (null uses chart default)
   bool? get crop;
+
+  /// Additional padding applied to this chart's shared layout group.
+  ChartInsets get padding;
+
+  /// Whether point [IDataPointExtent] metadata participates in fitting.
+  bool get supportsPointExtents;
 
   /// Renderer for this chart type
   IChartRenderer get renderer;

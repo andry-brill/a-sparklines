@@ -6,10 +6,15 @@
   * Single-point line and scatter data now render their point marker.
 * **Breaking: custom line types**
   * `ILineTypeData` now requires `drawLine` and `minPoints` so renderers can determine whether and when to draw connected geometry.
-* **Chart padding**
-  * Added widget-level `ChartPadding` with optional `left`, `top`, `right`, and `bottom` `ILengthValue`s.
-  * Padding composes a screen-space matrix after the layout matrix without changing source data or layout bounds.
-  * Over-constrained horizontal or vertical padding collapses every point to the same coordinate on that axis.
+* **Chart insets and point fitting**
+  * Added reusable `ChartInsets` with optional `left`, `top`, `right`, and `bottom` `ILengthValue`s for global widget padding and local per-chart padding.
+  * `ChartInsets` implements `IDataPointExtent` and can be stored in `DataPoint.data` for automatic, position-aware visual overflow fitting around `(x, fy)`.
+  * Global padding, local padding, and point overflow are combined once from the preliminary transform without changing source data or layout bounds.
+  * Charts sharing a layout receive one aligned inset transform; over-constrained axes collapse to the weighted position between their opposing insets.
+* **Breaking: custom chart data**
+  * Replaced `ChartPadding` with `ChartInsets` without a compatibility alias.
+  * `ISparklinesData` now implements `Iterable<DataPoint>` and requires `padding` and `supportsPointExtents`.
+  * `BetweenLineData` iterates its `from` points followed by its `to` points but disables point-extent fitting.
 
 ## 3.0.1
 

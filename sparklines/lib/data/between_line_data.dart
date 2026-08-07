@@ -1,15 +1,19 @@
+import 'dart:collection';
+
 import 'package:flutter/material.dart';
 import 'dart:math' as math;
 import '../interfaces/chart_flip.dart';
+import '../interfaces/chart_insets.dart';
 import '../interfaces/chart_rotation.dart';
 import '../interfaces/chart_area.dart';
 import '../interfaces/layout.dart';
 import '../interfaces/sparklines_data.dart';
+import 'data_point.dart';
 import 'line_data.dart';
 import '../renderers/between_line_renderer.dart';
 
 /// Between line chart data (fills area between two lines)
-class BetweenLineData implements ISparklinesData, IChartArea {
+class BetweenLineData with IterableMixin<DataPoint> implements ISparklinesData, IChartArea {
 
   static final IChartRenderer defaultRenderer = BetweenLineRenderer();
 
@@ -26,10 +30,17 @@ class BetweenLineData implements ISparklinesData, IChartArea {
   @override
   final bool? crop;
   @override
+  final ChartInsets padding;
+  @override
   IChartRenderer get renderer => defaultRenderer;
 
   final LineData from;
   final LineData to;
+
+  @override
+  Iterator<DataPoint> get iterator => from.followedBy(to).iterator;
+  @override
+  bool get supportsPointExtents => false;
 
   @override
   double get minX => math.min(from.minX, to.minX);
@@ -59,6 +70,7 @@ class BetweenLineData implements ISparklinesData, IChartArea {
     this.origin = Offset.zero,
     this.layout,
     this.crop,
+    this.padding = const ChartInsets(),
     required this.from,
     required this.to,
     this.areaColor = const Color(0xFF000000),
@@ -73,6 +85,7 @@ class BetweenLineData implements ISparklinesData, IChartArea {
     Offset? origin,
     IChartLayout? layout,
     bool? crop,
+    ChartInsets? padding,
     LineData? from,
     LineData? to,
     Color? color,
@@ -85,6 +98,7 @@ class BetweenLineData implements ISparklinesData, IChartArea {
       origin: origin ?? this.origin,
       layout: layout ?? this.layout,
       crop: crop ?? this.crop,
+      padding: padding ?? this.padding,
       from: from ?? this.from,
       to: to ?? this.to,
       areaColor: color ?? this.areaColor,
@@ -101,6 +115,7 @@ class BetweenLineData implements ISparklinesData, IChartArea {
     if (flip != other.flip) return true;
     if (origin != other.origin) return true;
     if (layout != other.layout) return true;
+    if (padding != other.padding) return true;
     if (areaColor != other.areaColor) return true;
     if (areaGradient != other.areaGradient) return true;
     if (areaFillType != other.areaFillType) return true;
@@ -124,6 +139,7 @@ class BetweenLineData implements ISparklinesData, IChartArea {
       origin: Offset.lerp(origin, next.origin, t) ?? next.origin,
       layout: next.layout,
       crop: next.crop,
+      padding: padding.lerp(next.padding, t),
       from: from.lerpTo(next.from, t) as LineData,
       to: to.lerpTo(next.to, t) as LineData,
       areaColor: Color.lerp(areaColor, next.areaColor, t)!,

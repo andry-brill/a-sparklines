@@ -1,7 +1,10 @@
+import 'dart:collection';
+
 import 'package:any_sparklines/interfaces/data_point_data.dart';
 import 'package:flutter/material.dart';
 import '../interfaces/chart_border.dart';
 import '../interfaces/chart_flip.dart';
+import '../interfaces/chart_insets.dart';
 import '../interfaces/chart_rotation.dart';
 import '../interfaces/data_point_style.dart';
 import '../interfaces/layout.dart';
@@ -13,7 +16,7 @@ import '../renderers/bar_chart_renderer.dart';
 import 'data_point.dart';
 
 /// Bar chart data
-class BarData implements ISparklinesData, IChartBorder, IChartThickness, IChartDataPointStyle {
+class BarData with IterableMixin<DataPoint> implements ISparklinesData, IChartBorder, IChartThickness, IChartDataPointStyle {
 
   static final IChartRenderer defaultRenderer = BarChartRenderer();
 
@@ -30,9 +33,16 @@ class BarData implements ISparklinesData, IChartBorder, IChartThickness, IChartD
   @override
   final bool? crop;
   @override
+  final ChartInsets padding;
+  @override
   IChartRenderer get renderer => defaultRenderer;
 
   final List<DataPoint> bars;
+
+  @override
+  Iterator<DataPoint> get iterator => bars.iterator;
+  @override
+  bool get supportsPointExtents => true;
 
   @override
   double get minX => bars.minX;
@@ -65,6 +75,7 @@ class BarData implements ISparklinesData, IChartBorder, IChartThickness, IChartD
     this.origin = Offset.zero,
     this.layout,
     this.crop,
+    this.padding = const ChartInsets(),
     required this.bars,
     this.thickness = const ThicknessData(size: Px(2.0)),
     this.border,
@@ -79,6 +90,7 @@ class BarData implements ISparklinesData, IChartBorder, IChartThickness, IChartD
     Offset? origin,
     IChartLayout? layout,
     bool? crop,
+    ChartInsets? padding,
     List<DataPoint>? bars,
     ThicknessData? thickness,
     ThicknessData? border,
@@ -92,6 +104,7 @@ class BarData implements ISparklinesData, IChartBorder, IChartThickness, IChartD
       origin: origin ?? this.origin,
       layout: layout ?? this.layout,
       crop: crop ?? this.crop,
+      padding: padding ?? this.padding,
       bars: bars ?? this.bars,
       thickness: thickness ?? this.thickness,
       border: border ?? this.border,
@@ -108,6 +121,7 @@ class BarData implements ISparklinesData, IChartBorder, IChartThickness, IChartD
     if (flip != other.flip) return true;
     if (origin != other.origin) return true;
     if (layout != other.layout) return true;
+    if (padding != other.padding) return true;
     if (thickness != other.thickness) return true;
     if (bars.length != other.bars.length) return true;
     if (border != other.border) return true;
@@ -141,6 +155,7 @@ class BarData implements ISparklinesData, IChartBorder, IChartThickness, IChartD
       origin: Offset.lerp(origin, next.origin, t) ?? next.origin,
       layout: next.layout,
       crop: next.crop,
+      padding: padding.lerp(next.padding, t),
       bars: interpolatedBars,
       thickness: thickness.lerpTo(next.thickness, t),
       border: ILerpTo.lerp(border, next.border, t),

@@ -1,9 +1,9 @@
 
 import 'package:flutter/material.dart';
-import 'chart_padding.dart';
+import 'chart_insets.dart';
 import '../data/layout_data.dart';
 import '../interfaces/chart_flip.dart';
-import '../interfaces/chart_padding.dart';
+import '../interfaces/chart_insets.dart';
 import '../interfaces/chart_rotation.dart';
 import '../interfaces/chart_transform.dart';
 import '../interfaces/layout.dart';
@@ -14,7 +14,7 @@ class SparklinesPainter extends CustomPainter {
   final List<ISparklinesData> charts;
   final IChartLayout defaultLayout;
   final bool defaultCrop;
-  final ChartPadding padding;
+  final ChartInsets padding;
   final double width;
   final double height;
   final List<ISparklinesData>? oldCharts;
@@ -23,7 +23,7 @@ class SparklinesPainter extends CustomPainter {
     required this.charts,
     required this.defaultLayout,
     required this.defaultCrop,
-    this.padding = const ChartPadding(),
+    this.padding = const ChartInsets(),
     required this.width,
     required this.height,
     this.oldCharts,
@@ -56,6 +56,23 @@ class SparklinesPainter extends CustomPainter {
       datas.add(layoutData(chart));
     }
 
+    final resolvedInsets = <IChartLayout, ResolvedChartInsets>{};
+
+    for (final chart in charts) {
+      if (!chart.visible) continue;
+      final originalLayout = chart.layout ?? defaultLayout;
+      final chartLayout = originalLayout.resolve(layouts[originalLayout]!);
+      final dimensions = layoutData(chart);
+      final preliminaryTransform = ChartTransform(
+        dimensions: dimensions,
+        pathTransform: chartLayout.transform(dimensions),
+      );
+      final chartInsets = resolveChartInsets(preliminaryTransform, padding)
+        .add(resolveChartInsets(preliminaryTransform, chart.padding))
+        .add(chart.supportsPointExtents ? resolveDataPointOverflow(preliminaryTransform, dimensions, chart) : const ResolvedChartInsets());
+      resolvedInsets[originalLayout] = (resolvedInsets[originalLayout] ?? const ResolvedChartInsets()).maxWith(chartInsets);
+    }
+
     for (final chart in charts) {
 
       if (!chart.visible) continue;
@@ -74,7 +91,7 @@ class SparklinesPainter extends CustomPainter {
       }
 
       final preliminaryMatrix = chartLayout.transform(dimensions);
-      final pathTransform = paddedChartMatrix(preliminaryMatrix, dimensions, padding);
+      final pathTransform = insetChartMatrix(preliminaryMatrix, dimensions, resolvedInsets[originalLayout] ?? const ResolvedChartInsets());
       final transform = ChartTransform(
           dimensions: dimensions,
           pathTransform: pathTransform,
