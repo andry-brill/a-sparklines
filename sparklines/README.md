@@ -25,6 +25,7 @@ Thicknesses, marker radii, borders, and corner radii use **ILengthValue**:
 
 - **Px(2)** — Flutter logical pixels.
 - **Vw(1)** / **Vh(1)** — CSS-style viewport percentages; `1` means 1%.
+- **Vmin(1)** / **Vmax(1)** — Percentage of the shorter/longer logical viewport dimension.
 - **Dx(0.1)** / **Dy(0.1)** — X/Y data-space intervals converted through the chart transform.
 
 ```dart
@@ -39,15 +40,13 @@ LineData(
 Custom units implement `ILengthValue.resolve(ILengthContext)`:
 
 ```dart
-final class VMin implements ILengthValue {
+final class Vmean implements ILengthValue {
   final double percentage;
-  const VMin(this.percentage);
+  const Vmean(this.percentage);
 
   @override
   double resolve(ILengthContext context) {
-    final side = context.viewportWidth < context.viewportHeight
-        ? context.viewportWidth
-        : context.viewportHeight;
+    final side = (context.viewportWidth + context.viewportHeight) / 2;
     return side * percentage / 100;
   }
 }
@@ -103,6 +102,7 @@ SparklinesChart(
 ### DataPoint
 
 - **x** — X coordinate.
+- **key** — Optional object used to select point transformations such as keyed `scatterZ()` styles. Use `DataPointKey(id: ..., key: ..., label: ...)` when a structured key is useful.
 - **y** — Base Y (e.g. stacked base).
 - **dy** — Delta from base; **fy = y + dy** is the value used for drawing.
 - **z** — Third dimension for weights and other visual mappings; defaults to `0` and does not affect layout bounds.
@@ -114,7 +114,6 @@ SparklinesChart(
 - **thickness** — `IThicknessOverride?` (size, color, gradient, align) to override chart thickness for this point.
 - **extent** — `IDataPointExtent?`; use `ChartInsets` to automatically fit a visual centered on `(x, fy)` inside the viewport.
 - **pieOffset** — `IPieOffset?` for pie slice offset.
-- **DataPointMeta** — `id`, `key`, `label` for tooltips or identification.
 
 Every `ISparklinesData` is iterable over its source points. Line, scatter, bar, and pie data iterate their corresponding point list. `BetweenLineData` iterates its `from` points followed by its `to` points, but reports `supportsPointExtents == false`, so metadata on those child points does not affect fitting.
 
@@ -151,6 +150,31 @@ LineData.scatter(
 )
 ```
 
+Use `z` with `DataPointPipeline.scatterZ()` to generate per-point styles and fitting extents:
+
+```dart
+const small = Vmin(0.5);
+const large = Vmax(2);
+
+final weightedPoints = DataPointPipeline()
+    .rescaleZ()
+    .scatterZ(
+      style: (
+        min: const CircleDataPointStyle(radius: small, color: Colors.blue),
+        max: const CircleDataPointStyle(radius: large, color: Colors.red),
+      ),
+      extent: (
+        min: const ChartInsets(left: small, top: small, right: small, bottom: small),
+        max: const ChartInsets(left: large, top: large, right: large, bottom: large),
+      ),
+    )
+    .build(points);
+
+final weightedScatter = LineData.scatter(points: weightedPoints);
+```
+
+Use `keys` or `predicate` to style only selected points. Supplying both uses AND matching.
+
 ### Line types
 
 - **LinearLineData** — Straight segments; optional `isStrokeCapRound`, `isStrokeJoinRound`.
@@ -183,6 +207,7 @@ Custom `ILineTypeData` implementations define `drawLine` and `minPoints`. Line a
 - **normalize2pi({ total, threshold?, spacing?, spacingDeg?, trailingSpacing?, thresholdPoint? })** — Same as `normalize` with default `total` 2π for angles. `spacingDeg` is spacing in degrees (converted to radians); `trailingSpacing` defaults to true when `total >= 2` or `total <= -2`.
 - **rescale({ currentMin?, currentMax?, targetMin, targetMax })** — Linearly rescale intervals `[DataPoint.y..DataPoint.fy]` from `[currentMin..currentMax]` to `[targetMin..targetMax]` (default 0–1). Both `y` and `fy` are transformed; `dy` is recalculated as `fy - y`. If `currentMin` or `currentMax` are not finite, they are computed from input interval bounds.
 - **rescaleZ({ currentMin?, currentMax?, targetMin, targetMax, clamp })** — Linearly rescale `DataPoint.z` into a target range (default 0–1). Automatic bounds are shared across every input registered with the pipeline. Values clamp to the source range by default, and an equal source range maps to the target midpoint.
+- **scatterZ({ predicate?, keys?, style, extent? })** — Interpolate `IDataPointStyle` and optional `IDataPointExtent` intervals using z clamped to 0–1, then store them in each matching point's metadata. `style` is a required `StylesInterval` record and `extent` is an optional `ExtentsInterval` record. When both `predicate` and `keys` are supplied, both must match.
 - **sort({ x?, y?, fy?, z? })** — Sort input by x, y, fy, and/or z. Each: `true` = ascending, `false` = descending. If all null, sorts by x ascending.
 - **aggregate({ function, window? })** — Aggregate `dy` over a window ending at each point. `function`: `DataAggregation.sum`, `.avg`, `.min`, `.max`, `.median`, `.std` (default `sum`). `window`: null = cumulative from start, N = last N elements. Updates `dy` and `fy` per point.
 

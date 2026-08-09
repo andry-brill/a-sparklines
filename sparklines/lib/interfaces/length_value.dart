@@ -77,6 +77,32 @@ final class Vh extends _SingleLengthValue {
       context.viewportHeight * value / 100;
 }
 
+/// A percentage of the shorter logical viewport dimension (`Vmin(1)` is 1%).
+final class Vmin extends _SingleLengthValue {
+  const Vmin(super.value);
+
+  @override
+  double resolve(ILengthContext context) {
+    final side = context.viewportWidth < context.viewportHeight
+        ? context.viewportWidth
+        : context.viewportHeight;
+    return side * value / 100;
+  }
+}
+
+/// A percentage of the longer logical viewport dimension (`Vmax(1)` is 1%).
+final class Vmax extends _SingleLengthValue {
+  const Vmax(super.value);
+
+  @override
+  double resolve(ILengthContext context) {
+    final side = context.viewportWidth > context.viewportHeight
+        ? context.viewportWidth
+        : context.viewportHeight;
+    return side * value / 100;
+  }
+}
+
 /// A length measured as an X-axis data-space interval.
 final class Dx extends _SingleLengthValue {
   const Dx(super.value);

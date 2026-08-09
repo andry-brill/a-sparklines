@@ -13,12 +13,17 @@ import '../interfaces/thickness.dart';
 
 typedef DataPoints = List<DataPoint>;
 
+const _dataPointKeyNotProvided = Object();
+
 /// A single data point with x, y coordinates and optional style
 /// DataPoint could be used as interface if needed
 class DataPoint implements ILerpTo<DataPoint> {
 
   /// Offset by X
   final double x;
+
+  /// Optional key used to select point transformations
+  final Object? key;
 
   /// Offset by Y
   final double y;
@@ -36,6 +41,7 @@ class DataPoint implements ILerpTo<DataPoint> {
 
   const DataPoint({
     required this.x,
+    this.key,
     this.y = 0.0,
     required this.dy,
     this.z = 0.0,
@@ -47,6 +53,7 @@ class DataPoint implements ILerpTo<DataPoint> {
   DataPoint copyWith({
     double? x,
     double? dx,
+    Object? key = _dataPointKeyNotProvided,
     double? y,
     double? dy,
     double? z,
@@ -54,6 +61,7 @@ class DataPoint implements ILerpTo<DataPoint> {
     DataPointDataMap? data,
   }) => DataPoint(
     x: x ?? this.x,
+    key: identical(key, _dataPointKeyNotProvided) ? this.key : key,
     y: y ?? this.y,
     dy: dy ?? this.dy,
     z: z ?? this.z,
@@ -65,6 +73,7 @@ class DataPoint implements ILerpTo<DataPoint> {
   DataPoint lerpTo(DataPoint next, double t) {
     return DataPoint(
       x: lerpDouble(x, next.x, t) ?? next.x,
+      key: t <= 0.0 ? key : next.key,
       y: lerpDouble(y, next.y, t) ?? next.y,
       dy: lerpDouble(dy, next.dy, t) ?? next.dy,
       z: lerpDouble(z, next.z, t) ?? next.z,
@@ -88,7 +97,7 @@ class DataPoint implements ILerpTo<DataPoint> {
       }
     }
 
-    return this.y == other.y && this.x == other.x && this.dy == other.dy && this.z == other.z;
+    return this.y == other.y && this.x == other.x && this.dy == other.dy && this.z == other.z && this.key == other.key;
   }
 
   @override
@@ -100,7 +109,7 @@ class DataPoint implements ILerpTo<DataPoint> {
       dataHash ^= Object.hash(entry.key, entry.value);
     }
 
-    return Object.hash(x, y, dy, z, dataHash);
+    return Object.hash(x, y, dy, z, key, dataHash);
   }
 
 }

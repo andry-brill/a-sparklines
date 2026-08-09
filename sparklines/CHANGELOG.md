@@ -8,8 +8,13 @@
   * `ILineTypeData` now requires `drawLine` and `minPoints` so renderers can determine whether and when to draw connected geometry.
 * **DataPoint and DataPointPipeline**
   * Added `DataPoint.z` as an interpolated third dimension that does not affect layout bounds.
+  * Added direct `Object?` point keys for selecting pipeline transformations; keys retain the source value at `t <= 0` and adopt the destination value afterward during interpolation.
+  * Removed `IDataPointMeta` and replaced `DataPointMeta` with the value-based `DataPointKey`, retaining its `id`, string `key`, and `label` fields.
   * Added `rescaleZ()` with shared automatic bounds, optional clamping, and target-midpoint handling for equal z values.
+  * Added `scatterZ()` with optional key/predicate filtering and z-interpolated `StylesInterval`/`ExtentsInterval` metadata.
   * Added optional z ordering to `sort()`.
+* **Visual lengths**
+  * Added `Vmin` and `Vmax` for percentages of the shorter and longer logical viewport dimensions.
 * **Chart insets and point fitting**
   * Added reusable `ChartInsets` with optional `left`, `top`, `right`, and `bottom` `ILengthValue`s for global widget padding and local per-chart padding.
   * `ChartInsets` implements `IDataPointExtent` and can be stored in `DataPoint.data` for automatic, position-aware visual overflow fitting around `(x, fy)`.

@@ -17,7 +17,7 @@ export 'interfaces/data_point_data.dart';
 export 'interfaces/data_point_style.dart';
 export 'interfaces/layout.dart';
 export 'interfaces/length_value.dart'
-    show ILengthContext, ILengthValue, Px, Vw, Vh, Dx, Dy;
+    show ILengthContext, ILengthValue, Px, Vw, Vh, Vmin, Vmax, Dx, Dy;
 export 'interfaces/lerp.dart';
 export 'interfaces/line_type.dart';
 export 'interfaces/pie_offset.dart';

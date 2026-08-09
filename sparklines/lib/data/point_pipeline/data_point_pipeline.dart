@@ -3,7 +3,10 @@ library;
 import 'dart:collection';
 import 'dart:math';
 
+import 'package:any_sparklines/interfaces/chart_insets.dart';
 import 'package:any_sparklines/interfaces/data_point_data.dart';
+import 'package:any_sparklines/interfaces/data_point_style.dart';
+import 'package:any_sparklines/interfaces/length_value.dart';
 
 import '../data_point.dart';
 
@@ -12,7 +15,11 @@ part '_stack_modifier.dart';
 part '_normalize_modifier.dart';
 part '_rescale_modifier.dart';
 part '_rescale_z_modifier.dart';
+part '_scatter_z_modifier.dart';
 part '_aggregation_modifier.dart';
+
+typedef StylesInterval = ({IDataPointStyle min, IDataPointStyle max});
+typedef ExtentsInterval = ({IDataPointExtent min, IDataPointExtent max});
 
 class _LazyList<T> extends ListBase<T> {
 
@@ -332,6 +339,24 @@ class DataPointPipeline {
       clamp: clamp,
     ));
 
+    return this;
+  }
+
+  /// Interpolate point style and optional visual extent by point.z.
+  ///
+  /// When both [predicate] and [keys] are provided, a point must match both.
+  DataPointPipeline scatterZ({
+    bool Function(DataPoint point)? predicate,
+    Set<Object>? keys,
+    required StylesInterval style,
+    ExtentsInterval? extent,
+  }) {
+    _modifiers.add(_ScatterZModifier(
+      predicate: predicate,
+      keys: keys == null ? null : Set.unmodifiable(keys),
+      style: style,
+      extent: extent,
+    ));
     return this;
   }
 

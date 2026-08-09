@@ -1,5 +1,3 @@
-import 'dart:math' as math;
-
 import 'package:any_sparklines/any_sparklines.dart';
 import 'package:any_sparklines/chart/sparklines_painter.dart';
 import 'package:any_sparklines/data/layout_data.dart';
@@ -30,16 +28,14 @@ ChartTransform _transform({
   );
 }
 
-final class VMin implements ILengthValue {
+final class Vmean implements ILengthValue {
   final double percentage;
 
-  const VMin(this.percentage);
+  const Vmean(this.percentage);
 
   @override
   double resolve(ILengthContext context) {
-    return math.min(context.viewportWidth, context.viewportHeight) *
-        percentage /
-        100;
+    return (context.viewportWidth + context.viewportHeight) / 2 * percentage / 100;
   }
 }
 
@@ -51,6 +47,8 @@ void main() {
       expect(transform.length(const Px(7)), 7);
       expect(transform.length(const Vw(1)), 2);
       expect(transform.length(const Vh(2.5)), 2);
+      expect(transform.length(const Vmin(10)), 8);
+      expect(transform.length(const Vmax(10)), 20);
     });
 
     test('resolve data-axis magnitudes through a relative matrix', () {
@@ -96,13 +94,15 @@ void main() {
     test('support custom user-defined units without a type switch', () {
       final transform = _transform();
 
-      expect(transform.length(const VMin(10)), 8);
+      expect(transform.length(const Vmean(10)), 14);
     });
 
     test('provide value equality for built-in units', () {
       expect(const Px(2), const Px(2));
       expect(const Px(2), isNot(const Dx(2)));
       expect(const Vw(1).hashCode, const Vw(1).hashCode);
+      expect(const Vmin(2), const Vmin(2));
+      expect(const Vmin(2), isNot(const Vmax(2)));
     });
 
     test('shared relative layouts still resolve from every data series', () {

@@ -1,10 +1,8 @@
 import 'dart:math';
 
-import 'package:any_sparklines/interfaces/data_point_data.dart';
+import 'package:any_sparklines/any_sparklines.dart';
+import 'package:flutter/material.dart';
 import 'package:test/test.dart';
-
-import 'package:any_sparklines/data/data_point.dart';
-import 'package:any_sparklines/data/point_pipeline/data_point_pipeline.dart';
 
 
 List<DataPoint> pointList(double x, double y, double dy) =>
@@ -13,11 +11,22 @@ List<DataPoint> pointList(double x, double y, double dy) =>
 List<DataPoint> points(List<(double x, double y, double dy)> coords) =>
     coords.map((e) => DataPoint(x: e.$1, y: e.$2, dy: e.$3)).toList();
 
+class _LengthContext implements ILengthContext {
+  const _LengthContext();
+
+  @override double get viewportWidth => 100;
+  @override double get viewportHeight => 100;
+  @override double dataX(double value) => value;
+  @override double dataY(double value) => value;
+}
+
+double _resolve(ILengthValue value) => value.resolve(const _LengthContext());
+
 
 
 void main() {
 
-  group('DataPoint z', () {
+  group('DataPoint key and z', () {
 
     test('defaults to zero and participates in copy, interpolation, and equality', () {
       const point = DataPoint(x: 1.0, y: 2.0, dy: 3.0);
@@ -30,6 +39,31 @@ void main() {
       expect(copied, equals(const DataPoint(x: 1.0, y: 2.0, dy: 3.0, z: 4.0)));
       expect(copied, isNot(point));
       expect(copied.hashCode, equals(const DataPoint(x: 1.0, y: 2.0, dy: 3.0, z: 4.0).hashCode));
+    });
+
+    test('preserves, replaces, clears, and interpolates key', () {
+      const point = DataPoint(key: 'start', x: 1.0, dy: 2.0);
+      final preserved = point.copyWith(z: 1.0);
+      final replaced = point.copyWith(key: 'end');
+      final cleared = point.copyWith(key: null);
+
+      expect(preserved.key, equals('start'));
+      expect(replaced.key, equals('end'));
+      expect(cleared.key, isNull);
+      expect(point.lerpTo(replaced, 0.0).key, equals('start'));
+      expect(point.lerpTo(replaced, 0.5).key, equals('end'));
+      expect(replaced, isNot(point));
+    });
+
+    test('provides a value key with id, string key, and label', () {
+      const key = DataPointKey(id: 1, key: 'middle', label: 'Middle');
+      const equalKey = DataPointKey(id: 1, key: 'middle', label: 'Middle');
+
+      expect(key.id, equals(1));
+      expect(key.key, equals('middle'));
+      expect(key.label, equals('Middle'));
+      expect(key, equals(equalKey));
+      expect(key.hashCode, equals(equalKey.hashCode));
     });
   });
 
@@ -468,12 +502,12 @@ void main() {
 
   group('RescaleZModifier', () {
 
-    test('given: explicit z bounds, should: rescale z and preserve point coordinates and data', () {
-      const meta = DataPointMeta(key: 'middle');
+    test('given: explicit z bounds, should: rescale z and preserve point coordinates and key', () {
+      const key = DataPointKey(key: 'middle', label: 'Middle');
       final pipeline = DataPointPipeline().rescaleZ(currentMin: 10.0, currentMax: 30.0);
       final input = [
         const DataPoint(x: 1.0, y: 2.0, dy: 3.0, z: 10.0),
-        const DataPoint(x: 2.0, y: 3.0, dy: 4.0, z: 20.0, data: {IDataPointMeta: meta}),
+        const DataPoint(key: key, x: 2.0, y: 3.0, dy: 4.0, z: 20.0),
         const DataPoint(x: 3.0, y: 4.0, dy: 5.0, z: 30.0),
       ];
       final out = pipeline.build(input);
@@ -483,7 +517,7 @@ void main() {
       expect(out[1].y, equals(3.0));
       expect(out[1].dy, equals(4.0));
       expect(out[1].fy, equals(7.0));
-      expect(out[1].of<IDataPointMeta>(), same(meta));
+      expect(out[1].key, same(key));
     });
 
     test('given: automatic z bounds and multiple inputs, should: share bounds across every input', () {
@@ -532,6 +566,72 @@ void main() {
 
     test('given: a non-finite z, should: reject it during lazy evaluation', () {
       final pipeline = DataPointPipeline().rescaleZ();
+      final out = pipeline.build(const [DataPoint(x: 0.0, dy: 0.0, z: double.nan)]);
+
+      expect(() => out.length, throwsArgumentError);
+    });
+  });
+
+  group('ScatterZModifier', () {
+
+    test('interpolates style and extent by clamped z', () {
+      const minStyle = CircleDataPointStyle(radius: Px(2.0), color: Colors.black);
+      const maxStyle = CircleDataPointStyle(radius: Px(10.0), color: Colors.white);
+      const minExtent = ChartInsets(left: Px(1.0), top: Px(2.0), right: Px(3.0), bottom: Px(4.0));
+      const maxExtent = ChartInsets(left: Px(5.0), top: Px(6.0), right: Px(7.0), bottom: Px(8.0));
+      final pipeline = DataPointPipeline().scatterZ(
+        style: (min: minStyle, max: maxStyle),
+        extent: (min: minExtent, max: maxExtent),
+      );
+      final out = pipeline.build(const [
+        DataPoint(x: 0.0, dy: 0.0, z: -1.0),
+        DataPoint(x: 1.0, dy: 0.0, z: 0.5),
+        DataPoint(x: 2.0, dy: 0.0, z: 2.0),
+      ]);
+
+      final styles = out.map((p) => p.style! as CircleDataPointStyle).toList();
+      expect(styles.map((s) => _resolve(s.radius)), orderedEquals([2.0, 6.0, 10.0]));
+      expect(styles.map((s) => s.color), orderedEquals([Colors.black, Color.lerp(Colors.black, Colors.white, 0.5), Colors.white]));
+      expect(out.map((p) => _resolve(p.extent!.left!)), orderedEquals([1.0, 3.0, 5.0]));
+      expect(out.map((p) => _resolve(p.extent!.bottom!)), orderedEquals([4.0, 6.0, 8.0]));
+    });
+
+    test('treats keys and predicate as an AND filter', () {
+      const style = CircleDataPointStyle(radius: Px(4.0), color: Colors.blue);
+      final pipeline = DataPointPipeline().scatterZ(
+        keys: const {'selected'},
+        predicate: (point) => point.x > 0.0,
+        style: (min: style, max: style),
+      );
+      final input = const [
+        DataPoint(key: 'selected', x: 0.0, dy: 0.0, z: 0.5),
+        DataPoint(key: 'selected', x: 1.0, dy: 0.0, z: 0.5),
+        DataPoint(key: 'other', x: 2.0, dy: 0.0, z: 0.5),
+      ];
+      final out = pipeline.build(input);
+
+      expect(out[0], same(input[0]));
+      expect(out[0].style, isNull);
+      expect(out[1].style, same(style));
+      expect(out[2], same(input[2]));
+      expect(out[2].style, isNull);
+    });
+
+    test('preserves existing extent when no extent interval is supplied', () {
+      const style = CircleDataPointStyle(radius: Px(4.0), color: Colors.blue);
+      const extent = ChartInsets(left: Px(4.0));
+      final pipeline = DataPointPipeline().scatterZ(style: (min: style, max: style));
+      final out = pipeline.build(const [
+        DataPoint(x: 0.0, dy: 0.0, z: 0.5, data: {IDataPointExtent: extent}),
+      ]);
+
+      expect(out.single.style, same(style));
+      expect(out.single.extent, same(extent));
+    });
+
+    test('rejects a non-finite z for a matching point', () {
+      const style = CircleDataPointStyle(radius: Px(4.0), color: Colors.blue);
+      final pipeline = DataPointPipeline().scatterZ(style: (min: style, max: style));
       final out = pipeline.build(const [DataPoint(x: 0.0, dy: 0.0, z: double.nan)]);
 
       expect(() => out.length, throwsArgumentError);

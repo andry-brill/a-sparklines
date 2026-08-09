@@ -53,19 +53,19 @@ extension DataPointDataMapExtension on DataPointDataMap {
 }
 
 
-abstract class IDataPointMeta {
-  int? get id;
-  String? get key;
-  String? get label;
-}
+class DataPointKey {
 
-class DataPointMeta extends ADataPointPlainData<DataPointMeta> implements IDataPointMeta {
+  final int? id;
+  final String? key;
+  final String? label;
 
-  @override final int? id;
-  @override final String? key;
-  @override final String? label;
+  const DataPointKey({this.id, this.key, this.label});
 
-  const DataPointMeta({this.id, this.key, this.label});
+  @override
+  bool operator ==(Object other) => identical(this, other) || other is DataPointKey && id == other.id && key == other.key && label == other.label;
+
+  @override
+  int get hashCode => Object.hash(id, key, label);
 
 }
 
