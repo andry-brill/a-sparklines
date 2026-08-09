@@ -20,8 +20,16 @@
   * `ChartInsets` implements `IDataPointExtent` and can be stored in `DataPoint.data` for automatic, position-aware visual overflow fitting around `(x, fy)`.
   * Global padding, local padding, and point overflow are combined once from the preliminary transform without changing source data or layout bounds.
   * Charts sharing a layout receive one aligned inset transform; over-constrained axes collapse to the weighted position between their opposing insets.
+* **Seat maps**
+  * Added `SeatKey` with an optional database/display label and value identity based on area, row, and column.
+  * Added `SeatSelector` with OR-set label, row, column, and nullable-area filters plus OR-of-AND tag groups.
+  * Added deferred `SeatsBuilder` actions for fluent row and column geometry with labels, horizontal and vertical gaps, skipped slots, z values, tags, areas, and point metadata.
+  * Added nestable `record()`/`repeat()` blocks for replaying seat-layout action sequences during `build()`.
+  * Added `ISeatLabelBuilder`, default `NullLabels`, and exact-consumption `ListLabels` with end-of-build validation.
+  * Added `DataPointPipeline.seats()` for fixed style and optional extent decoration using selectors, predicates, and exact seat keys.
 * **Breaking: custom chart data**
   * Replaced `ChartPadding` with `ChartInsets` without a compatibility alias.
+  * `IDataPointExtent` now extends `IDataPointData` so custom extents can be stored directly in point metadata.
   * `ISparklinesData` now implements `Iterable<DataPoint>` and requires `padding` and `supportsPointExtents`.
   * `BetweenLineData` iterates its `from` points followed by its `to` points but disables point-extent fitting.
 

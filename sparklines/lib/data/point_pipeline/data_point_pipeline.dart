@@ -9,6 +9,7 @@ import 'package:any_sparklines/interfaces/data_point_style.dart';
 import 'package:any_sparklines/interfaces/length_value.dart';
 
 import '../data_point.dart';
+import '../seat_key.dart';
 
 part '_sort_modifier.dart';
 part '_stack_modifier.dart';
@@ -16,6 +17,7 @@ part '_normalize_modifier.dart';
 part '_rescale_modifier.dart';
 part '_rescale_z_modifier.dart';
 part '_scatter_z_modifier.dart';
+part '_seats_modifier.dart';
 part '_aggregation_modifier.dart';
 
 typedef StylesInterval = ({IDataPointStyle min, IDataPointStyle max});
@@ -352,6 +354,26 @@ class DataPointPipeline {
     ExtentsInterval? extent,
   }) {
     _modifiers.add(_ScatterZModifier(
+      predicate: predicate,
+      keys: keys == null ? null : Set.unmodifiable(keys),
+      style: style,
+      extent: extent,
+    ));
+    return this;
+  }
+
+  /// Apply a fixed style and optional extent to seat points.
+  ///
+  /// When multiple filters are provided, a point must match all of them.
+  DataPointPipeline seats({
+    SeatSelector? selector,
+    SeatPredicate? predicate,
+    Set<SeatKey>? keys,
+    required IDataPointStyle style,
+    IDataPointExtent? extent,
+  }) {
+    _modifiers.add(_SeatsModifier(
+      selector: selector,
       predicate: predicate,
       keys: keys == null ? null : Set.unmodifiable(keys),
       style: style,

@@ -3,7 +3,7 @@ import 'package:flutter/foundation.dart';
 import 'data_point_data.dart';
 import 'length_value.dart';
 
-abstract interface class IDataPointExtent {
+abstract interface class IDataPointExtent implements IDataPointData {
   ILengthValue? get left;
   ILengthValue? get top;
   ILengthValue? get right;

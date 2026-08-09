@@ -111,13 +111,13 @@ SparklinesChart(
 `DataPoint.key` accepts any object. `DataPointKey` is a convenience value object when a point needs a numeric ID, string key, label, or any combination of them:
 
 ```dart
-const seat = DataPoint(
-  x: 12,
-  dy: 1,
-  key: DataPointKey(id: 42, key: '12A', label: 'Seat 12A'),
+const stockPrice = DataPoint(
+  x: 0,
+  dy: 187.44,
+  key: DataPointKey(id: 42, key: 'AAPL', label: 'Apple Inc.'),
 );
 
-final seatKey = seat.key as DataPointKey;
+final instrumentKey = stockPrice.key as DataPointKey;
 ```
 
 `DataPointKey` has value equality, so equivalent keys can be used in sets passed to keyed pipeline operations such as `scatterZ(keys: ...)`. During point interpolation, the source key is retained at `t <= 0`; the destination key is used afterward.
@@ -189,6 +189,67 @@ final weightedScatter = LineData.scatter(points: weightedPoints);
 
 Use `keys` or `predicate` to style only selected points. Supplying both uses AND matching.
 
+### Seat maps
+
+`SeatsBuilder` records seat-layout actions and creates ordinary `DataPoint` objects only when `build()` is called.
+Each point uses a `SeatKey` directly as its key. A key may include a database/display `label`, but identity remains based on `area`, `row`, and `column`; labels and stable characteristic tags do not affect equality.
+
+```dart
+enum AircraftSeatTag { extraLegroom }
+
+final labels = ListLabels([
+  for (var row = 1; row <= 10; row++)
+    for (final column in ['A', 'B', 'C', 'D', 'E', 'F']) '$row$column',
+]);
+
+final rawSeats = SeatsBuilder(
+  area: 'economy',
+  seatDx: 1.0,
+  rowDy: 1.0,
+  gapDx: 0.2,
+  gapDy: 0.4,
+  labelBuilder: labels,
+)
+    .seats(3, tags: {AircraftSeatTag.extraLegroom})
+    .skip(2)
+    .seats(3, tags: {AircraftSeatTag.extraLegroom})
+    .nextRow()
+    .record()
+    .seats(3)
+    .skip(2)
+    .seats(3)
+    .nextRow()
+    .repeat(9)
+    .build();
+
+final points = DataPointPipeline()
+    .seats(style: availableStyle, extent: seatExtent)
+    .seats(
+      selector: SeatSelector(tags: {{AircraftSeatTag.extraLegroom}}),
+      style: extraLegroomStyle,
+    )
+    .seats(keys: bookedSeats, style: bookedStyle)
+    .build(rawSeats);
+
+final seatMap = LineData.scatter(points: points);
+```
+
+`seatDx` and `rowDy` are the base slot distances.
+`gapDx` and `gapDy` add persistent space between future columns and rows without moving the cursor immediately; `skip()` instead consumes complete horizontal slots and their column numbers.
+`nextRow()` resets the horizontal cursor and column while retaining area, tags, data, and gap defaults.
+
+`record()` starts a repeatable action block and `repeat(count)` closes it; the count is the total number of block executions.
+Blocks may be nested. Labels default to `null` through `const NullLabels()`; provide an `ISeatLabelBuilder` to the constructor or an individual `seats()` action, or override one seat with `seat(label: ...)`.
+`ListLabels` assigns its strings sequentially to emitted seats, ignores skipped slots, and validates that every supplied label was consumed. Custom builders implement `next(row, column, area)` and `validate()`; validation runs at the end of `build()`.
+
+`area()`, `tags()`, and `data()` replace defaults for subsequent actions.
+Per-call `data` overlays the default `DataPointDataMap`, with call entries winning by metadata type.
+Inputs are snapshotted when their actions are recorded, and each `build()` independently interprets the complete action program.
+
+Every `SeatSelector` field is a set. Values within `labels`, `rows`, `columns`, and `areas` use OR semantics, while different fields use AND semantics; `areas` may contain `null`.
+`tags` is an OR-set of all-of groups, so `{{window, extraLegroom}, {accessible}}` means `(window AND extraLegroom) OR accessible`.
+All supplied pipeline filters are combined with AND semantics, and later `seats()` decorators retain normal last-writer-wins styling behavior.
+
 ### Line types
 
 - **LinearLineData** — Straight segments; optional `isStrokeCapRound`, `isStrokeJoinRound`.
@@ -222,6 +283,7 @@ Custom `ILineTypeData` implementations define `drawLine` and `minPoints`. Line a
 - **rescale({ currentMin?, currentMax?, targetMin, targetMax })** — Linearly rescale intervals `[DataPoint.y..DataPoint.fy]` from `[currentMin..currentMax]` to `[targetMin..targetMax]` (default 0–1). Both `y` and `fy` are transformed; `dy` is recalculated as `fy - y`. If `currentMin` or `currentMax` are not finite, they are computed from input interval bounds.
 - **rescaleZ({ currentMin?, currentMax?, targetMin, targetMax, clamp })** — Linearly rescale `DataPoint.z` into a target range (default 0–1). Automatic bounds are shared across every input registered with the pipeline. Values clamp to the source range by default, and an equal source range maps to the target midpoint.
 - **scatterZ({ predicate?, keys?, style, extent? })** — Interpolate `IDataPointStyle` and optional `IDataPointExtent` intervals using z clamped to 0–1, then store them in each matching point's metadata. `style` is a required `StylesInterval` record and `extent` is an optional `ExtentsInterval` record. When both `predicate` and `keys` are supplied, both must match.
+- **seats({ selector?, predicate?, keys?, style, extent? })** — Apply a fixed style and optional extent to matching points whose key is a `SeatKey`. All supplied filters must match; without filters, every seat point is decorated.
 - **sort({ x?, y?, fy?, z? })** — Sort input by x, y, fy, and/or z. Each: `true` = ascending, `false` = descending. If all null, sorts by x ascending.
 - **aggregate({ function, window? })** — Aggregate `dy` over a window ending at each point. `function`: `DataAggregation.sum`, `.avg`, `.min`, `.max`, `.median`, `.std` (default `sum`). `window`: null = cumulative from start, N = last N elements. Updates `dy` and `fy` per point.
 
