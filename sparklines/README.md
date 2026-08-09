@@ -108,6 +108,20 @@ SparklinesChart(
 - **z** — Third dimension for weights and other visual mappings; defaults to `0` and does not affect layout bounds.
 - **data** — Extensible `Map<Type, IDataPointData?>` for per-point metadata. Keys are type tokens; values implement `IDataPointData` (supports `lerpTo` for animation). Use `point.of<M>()` for type-safe access.
 
+`DataPoint.key` accepts any object. `DataPointKey` is a convenience value object when a point needs a numeric ID, string key, label, or any combination of them:
+
+```dart
+const seat = DataPoint(
+  x: 12,
+  dy: 1,
+  key: DataPointKey(id: 42, key: '12A', label: 'Seat 12A'),
+);
+
+final seatKey = seat.key as DataPointKey;
+```
+
+`DataPointKey` has value equality, so equivalent keys can be used in sets passed to keyed pipeline operations such as `scatterZ(keys: ...)`. During point interpolation, the source key is retained at `t <= 0`; the destination key is used afterward.
+
 **Common data entries** (via extension getters or `of<M>()`):
 
 - **style** — `IDataPointStyle?` (e.g. `CircleDataPointStyle`) for point markers.
