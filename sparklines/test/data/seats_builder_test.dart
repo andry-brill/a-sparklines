@@ -258,14 +258,18 @@ void main() {
       expect(points.map((point) => (point.key! as SeatKey).row), orderedEquals([1, 2, 3, 4]));
     });
 
-    test('named recordings can be replayed later from the current cursor', () {
-      final points = SeatsBuilder(labelBuilder: const _CoordinateLabels())
-          .record(key: 'row')
+    test('saved records remain unapplied until replayed from the current cursor', () {
+      final builder = SeatsBuilder(labelBuilder: const _CoordinateLabels())
+          .record()
           .seats(2)
           .skip()
           .seat()
           .nextRow()
-          .repeat(2)
+          .saveRecord(key: 'row');
+
+      expect(builder.build(), isEmpty);
+      final points = builder
+          .repeat(2, key: 'row')
           .nextRow()
           .repeat(2, key: 'row')
           .build();
@@ -274,12 +278,13 @@ void main() {
       expect(points.map((point) => (point.key! as SeatKey).label), orderedEquals(['1:1', '1:2', '1:4', '2:1', '2:2', '2:4', '4:1', '4:2', '4:4', '5:1', '5:2', '5:4']));
     });
 
-    test('named recordings use current defaults and compose inside recordings', () {
+    test('saved records use current defaults and compose inside recordings', () {
       final points = SeatsBuilder()
-          .record(key: 'row')
+          .record()
           .seats(2)
           .nextRow()
-          .repeat(1)
+          .saveRecord(key: 'row')
+          .repeat(1, key: 'row')
           .area('business')
           .gap(gapDx: 0.5)
           .record()
@@ -295,12 +300,142 @@ void main() {
     test('record and repeat report invalid block usage', () {
       expect(() => SeatsBuilder().repeat(1), throwsStateError);
       expect(() => SeatsBuilder().repeat(1, key: 'missing'), throwsStateError);
+      expect(() => SeatsBuilder().saveRecord(key: 'missing'), throwsStateError);
       expect(() => SeatsBuilder().record().seat().build(), throwsStateError);
       expect(() => SeatsBuilder().record().repeat(-1), throwsArgumentError);
 
-      final stored = SeatsBuilder().record(key: 'row').seat().repeat(1);
-      expect(() => stored.record(key: 'row'), throwsArgumentError);
-      expect(() => SeatsBuilder().record(key: 'row').record(key: 'row'), throwsArgumentError);
+      final stored = SeatsBuilder().record().seat().saveRecord(key: 'row').record().seat();
+      expect(() => stored.saveRecord(key: 'row'), throwsArgumentError);
+      expect(stored.saveRecord(key: 'other').repeat(1, key: 'other').build(), hasLength(1));
+      expect(SeatsBuilder().record().seat().saveRecord(key: '').repeat(1, key: '').build(), hasLength(1));
+    });
+
+    test('saveState restores all state without rewinding the cursor', () {
+      const originalData = _FirstData('original');
+      const changedData = _SecondData('changed');
+      final points = SeatsBuilder(
+        gapDx: 0.25,
+        gapDy: 0.5,
+        area: 'economy',
+        tags: {_SeatTag.vip},
+        data: const {_FirstData: originalData},
+      )
+          .saveState()
+          .gap(gapDx: 1.0, gapDy: 2.0)
+          .area('business')
+          .tags({_SeatTag.window})
+          .data(const {_SecondData: changedData})
+          .seat()
+          .restoreState()
+          .seat()
+          .nextRow()
+          .seat()
+          .build();
+
+      expect(points.map((point) => point.x), orderedEquals([0.0, 1.25, 0.0]));
+      expect(points.map((point) => point.y), orderedEquals([0.0, 0.0, 1.5]));
+      expect(points.map((point) => (point.key! as SeatKey).column), orderedEquals([1, 2, 1]));
+      expect(points.map((point) => (point.key! as SeatKey).area), orderedEquals(['business', 'economy', 'economy']));
+      expect((points[0].key! as SeatKey).tags, equals({_SeatTag.window}));
+      expect((points[1].key! as SeatKey).tags, equals({_SeatTag.vip}));
+      expect(points[0].of<_FirstData>(), isNull);
+      expect(points[0].of<_SecondData>(), same(changedData));
+      expect(points[1].of<_FirstData>(), same(originalData));
+      expect(points[1].of<_SecondData>(), isNull);
+    });
+
+    test('saveState exclusions and saveOnlyState selections restore only included fields', () {
+      const originalData = _FirstData('original');
+      const changedData = _SecondData('changed');
+      final points = SeatsBuilder(gapDx: 0.1, area: 'base', tags: {_SeatTag.vip}, data: const {_FirstData: originalData})
+          .saveState(key: 'exceptArea', area: false)
+          .gap(gapDx: 0.8)
+          .area('changed')
+          .tags({_SeatTag.window})
+          .data(const {_SecondData: changedData})
+          .restoreState('exceptArea')
+          .seat()
+          .seat()
+          .saveOnlyState(key: 'areaOnly', area: true)
+          .gap(gapDx: 0.9)
+          .area('final')
+          .tags({_SeatTag.aisle})
+          .data(const {_SecondData: changedData})
+          .restoreState('areaOnly')
+          .nextRow()
+          .seat()
+          .seat()
+          .build();
+
+      expect(points.map((point) => point.x), orderedEquals([0.0, 1.1, 0.0, 1.9]));
+      expect(points.map((point) => (point.key! as SeatKey).area), everyElement('changed'));
+      expect((points[0].key! as SeatKey).tags, equals({_SeatTag.vip}));
+      expect(points[0].of<_FirstData>(), same(originalData));
+      expect((points[2].key! as SeatKey).tags, equals({_SeatTag.aisle}));
+      expect(points[2].of<_SecondData>(), same(changedData));
+    });
+
+    test('empty saveOnlyState is a restorable no-op', () {
+      final points = SeatsBuilder(area: 'before')
+          .saveOnlyState()
+          .area('after')
+          .restoreState()
+          .seat()
+          .saveOnlyState(key: 'empty')
+          .area('last')
+          .restoreState('empty')
+          .seat()
+          .build();
+
+      expect(points.map((point) => (point.key! as SeatKey).area), orderedEquals(['after', 'last']));
+    });
+
+    test('anonymous state snapshots are LIFO and named snapshots are reusable', () {
+      final points = SeatsBuilder(area: 'a')
+          .saveState()
+          .area('b')
+          .saveState()
+          .area('c')
+          .restoreState()
+          .seat()
+          .restoreState()
+          .seat()
+          .saveState(key: 'a')
+          .area('d')
+          .restoreState('a')
+          .seat()
+          .area('e')
+          .restoreState('a')
+          .seat()
+          .build();
+
+      expect(points.map((point) => (point.key! as SeatKey).area), orderedEquals(['b', 'a', 'a', 'a']));
+    });
+
+    test('named state saves overwrite during saved-record replay and use a separate key namespace', () {
+      final points = SeatsBuilder()
+          .record()
+          .saveState(key: 'shared')
+          .area('inside')
+          .saveRecord(key: 'shared')
+          .area('first')
+          .repeat(1, key: 'shared')
+          .area('second')
+          .repeat(1, key: 'shared')
+          .restoreState('shared')
+          .seat()
+          .build();
+
+      expect((points.single.key! as SeatKey).area, equals('second'));
+    });
+
+    test('state restore failures happen during build and builds have independent state stacks', () {
+      expect(() => SeatsBuilder().restoreState().build(), throwsStateError);
+      expect(() => SeatsBuilder().restoreState('missing').build(), throwsStateError);
+
+      final builder = SeatsBuilder(area: 'base').saveState().area('changed').restoreState().seat();
+      expect((builder.build().single.key! as SeatKey).area, equals('base'));
+      expect((builder.build().single.key! as SeatKey).area, equals('base'));
     });
 
     test('builder data is replaced while call data overlays it by type', () {

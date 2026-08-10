@@ -214,13 +214,13 @@ final rawSeats = SeatsBuilder(
     .skip(2)
     .seats(3, tags: {AircraftSeatTag.extraLegroom})
     .nextRow()
-    .record(key: 'standardRow')
+    .record()
     .seats(3)
     .skip(2)
     .seats(3)
     .nextRow()
-    .repeat(3)
-    .repeat(6, key: 'standardRow')
+    .saveRecord(key: 'standardRow')
+    .repeat(9, key: 'standardRow')
     .build();
 
 final points = DataPointPipeline()
@@ -240,10 +240,14 @@ final seatMap = LineData.scatter(points: points);
 `nextRow()` resets the horizontal cursor and column while retaining area, tags, data, and gap defaults.
 
 `record()` starts a repeatable action block and `repeat(count)` closes it; the count is the total number of block executions.
-Use `record(key: 'name')` to save a block and replay it later with `repeat(count, key: 'name')`. Named replays start from the current cursor and use the current defaults.
-Keys must be unique, blocks must be closed before they can be replayed, and named replays can be composed inside other recording blocks.
+Use `saveRecord(key: 'name')` instead of `repeat(count)` to close and save a block without applying it. Replay it later with `repeat(count, key: 'name')` from the current cursor and defaults.
+Saved-record keys must be unique, records must be saved before they can be replayed, and saved replays can be composed inside other recording blocks.
 Blocks may be nested. Labels default to `null` through `const NullLabels()`; provide an `ISeatLabelBuilder` to the constructor or an individual `seats()` action, or override one seat with `seat(label: ...)`.
 `ListLabels` assigns its strings sequentially to emitted seats, ignores skipped slots, and validates that every supplied label was consumed. Custom builders implement `next(row, column, area)` and `validate()`; validation runs at the end of `build()`.
+
+`saveState()` saves the current gaps, area, tags, and data by default; set a flag to `false` to exclude that state group. `saveOnlyState()` starts with every flag disabled so individual groups can be selected, and an empty snapshot is a valid no-op.
+Anonymous snapshots are restored once in LIFO order with `restoreState()`. Named snapshots use `saveState(key: ...)` or `saveOnlyState(key: ...)`, are overwritten by later saves with that key, and can be restored repeatedly with `restoreState(key)`.
+State restoration never rewinds the seat cursor, row, column, labels, or emitted points.
 
 `area()`, `tags()`, and `data()` replace defaults for subsequent actions.
 Per-call `data` overlays the default `DataPointDataMap`, with call entries winning by metadata type.

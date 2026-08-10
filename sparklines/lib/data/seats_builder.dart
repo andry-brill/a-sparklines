@@ -12,7 +12,7 @@ class SeatsBuilder {
 
   final _SeatsBuildConfiguration _configuration;
   final List<_SeatsAction> _actions = [];
-  final List<_SeatsRecording> _recordings = [];
+  final List<int> _recordingStarts = [];
   final Map<String, List<_SeatsAction>> _namedRecordings = {};
 
   SeatsBuilder({
@@ -146,11 +146,43 @@ class SeatsBuilder {
     return this;
   }
 
-  SeatsBuilder record({String? key}) {
-    if (key != null && (_namedRecordings.containsKey(key) || _recordings.any((recording) => recording.key == key))) {
+  SeatsBuilder saveState({
+    String? key,
+    bool gap = true,
+    bool area = true,
+    bool tags = true,
+    bool data = true,
+  }) {
+    _recordStateSnapshot(key: key, gap: gap, area: area, tags: tags, data: data);
+    return this;
+  }
+
+  SeatsBuilder saveOnlyState({
+    String? key,
+    bool gap = false,
+    bool area = false,
+    bool tags = false,
+    bool data = false,
+  }) {
+    _recordStateSnapshot(key: key, gap: gap, area: area, tags: tags, data: data);
+    return this;
+  }
+
+  SeatsBuilder restoreState([String? key]) {
+    _actions.add((state) => state.restoreState(key));
+    return this;
+  }
+
+  SeatsBuilder record() {
+    _recordingStarts.add(_actions.length);
+    return this;
+  }
+
+  SeatsBuilder saveRecord({required String key}) {
+    if (_namedRecordings.containsKey(key)) {
       throw ArgumentError.value(key, 'key', 'a recording with this key already exists');
     }
-    _recordings.add(_SeatsRecording(start: _actions.length, key: key));
+    _namedRecordings[key] = _closeRecording('saveRecord() requires an open record() block');
     return this;
   }
 
@@ -164,22 +196,14 @@ class SeatsBuilder {
       _addRepeatedActions(recorded, count);
       return this;
     }
-    if (_recordings.isEmpty) {
-      throw StateError('repeat() requires an open record() block');
-    }
-    final recording = _recordings.removeLast();
-    final recorded = List<_SeatsAction>.unmodifiable(_actions.sublist(recording.start));
-    _actions.removeRange(recording.start, _actions.length);
-    if (recording.key != null) {
-      _namedRecordings[recording.key!] = recorded;
-    }
+    final recorded = _closeRecording('repeat() requires an open record() block');
     _addRepeatedActions(recorded, count);
     return this;
   }
 
   List<DataPoint> build() {
-    if (_recordings.isNotEmpty) {
-      throw StateError('Every record() block must be closed by repeat() before build()');
+    if (_recordingStarts.isNotEmpty) {
+      throw StateError('Every record() block must be closed by repeat() or saveRecord() before build()');
     }
     final state = _SeatsBuildState(_configuration);
     for (final action in _actions) {
@@ -187,6 +211,26 @@ class SeatsBuilder {
     }
     state.validateLabels();
     return List<DataPoint>.unmodifiable(state.points);
+  }
+
+  void _recordStateSnapshot({
+    required String? key,
+    required bool gap,
+    required bool area,
+    required bool tags,
+    required bool data,
+  }) {
+    _actions.add((state) => state.saveState(key: key, gap: gap, area: area, tags: tags, data: data));
+  }
+
+  List<_SeatsAction> _closeRecording(String error) {
+    if (_recordingStarts.isEmpty) {
+      throw StateError(error);
+    }
+    final start = _recordingStarts.removeLast();
+    final recorded = List<_SeatsAction>.unmodifiable(_actions.sublist(start));
+    _actions.removeRange(start, _actions.length);
+    return recorded;
   }
 
   void _addRepeatedActions(List<_SeatsAction> recorded, int count) {
@@ -252,18 +296,6 @@ class SeatsBuilder {
 
 }
 
-class _SeatsRecording {
-
-  final int start;
-  final String? key;
-
-  const _SeatsRecording({
-    required this.start,
-    required this.key,
-  });
-
-}
-
 class _SeatsBuildConfiguration {
 
   final double x;
@@ -324,6 +356,8 @@ class _SeatsBuildState {
 
   final List<DataPoint> points = [];
   final Set<SeatKey> identities = {};
+  final List<_SeatsStateSnapshot> stateSnapshots = [];
+  final Map<String, _SeatsStateSnapshot> namedStateSnapshots = {};
 
   _SeatsBuildState(_SeatsBuildConfiguration configuration) :
     startX = configuration.x,
@@ -405,6 +439,48 @@ class _SeatsBuildState {
     slotsInRow = 0;
   }
 
+  void saveState({
+    required String? key,
+    required bool gap,
+    required bool area,
+    required bool tags,
+    required bool data,
+  }) {
+    final snapshot = _SeatsStateSnapshot(
+      hasGap: gap,
+      hasArea: area,
+      hasTags: tags,
+      hasData: data,
+      gapDx: gapDx,
+      gapDy: gapDy,
+      area: this.area,
+      tags: this.tags,
+      data: this.data,
+    );
+    if (key == null) {
+      stateSnapshots.add(snapshot);
+    } else {
+      namedStateSnapshots[key] = snapshot;
+    }
+  }
+
+  void restoreState(String? key) {
+    final _SeatsStateSnapshot snapshot;
+    if (key == null) {
+      if (stateSnapshots.isEmpty) {
+        throw StateError('No anonymous state snapshot exists');
+      }
+      snapshot = stateSnapshots.removeLast();
+    } else {
+      final namedSnapshot = namedStateSnapshots[key];
+      if (namedSnapshot == null) {
+        throw StateError('No state snapshot exists for key "$key"');
+      }
+      snapshot = namedSnapshot;
+    }
+    snapshot.restore(this);
+  }
+
   void validateLabels() {
     Object? firstError;
     StackTrace? firstStackTrace;
@@ -429,6 +505,42 @@ class _SeatsBuildState {
     }
     slotsInRow++;
     return currentX;
+  }
+
+}
+
+class _SeatsStateSnapshot {
+
+  final bool hasGap;
+  final bool hasArea;
+  final bool hasTags;
+  final bool hasData;
+  final double gapDx;
+  final double gapDy;
+  final Object? area;
+  final Set<Object> tags;
+  final DataPointDataMap data;
+
+  const _SeatsStateSnapshot({
+    required this.hasGap,
+    required this.hasArea,
+    required this.hasTags,
+    required this.hasData,
+    required this.gapDx,
+    required this.gapDy,
+    required this.area,
+    required this.tags,
+    required this.data,
+  });
+
+  void restore(_SeatsBuildState state) {
+    if (hasGap) {
+      state.gapDx = gapDx;
+      state.gapDy = gapDy;
+    }
+    if (hasArea) state.area = area;
+    if (hasTags) state.tags = tags;
+    if (hasData) state.data = data;
   }
 
 }

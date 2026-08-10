@@ -24,7 +24,8 @@
   * Added `SeatKey` with an optional database/display label and value identity based on area, row, and column.
   * Added `SeatSelector` with OR-set label, row, column, and nullable-area filters plus OR-of-AND tag groups.
   * Added deferred `SeatsBuilder` actions for fluent row and column geometry with labels, horizontal and vertical gaps, skipped slots, z values, tags, areas, and point metadata.
-  * Added nestable and reusable named `record()`/`repeat()` blocks for replaying seat-layout action sequences during `build()`.
+  * Added nestable `record()`/`repeat()` blocks and reusable `saveRecord()` action templates for replaying seat-layout sequences during `build()`.
+  * Added `saveState()`, `saveOnlyState()`, and `restoreState()` for deferred gap, area, tag, and data snapshots.
   * Added `ISeatLabelBuilder`, default `NullLabels`, and exact-consumption `ListLabels` with end-of-build validation.
   * Added `DataPointPipeline.seats()` for fixed style and optional extent decoration using selectors, predicates, and exact seat keys.
 * **Breaking: custom chart data**
