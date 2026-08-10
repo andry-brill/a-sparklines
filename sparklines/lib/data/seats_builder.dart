@@ -12,7 +12,8 @@ class SeatsBuilder {
 
   final _SeatsBuildConfiguration _configuration;
   final List<_SeatsAction> _actions = [];
-  final List<int> _recordingStarts = [];
+  final List<_SeatsRecording> _recordings = [];
+  final Map<String, List<_SeatsAction>> _namedRecordings = {};
 
   SeatsBuilder({
     double x = 0.0,
@@ -145,33 +146,39 @@ class SeatsBuilder {
     return this;
   }
 
-  SeatsBuilder record() {
-    _recordingStarts.add(_actions.length);
+  SeatsBuilder record({String? key}) {
+    if (key != null && (_namedRecordings.containsKey(key) || _recordings.any((recording) => recording.key == key))) {
+      throw ArgumentError.value(key, 'key', 'a recording with this key already exists');
+    }
+    _recordings.add(_SeatsRecording(start: _actions.length, key: key));
     return this;
   }
 
-  SeatsBuilder repeat(int count) {
+  SeatsBuilder repeat(int count, {String? key}) {
     _validateCount(count, 'count');
-    if (_recordingStarts.isEmpty) {
+    if (key != null) {
+      final recorded = _namedRecordings[key];
+      if (recorded == null) {
+        throw StateError('No recording exists for key "$key"');
+      }
+      _addRepeatedActions(recorded, count);
+      return this;
+    }
+    if (_recordings.isEmpty) {
       throw StateError('repeat() requires an open record() block');
     }
-    final start = _recordingStarts.removeLast();
-    final recorded = List<_SeatsAction>.unmodifiable(_actions.sublist(start));
-    _actions.removeRange(start, _actions.length);
-    if (count > 0) {
-      _actions.add((state) {
-        for (var i = 0; i < count; i++) {
-          for (final action in recorded) {
-            action(state);
-          }
-        }
-      });
+    final recording = _recordings.removeLast();
+    final recorded = List<_SeatsAction>.unmodifiable(_actions.sublist(recording.start));
+    _actions.removeRange(recording.start, _actions.length);
+    if (recording.key != null) {
+      _namedRecordings[recording.key!] = recorded;
     }
+    _addRepeatedActions(recorded, count);
     return this;
   }
 
   List<DataPoint> build() {
-    if (_recordingStarts.isNotEmpty) {
+    if (_recordings.isNotEmpty) {
       throw StateError('Every record() block must be closed by repeat() before build()');
     }
     final state = _SeatsBuildState(_configuration);
@@ -180,6 +187,17 @@ class SeatsBuilder {
     }
     state.validateLabels();
     return List<DataPoint>.unmodifiable(state.points);
+  }
+
+  void _addRepeatedActions(List<_SeatsAction> recorded, int count) {
+    if (count == 0) return;
+    _actions.add((state) {
+      for (var i = 0; i < count; i++) {
+        for (final action in recorded) {
+          action(state);
+        }
+      }
+    });
   }
 
   void _recordSeats({
@@ -231,6 +249,18 @@ class SeatsBuilder {
       throw ArgumentError.value(value, name, 'must be non-negative');
     }
   }
+
+}
+
+class _SeatsRecording {
+
+  final int start;
+  final String? key;
+
+  const _SeatsRecording({
+    required this.start,
+    required this.key,
+  });
 
 }
 

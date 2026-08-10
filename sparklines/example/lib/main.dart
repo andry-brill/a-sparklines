@@ -3,6 +3,138 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:any_sparklines/any_sparklines.dart';
 
+
+class ChairDataPointStyle extends ADataPointData<ChairDataPointStyle> implements IDataPointStyle {
+
+  static const IDataPointRenderer defaultRenderer = ChairDataPointRenderer();
+
+  final ILengthValue size;
+  final Color backColor;
+  final Color baseColor;
+
+  const ChairDataPointStyle({
+    required this.size,
+    required this.backColor,
+    required this.baseColor,
+  });
+
+  @override
+  ChairDataPointStyle lerp(ChairDataPointStyle next, double t) {
+    return ChairDataPointStyle(
+      size: ILengthValue.lerp(size, next.size, t)!,
+      backColor: Color.lerp(backColor, next.backColor, t) ?? next.backColor,
+      baseColor: Color.lerp(baseColor, next.baseColor, t) ?? next.baseColor,
+    );
+  }
+
+  @override
+  IDataPointRenderer get renderer => defaultRenderer;
+
+}
+
+class ChairDataPointRenderer implements IDataPointRenderer {
+
+  const ChairDataPointRenderer();
+
+  @override
+  void render(Canvas canvas, ChartTransform transform, Paint paint, IDataPointStyle style, Object dataPoint) {
+    final chairStyle = style as ChairDataPointStyle;
+    final point = dataPoint as DataPoint;
+    final size = transform.length(chairStyle.size);
+    if (!size.isFinite || size <= 0.0) return;
+
+    final center = transform.xy(point.x, point.fy);
+    final top = center.dy - size / 2.0;
+    final backBottomRadius = Radius.circular(size * 0.09);
+    final back = RRect.fromRectAndCorners(
+      Rect.fromLTWH(center.dx - size * 0.39, top, size * 0.78, size * 0.82),
+      topLeft: Radius.circular(size * 0.24),
+      topRight: Radius.circular(size * 0.24),
+      bottomLeft: backBottomRadius,
+      bottomRight: backBottomRadius,
+    );
+    final base = RRect.fromRectAndCorners(
+      Rect.fromLTWH(center.dx - size / 2.0, top + size * 0.70, size, size * 0.30),
+      topLeft: Radius.circular(size * 0.07),
+      topRight: Radius.circular(size * 0.07),
+      bottomLeft: backBottomRadius,
+      bottomRight: backBottomRadius,
+    );
+
+    paint
+      ..style = PaintingStyle.fill
+      ..shader = null
+      ..color = chairStyle.backColor;
+    canvas.drawRRect(back, paint);
+    paint.color = chairStyle.baseColor;
+    canvas.drawRRect(base, paint);
+  }
+
+}
+
+class UserDataPointStyle extends ADataPointData<UserDataPointStyle> implements IDataPointStyle {
+
+  static const IDataPointRenderer defaultRenderer = UserDataPointRenderer();
+
+  final ILengthValue size;
+  final Color color;
+
+  const UserDataPointStyle({
+    required this.size,
+    required this.color,
+  });
+
+  @override
+  UserDataPointStyle lerp(UserDataPointStyle next, double t) {
+    return UserDataPointStyle(
+      size: ILengthValue.lerp(size, next.size, t)!,
+      color: Color.lerp(color, next.color, t) ?? next.color,
+    );
+  }
+
+  @override
+  IDataPointRenderer get renderer => defaultRenderer;
+
+}
+
+class UserDataPointRenderer implements IDataPointRenderer {
+
+  const UserDataPointRenderer();
+
+  @override
+  void render(Canvas canvas, ChartTransform transform, Paint paint, IDataPointStyle style, Object dataPoint) {
+    final userStyle = style as UserDataPointStyle;
+    final point = dataPoint as DataPoint;
+    final size = transform.length(userStyle.size);
+    if (!size.isFinite || size <= 0.0) return;
+
+    final center = transform.xy(point.x, point.fy);
+    final top = center.dy - size / 2.0;
+    final headRadius = size * 0.135;
+    final bodyAndLegsTop = top + headRadius * 2.0 + size * 0.06;
+    final bodyAndLegsHeight = size * 0.67;
+    final bodyHeight = bodyAndLegsHeight * 0.45;
+    final legsHeight = bodyAndLegsHeight - bodyHeight;
+    final body = RRect.fromRectAndRadius(
+      Rect.fromLTWH(center.dx - size * 0.39, bodyAndLegsTop, size * 0.78, bodyHeight),
+      Radius.circular(size * 0.12),
+    );
+    final legs = RRect.fromRectAndRadius(
+      Rect.fromLTWH(center.dx - size * 0.20, bodyAndLegsTop + bodyHeight, size * 0.40, legsHeight),
+      Radius.circular(size * 0.09),
+    );
+
+    paint
+      ..style = PaintingStyle.fill
+      ..shader = null
+      ..color = userStyle.color;
+    canvas.drawCircle(Offset(center.dx, top + headRadius), headRadius, paint);
+    canvas.drawRRect(body, paint);
+    canvas.drawRRect(legs, paint);
+  }
+
+}
+
 final bigPie = PieData(
   pies: [
     DataPoint(x: 100.0, y: 0, dy: pi / 6.0),
@@ -457,6 +589,150 @@ final barsT = BarData(
       DataPoint(x: 90, y: 44, dy: 2, data: barsData),
     ]);
 
+
+const chairStyle = ChairDataPointStyle(
+  size: Dx(0.72),
+  backColor: Color(0xff315f96),
+  baseColor: Color(0xff78a9dc),
+);
+
+const chairExtent = ChartInsets(
+  left: Dx(0.36),
+  top: Dx(0.36),
+  right: Dx(0.36),
+  bottom: Dx(0.36),
+);
+
+final chairSeats = DataPointPipeline()
+    .seats(style: chairStyle, extent: chairExtent)
+    .build(
+      SeatsBuilder(
+        seatDx: 1.0,
+        rowDy: 1.0,
+        gapDx: 0.12,
+        gapDy: 0.12,
+      )
+          .record(key: 'chairSection')
+          .seats(3)
+          .skip(2)
+          .seats(3)
+          .nextRow()
+          .repeat(3)
+          .nextRow()
+          .repeat(3, key: 'chairSection')
+          .nextRow()
+          .repeat(3, key: 'chairSection')
+          .build(),
+    );
+
+final chairSeatChart = LineData.scatter(points: chairSeats);
+
+const circleSeatStyle = CircleDataPointStyle(
+  radius: Dx(0.28),
+  color: Color(0xff42a5a5),
+);
+
+const circleSeatExtent = ChartInsets(
+  left: Dx(0.28),
+  top: Dx(0.28),
+  right: Dx(0.28),
+  bottom: Dx(0.28),
+);
+
+final circleSeats = DataPointPipeline()
+    .seats(style: circleSeatStyle, extent: circleSeatExtent)
+    .build(
+      SeatsBuilder(
+        seatDx: 1.0,
+        rowDy: 1.0,
+        gapDx: 0.12,
+        gapDy: 0.12,
+      )
+          .record()
+          .seats(8)
+          .nextRow()
+          .repeat(2)
+          .nextRow()
+          .record()
+          .skip()
+          .seats(6)
+          .nextRow()
+          .repeat(4)
+          .nextRow()
+          .record()
+          .skip(2)
+          .seats(4)
+          .nextRow()
+          .repeat(3)
+          .build(),
+    );
+
+final circleSeatChart = LineData.scatter(points: circleSeats);
+
+const userSeatStyle = UserDataPointStyle(
+  size: Dx(0.72),
+  color: Color(0xff7357a6),
+);
+
+const userSeatExtent = ChartInsets(
+  left: Dx(0.36),
+  top: Dx(0.36),
+  right: Dx(0.36),
+  bottom: Dx(0.36),
+);
+
+final userSeats = DataPointPipeline()
+    .seats(style: userSeatStyle, extent: userSeatExtent)
+    .build(
+      SeatsBuilder(
+        seatDx: 1.0,
+        rowDy: 1.0,
+        gapDx: 0.15,
+        gapDy: 0.15,
+      )
+          .record()
+          .seats(5)
+          .nextRow()
+          .repeat(5)
+          .build(),
+    );
+
+final userSeatChart = LineData.scatter(points: userSeats);
+
+const weightedScatterSource = [
+  DataPoint(x: 0.0, y: 0.8, dy: 0.0, z: 2.0),
+  DataPoint(x: 0.8, y: 3.2, dy: 0.0, z: 7.0),
+  DataPoint(x: 1.8, y: 1.7, dy: 0.0, z: 4.0),
+  DataPoint(x: 2.5, y: 4.4, dy: 0.0, z: 10.0),
+  DataPoint(x: 3.4, y: 2.8, dy: 0.0, z: 5.0),
+  DataPoint(x: 4.2, y: 0.6, dy: 0.0, z: 8.0),
+  DataPoint(x: 5.0, y: 3.8, dy: 0.0, z: 3.0),
+  DataPoint(x: 5.8, y: 2.0, dy: 0.0, z: 9.0),
+  DataPoint(x: 6.7, y: 4.6, dy: 0.0, z: 6.0),
+  DataPoint(x: 7.6, y: 1.0, dy: 0.0, z: 11.0),
+  DataPoint(x: 8.5, y: 3.0, dy: 0.0, z: 2.5),
+  DataPoint(x: 9.4, y: 4.2, dy: 0.0, z: 8.5),
+  DataPoint(x: 10.2, y: 1.9, dy: 0.0, z: 4.5),
+  DataPoint(x: 11.0, y: 3.6, dy: 0.0, z: 7.5),
+  DataPoint(x: 12.0, y: 0.7, dy: 0.0, z: 6.5),
+];
+
+final weightedScatter = DataPointPipeline()
+    .rescaleZ()
+    .scatterZ(
+      style: (
+        min: const CircleDataPointStyle(radius: Vmin(2.5), color: Color(0xff90caf9)),
+        max: const CircleDataPointStyle(radius: Vmin(8.0), color: Color(0xff3949ab)),
+      ),
+      extent: (
+        min: const ChartInsets(left: Vmin(2.5), top: Vmin(2.5), right: Vmin(2.5), bottom: Vmin(2.5)),
+        max: const ChartInsets(left: Vmin(8.0), top: Vmin(8.0), right: Vmin(8.0), bottom: Vmin(8.0)),
+      ),
+    )
+    .build(weightedScatterSource);
+
+final weightedScatterChart = LineData.scatter(points: weightedScatter);
+
 class _ExamplePageState extends State<_ExamplePage> {
 
   bool _toggled = false;
@@ -468,6 +744,13 @@ class _ExamplePageState extends State<_ExamplePage> {
   static final _toggleCharts = [
     bigPieT, steppedLineT, smallPieT, betweenT, lineTopT, lineBottomT, dxPieT, padPieT, barsT
   ];
+
+  Widget _panel(Widget chart) {
+    return Padding(
+      padding: const EdgeInsets.all(5.0),
+      child: chart,
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -484,16 +767,82 @@ class _ExamplePageState extends State<_ExamplePage> {
             borderRadius: BorderRadius.circular(8),
           ),
           alignment: Alignment.center,
-          child: SparklinesChart(
-            aspectRatio: 1,
-            animate: true,
-            layout: const RelativeLayout(
-              minX: -150.0,
-              maxX: 150.0,
-              minY: -150.0,
-              maxY: 150.0,
+          child: AspectRatio(
+            aspectRatio: 1.0,
+            child: Column(
+              children: [
+                Expanded(
+                  flex: 2,
+                  child: Row(
+                    children: [
+                      Expanded(
+                        flex: 2,
+                        child: _panel(SparklinesChart(
+                          aspectRatio: 1.0,
+                          animate: true,
+                          layout: const RelativeLayout(
+                            minX: -150.0,
+                            maxX: 150.0,
+                            minY: -150.0,
+                            maxY: 150.0,
+                          ),
+                          charts: charts,
+                        )),
+                      ),
+                      Expanded(
+                        child: Column(
+                          children: [
+                            Expanded(
+                              child: _panel(SparklinesChart(
+                                aspectRatio: 1.0,
+                                animate: false,
+                                crop: true,
+                                layout: const RelativeLayout.full(),
+                                charts: [chairSeatChart],
+                              )),
+                            ),
+                            Expanded(
+                              child: _panel(SparklinesChart(
+                                aspectRatio: 1.0,
+                                animate: false,
+                                crop: true,
+                                layout: const RelativeLayout.full(),
+                                charts: [circleSeatChart],
+                              )),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                Expanded(
+                  child: Row(
+                    children: [
+                      Expanded(
+                        flex: 2,
+                        child: _panel(SparklinesChart(
+                          aspectRatio: 2.0,
+                          animate: false,
+                          crop: true,
+                          layout: const RelativeLayout.full(),
+                          charts: [weightedScatterChart],
+                        )),
+                      ),
+                      Expanded(
+                        child: _panel(SparklinesChart(
+                          aspectRatio: 1.0,
+                          animate: false,
+                          crop: true,
+                          layout: const RelativeLayout.full(),
+                          charts: [userSeatChart],
+                        )),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
             ),
-            charts: charts,
           ),
         ),
       ),

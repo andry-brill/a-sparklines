@@ -258,10 +258,49 @@ void main() {
       expect(points.map((point) => (point.key! as SeatKey).row), orderedEquals([1, 2, 3, 4]));
     });
 
+    test('named recordings can be replayed later from the current cursor', () {
+      final points = SeatsBuilder(labelBuilder: const _CoordinateLabels())
+          .record(key: 'row')
+          .seats(2)
+          .skip()
+          .seat()
+          .nextRow()
+          .repeat(2)
+          .nextRow()
+          .repeat(2, key: 'row')
+          .build();
+
+      expect(points.map((point) => point.y), orderedEquals([0.0, 0.0, 0.0, 1.0, 1.0, 1.0, 3.0, 3.0, 3.0, 4.0, 4.0, 4.0]));
+      expect(points.map((point) => (point.key! as SeatKey).label), orderedEquals(['1:1', '1:2', '1:4', '2:1', '2:2', '2:4', '4:1', '4:2', '4:4', '5:1', '5:2', '5:4']));
+    });
+
+    test('named recordings use current defaults and compose inside recordings', () {
+      final points = SeatsBuilder()
+          .record(key: 'row')
+          .seats(2)
+          .nextRow()
+          .repeat(1)
+          .area('business')
+          .gap(gapDx: 0.5)
+          .record()
+          .repeat(2, key: 'row')
+          .repeat(1)
+          .build();
+
+      expect(points.map((point) => point.x), orderedEquals([0.0, 1.0, 0.0, 1.5, 0.0, 1.5]));
+      expect(points.map((point) => (point.key! as SeatKey).area), orderedEquals([null, null, 'business', 'business', 'business', 'business']));
+      expect(points.map((point) => (point.key! as SeatKey).row), orderedEquals([1, 1, 2, 2, 3, 3]));
+    });
+
     test('record and repeat report invalid block usage', () {
       expect(() => SeatsBuilder().repeat(1), throwsStateError);
+      expect(() => SeatsBuilder().repeat(1, key: 'missing'), throwsStateError);
       expect(() => SeatsBuilder().record().seat().build(), throwsStateError);
       expect(() => SeatsBuilder().record().repeat(-1), throwsArgumentError);
+
+      final stored = SeatsBuilder().record(key: 'row').seat().repeat(1);
+      expect(() => stored.record(key: 'row'), throwsArgumentError);
+      expect(() => SeatsBuilder().record(key: 'row').record(key: 'row'), throwsArgumentError);
     });
 
     test('builder data is replaced while call data overlays it by type', () {

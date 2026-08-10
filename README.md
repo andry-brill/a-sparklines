@@ -214,12 +214,13 @@ final rawSeats = SeatsBuilder(
     .skip(2)
     .seats(3, tags: {AircraftSeatTag.extraLegroom})
     .nextRow()
-    .record()
+    .record(key: 'standardRow')
     .seats(3)
     .skip(2)
     .seats(3)
     .nextRow()
-    .repeat(9)
+    .repeat(3)
+    .repeat(6, key: 'standardRow')
     .build();
 
 final points = DataPointPipeline()
@@ -239,6 +240,8 @@ final seatMap = LineData.scatter(points: points);
 `nextRow()` resets the horizontal cursor and column while retaining area, tags, data, and gap defaults.
 
 `record()` starts a repeatable action block and `repeat(count)` closes it; the count is the total number of block executions.
+Use `record(key: 'name')` to save a block and replay it later with `repeat(count, key: 'name')`. Named replays start from the current cursor and use the current defaults.
+Keys must be unique, blocks must be closed before they can be replayed, and named replays can be composed inside other recording blocks.
 Blocks may be nested. Labels default to `null` through `const NullLabels()`; provide an `ISeatLabelBuilder` to the constructor or an individual `seats()` action, or override one seat with `seat(label: ...)`.
 `ListLabels` assigns its strings sequentially to emitted seats, ignores skipped slots, and validates that every supplied label was consumed. Custom builders implement `next(row, column, area)` and `validate()`; validation runs at the end of `build()`.
 
