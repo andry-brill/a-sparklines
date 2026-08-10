@@ -1,4 +1,14 @@
-## 3.1.0
+## 3.0.0
+
+* **Breaking: unit-aware visual lengths**
+  * `ThicknessData.size`, `ThicknessOverride.size`, marker radius, and chart/data-point border radius now use `ILengthValue`.
+  * Added `Px`, `Vw`, `Vh`, `Dx`, and `Dy`; viewport units follow CSS percentage semantics (`Vw(1)` is 1%).
+  * Added deferred cross-unit interpolation and support for custom length implementations through `ILengthContext`.
+* **Breaking: simplified layouts**
+  * Removed `RelativeDimension`, `RelativeLayout.relativeTo`, and `IChartLayout.transformScalar()`.
+  * `ChartTransform` no longer accepts an `IChartLayout`; it resolves lengths from its dimensions and path matrix.
+  * Layouts now transform plot coordinates only; each visual value owns its sizing policy.
+  * Pie auto-bounds are derived from data geometry and no longer include visual thickness, borders, corners, or markers.
 
 * **LineData**
   * Added `LineData.scatter(points: ...)` for marker-only x/y plots without connected lines or area fills.
@@ -12,6 +22,7 @@
   * Removed `IDataPointMeta` and replaced `DataPointMeta` with the value-based `DataPointKey`, retaining its `id`, string `key`, and `label` fields.
   * Added `rescaleZ()` with shared automatic bounds, optional clamping, and target-midpoint handling for equal z values.
   * Added `scatterZ()` with optional key/predicate filtering and z-interpolated `StylesInterval`/`ExtentsInterval` metadata.
+  * Added optional `groupingStep` to `stack()`. When provided, nearby x values are grouped into rounded buckets of that size; the default remains exact x matching.
   * Added optional z ordering to `sort()`.
 * **Visual lengths**
   * Added `Vmin` and `Vmax` for percentages of the shorter and longer logical viewport dimensions.
@@ -35,23 +46,6 @@
   * `IDataPointExtent` now extends `IDataPointData` so custom extents can be stored directly in point metadata.
   * `ISparklinesData` now implements `Iterable<DataPoint>` and requires `padding` and `supportsPointExtents`.
   * `BetweenLineData` iterates its `from` points followed by its `to` points but disables point-extent fitting.
-
-## 3.0.1
-
-* **DataPointPipeline**
-  * Added optional `groupingStep` to `stack()`. When provided, nearby x values are grouped into rounded buckets of that size; the default remains exact x matching.
-
-## 3.0.0
-
-* **Breaking: unit-aware visual lengths**
-  * `ThicknessData.size`, `ThicknessOverride.size`, marker radius, and chart/data-point border radius now use `ILengthValue`.
-  * Added `Px`, `Vw`, `Vh`, `Dx`, and `Dy`; viewport units follow CSS percentage semantics (`Vw(1)` is 1%).
-  * Added deferred cross-unit interpolation and support for custom length implementations through `ILengthContext`.
-* **Breaking: simplified layouts**
-  * Removed `RelativeDimension`, `RelativeLayout.relativeTo`, and `IChartLayout.transformScalar()`.
-  * `ChartTransform` no longer accepts an `IChartLayout`; it resolves lengths from its dimensions and path matrix.
-  * Layouts now transform plot coordinates only; each visual value owns its sizing policy.
-  * Pie auto-bounds are derived from data geometry and no longer include visual thickness, borders, corners, or markers.
 
 ### Migration
 
