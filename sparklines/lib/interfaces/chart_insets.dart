@@ -26,6 +26,24 @@ class ChartInsets extends ADataPointData<ChartInsets> implements IDataPointExten
     this.bottom,
   });
 
+  const ChartInsets.all(ILengthValue value) :
+    left = value,
+    top = value,
+    right = value,
+    bottom = value;
+
+  const ChartInsets.horizontal(ILengthValue value) :
+    left = value,
+    top = null,
+    right = value,
+    bottom = null;
+
+  const ChartInsets.vertical(ILengthValue value) :
+    left = null,
+    top = value,
+    right = null,
+    bottom = value;
+
   bool get isEmpty => left == null && top == null && right == null && bottom == null;
 
   @override

@@ -1,6 +1,7 @@
 import 'dart:ui';
 
 import '../data/data_point.dart';
+import '../interfaces/chart_insets.dart';
 import '../interfaces/chart_transform.dart';
 import '../interfaces/data_point_data.dart';
 import '../interfaces/data_point_style.dart';
@@ -20,6 +21,8 @@ class CircleDataPointStyle extends ADataPointData<CircleDataPointStyle> implemen
     required this.radius,
     required this.color,
   });
+
+  ChartInsets get extent => ChartInsets.all(radius);
 
   @override
   CircleDataPointStyle lerp(CircleDataPointStyle next, double t) {

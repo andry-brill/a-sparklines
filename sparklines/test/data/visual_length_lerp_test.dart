@@ -38,12 +38,13 @@ void main() {
     expect(_transform().length(middle.size!), 5);
   });
 
-  test('CircleDataPointStyle defers radius interpolation', () {
+  test('CircleDataPointStyle defers radius interpolation and exposes its extent', () {
     const from = CircleDataPointStyle(radius: Px(2), color: Colors.black);
     const to = CircleDataPointStyle(radius: Vh(10), color: Colors.white);
 
     final middle = from.lerp(to, 0.5);
 
+    expect(from.extent, const ChartInsets.all(Px(2)));
     expect(_transform().length(middle.radius), 6);
   });
 

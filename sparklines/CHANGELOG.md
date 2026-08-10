@@ -17,6 +17,8 @@
   * Added `Vmin` and `Vmax` for percentages of the shorter and longer logical viewport dimensions.
 * **Chart insets and point fitting**
   * Added reusable `ChartInsets` with optional `left`, `top`, `right`, and `bottom` `ILengthValue`s for global widget padding and local per-chart padding.
+  * Added `ChartInsets.all()`, `ChartInsets.horizontal()`, and `ChartInsets.vertical()` convenience constructors.
+  * Added `CircleDataPointStyle.extent` for a symmetric point extent matching the circle radius.
   * `ChartInsets` implements `IDataPointExtent` and can be stored in `DataPoint.data` for automatic, position-aware visual overflow fitting around `(x, fy)`.
   * Global padding, local padding, and point overflow are combined once from the preliminary transform without changing source data or layout bounds.
   * Charts sharing a layout receive one aligned inset transform; over-constrained axes collapse to the weighted position between their opposing insets.

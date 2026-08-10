@@ -94,6 +94,12 @@ void main() {
       expect(const SparklinesChart(charts: []).padding, const ChartInsets());
     });
 
+    test('named constructors map values to all, horizontal, or vertical sides', () {
+      expect(const ChartInsets.all(Px(10)), const ChartInsets(left: Px(10), top: Px(10), right: Px(10), bottom: Px(10)));
+      expect(const ChartInsets.horizontal(Px(10)), const ChartInsets(left: Px(10), right: Px(10)));
+      expect(const ChartInsets.vertical(Px(10)), const ChartInsets(top: Px(10), bottom: Px(10)));
+    });
+
     test('interpolates lengths and works as data-point extent metadata', () {
       const from = ChartInsets(left: Px(0), top: Vh(0));
       const to = ChartInsets(left: Px(10), top: Vh(20));

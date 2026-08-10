@@ -67,7 +67,8 @@ Unit changes animate smoothly because both endpoints are resolved in the current
 
 ### Chart insets and point fitting
 
-`ChartInsets` reserves screen-space room inside the chart viewport without changing data points or layout bounds. Each side accepts any `ILengthValue` and omitted sides have no inset. Set global insets on `SparklinesChart.padding` or additional local insets on any built-in chart data object.
+`ChartInsets` reserves screen-space room inside the chart viewport without changing data points or layout bounds. Each side accepts any `ILengthValue` and omitted sides have no inset.
+Use `ChartInsets.all()`, `ChartInsets.horizontal()`, or `ChartInsets.vertical()` for equal sides. Set global insets on `SparklinesChart.padding` or additional local insets on any built-in chart data object.
 
 ```dart
 SparklinesChart(
@@ -79,14 +80,14 @@ SparklinesChart(
   ),
   charts: [
     LineData.scatter(
-      padding: const ChartInsets(left: Px(2), right: Px(2)),
+      padding: const ChartInsets.horizontal(Px(2)),
       points: const [
         DataPoint(
           x: 0,
           y: 0.5,
           dy: 0,
           data: {
-            IDataPointExtent: ChartInsets(left: Px(6), top: Px(6), right: Px(6), bottom: Px(6)),
+            IDataPointExtent: ChartInsets.all(Px(6)),
           },
         ),
       ],
@@ -167,19 +168,19 @@ LineData.scatter(
 Use `z` with `DataPointPipeline.scatterZ()` to generate per-point styles and fitting extents:
 
 ```dart
-const small = Vmin(0.5);
-const large = Vmax(2);
+const smallStyle = CircleDataPointStyle(radius: Vmin(0.5), color: Colors.blue);
+const largeStyle = CircleDataPointStyle(radius: Vmax(2), color: Colors.red);
 
 final weightedPoints = DataPointPipeline()
     .rescaleZ()
     .scatterZ(
       style: (
-        min: const CircleDataPointStyle(radius: small, color: Colors.blue),
-        max: const CircleDataPointStyle(radius: large, color: Colors.red),
+        min: smallStyle,
+        max: largeStyle,
       ),
       extent: (
-        min: const ChartInsets(left: small, top: small, right: small, bottom: small),
-        max: const ChartInsets(left: large, top: large, right: large, bottom: large),
+        min: smallStyle.extent,
+        max: largeStyle.extent,
       ),
     )
     .build(points);
