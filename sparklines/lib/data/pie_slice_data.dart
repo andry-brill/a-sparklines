@@ -61,14 +61,16 @@ Offset toCartesian(double radius, DataPoint point) {
 /// - Each point (x, y) defines an arc: r = x, startAngle = y, endAngle = y + dy.
 /// - innerRadius = x - thicknessAlignedLeft, outerRadius = x + thicknessAlignedRight based on thicknessAlign.
 /// - space = uniform linear gap between slices, set as spaceOffset (aligned with arc midpoint angle).
+/// - [eps] is the minimum radius, thickness, and angular span to include.
 List<PieSliceData> computePies(
   List<DataPoint> pies,
   double offset,
   double padAngle,
   ThicknessData thickness,
   ILengthValue? radius,
-  ChartTransform transform,
-) {
+  ChartTransform transform, {
+  double eps = 0.0001,
+}) {
   List<PieSliceData> layouts = [];
 
   for (var pie in pies) {
@@ -82,8 +84,9 @@ List<PieSliceData> computePies(
     final thicknessSize =
         transform.antiScalar(transform.length(thicknessValue));
 
-    if (pie.x <= 0.0001 || thicknessSize <= 0.0001 || pie.dy <= 0.0001)
+    if (pie.x <= eps || thicknessSize <= eps || pie.dy <= eps) {
       continue;
+    }
 
     final halfInnerThickness = thicknessSize * (1 - thicknessAlign) / 2;
     final halfOuterThickness = thicknessSize * (1 + thicknessAlign) / 2;
@@ -112,11 +115,18 @@ List<PieSliceData> computePies(
 ///
 /// Visual thickness, borders, corner radii, and markers are intentionally not
 /// included, matching the bounds behavior of line and bar charts.
-Rect computePieDataBounds(List<DataPoint> pies, double offset) {
+/// [eps] is the minimum radius and angular span to include.
+Rect computePieDataBounds(
+  List<DataPoint> pies,
+  double offset, {
+  double eps = 0.0001,
+}) {
   Rect? bounds;
 
   for (final pie in pies) {
-    if (pie.x <= 0.0001 || pie.dy <= 0.0001) continue;
+    if (pie.x <= eps || pie.dy <= eps) {
+      continue;
+    }
 
     final center = toCartesian(pie.pieOffset?.pieOffset ?? offset, pie);
     final start = pie.y;

@@ -1,3 +1,8 @@
+## 3.0.1
+
+* Added a configurable `eps` threshold to pie layout and data-bounds computations.
+* Fixed lint warnings for unbraced `if` statements.
+
 ## 3.0.0
 
 * **Breaking: unit-aware visual lengths**
