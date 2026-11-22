@@ -7,7 +7,6 @@ import 'package:any_sparklines/renderers/bar_chart_renderer.dart';
 import 'package:any_sparklines/renderers/between_line_renderer.dart';
 import 'package:any_sparklines/renderers/line_chart_renderer.dart';
 import 'package:any_sparklines/renderers/pie_chart_renderer.dart';
-import 'package:flutter/material.dart' show Colors;
 import 'package:test/test.dart';
 
 ChartTransform _transform() {
@@ -107,7 +106,7 @@ void main() {
     final data = LineData(
       line: const [DataPoint(x: -1, dy: -0.5), DataPoint(x: 1, dy: 0.5)],
       thickness: const ThicknessData(size: Px(2)),
-      pointStyle: const CircleDataPointStyle(radius: Vh(2), color: Colors.blue),
+      pointStyle: const CircleDataPointStyle(radius: Vh(2), color: Color(0xFF2196F3)),
     );
 
     expect(
@@ -119,10 +118,10 @@ void main() {
   test('bar, border, corner, and marker lengths render independently', () {
     final data = BarData(
       bars: const [DataPoint(x: 0, y: -1, dy: 1.5)],
-      thickness: const ThicknessData(size: Dx(0.2), color: Colors.blue),
-      border: const ThicknessData(size: Px(2), color: Colors.black),
+      thickness: const ThicknessData(size: Dx(0.2), color: Color(0xFF2196F3)),
+      border: const ThicknessData(size: Px(2), color: Color(0xFF000000)),
       borderRadius: const Vh(2),
-      pointStyle: const CircleDataPointStyle(radius: Px(3), color: Colors.red),
+      pointStyle: const CircleDataPointStyle(radius: Px(3), color: Color(0xFFF44336)),
     );
 
     expect(
@@ -169,7 +168,7 @@ void main() {
       ],
       pointStyle: _RecordingDataPointStyle(pointRenderer),
     ).copyWith(
-      areaColor: Colors.red,
+      areaColor: const Color(0xFFF44336),
       lineType: _RecordingLineTypeData(
         lineRenderer,
         drawLine: false,
@@ -316,10 +315,10 @@ void main() {
   test('pie visual lengths render on a non-square relative layout', () {
     final data = PieData(
       pies: const [DataPoint(x: 0.6, y: 0, dy: 1.5 * pi)],
-      thickness: const ThicknessData(size: Dx(0.15), color: Colors.blue),
-      border: const ThicknessData(size: Vh(1), color: Colors.black),
+      thickness: const ThicknessData(size: Dx(0.15), color: Color(0xFF2196F3)),
+      border: const ThicknessData(size: Vh(1), color: Color(0xFF000000)),
       borderRadius: const Px(3),
-      pointStyle: const CircleDataPointStyle(radius: Vw(1), color: Colors.red),
+      pointStyle: const CircleDataPointStyle(radius: Vw(1), color: Color(0xFFF44336)),
     );
 
     expect(

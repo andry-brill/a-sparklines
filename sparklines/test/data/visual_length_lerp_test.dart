@@ -1,6 +1,6 @@
+import 'dart:ui';
 import 'package:any_sparklines/any_sparklines.dart';
 import 'package:any_sparklines/data/layout_data.dart';
-import 'package:flutter/material.dart';
 import 'package:test/test.dart';
 
 ChartTransform _transform() {
@@ -39,8 +39,8 @@ void main() {
   });
 
   test('CircleDataPointStyle defers radius interpolation and exposes its extent', () {
-    const from = CircleDataPointStyle(radius: Px(2), color: Colors.black);
-    const to = CircleDataPointStyle(radius: Vh(10), color: Colors.white);
+    const from = CircleDataPointStyle(radius: Px(2), color: Color(0xFF000000));
+    const to = CircleDataPointStyle(radius: Vh(10), color: Color(0xFFFFFFFF));
 
     final middle = from.lerp(to, 0.5);
 

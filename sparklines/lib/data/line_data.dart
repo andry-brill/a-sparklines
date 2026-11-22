@@ -1,7 +1,7 @@
 import 'dart:collection';
 
 import 'package:any_sparklines/interfaces/data_point_data.dart';
-import 'package:flutter/material.dart';
+import 'package:flutter/painting.dart';
 import '../interfaces/chart_flip.dart';
 import '../interfaces/chart_insets.dart';
 import '../interfaces/chart_rotation.dart';

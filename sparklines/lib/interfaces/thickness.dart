@@ -1,6 +1,6 @@
 import 'dart:ui' show lerpDouble;
 
-import 'package:flutter/material.dart';
+import 'package:flutter/painting.dart';
 
 import 'data_point_data.dart';
 import 'length_value.dart';

@@ -1,5 +1,5 @@
+import 'dart:ui';
 import 'dart:math' as math;
-import 'package:flutter/material.dart';
 import '../data/bar_data.dart';
 import '../data/data_point.dart';
 import '../interfaces/chart_transform.dart';

@@ -1,6 +1,6 @@
 import 'dart:collection';
 
-import 'package:flutter/material.dart';
+import 'package:flutter/painting.dart';
 import 'dart:math' as math;
 import '../interfaces/chart_flip.dart';
 import '../interfaces/chart_insets.dart';

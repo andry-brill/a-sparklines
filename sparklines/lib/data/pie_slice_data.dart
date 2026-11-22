@@ -1,5 +1,5 @@
 import 'dart:math';
-import 'package:flutter/material.dart';
+import 'dart:ui';
 import '../interfaces/chart_transform.dart';
 import '../interfaces/length_value.dart';
 import '../interfaces/thickness.dart';

@@ -1,7 +1,7 @@
 import 'dart:math';
+import 'dart:ui';
 
 import 'package:any_sparklines/any_sparklines.dart';
-import 'package:flutter/material.dart';
 import 'package:test/test.dart';
 
 
@@ -575,8 +575,8 @@ void main() {
   group('ScatterZModifier', () {
 
     test('interpolates style and extent by clamped z', () {
-      const minStyle = CircleDataPointStyle(radius: Px(2.0), color: Colors.black);
-      const maxStyle = CircleDataPointStyle(radius: Px(10.0), color: Colors.white);
+      const minStyle = CircleDataPointStyle(radius: Px(2.0), color: Color(0xFF000000));
+      const maxStyle = CircleDataPointStyle(radius: Px(10.0), color: Color(0xFFFFFFFF));
       const minExtent = ChartInsets(left: Px(1.0), top: Px(2.0), right: Px(3.0), bottom: Px(4.0));
       const maxExtent = ChartInsets(left: Px(5.0), top: Px(6.0), right: Px(7.0), bottom: Px(8.0));
       final pipeline = DataPointPipeline().scatterZ(
@@ -591,13 +591,13 @@ void main() {
 
       final styles = out.map((p) => p.style! as CircleDataPointStyle).toList();
       expect(styles.map((s) => _resolve(s.radius)), orderedEquals([2.0, 6.0, 10.0]));
-      expect(styles.map((s) => s.color), orderedEquals([Colors.black, Color.lerp(Colors.black, Colors.white, 0.5), Colors.white]));
+      expect(styles.map((s) => s.color), orderedEquals([const Color(0xFF000000), Color.lerp(const Color(0xFF000000), const Color(0xFFFFFFFF), 0.5), const Color(0xFFFFFFFF)]));
       expect(out.map((p) => _resolve(p.extent!.left!)), orderedEquals([1.0, 3.0, 5.0]));
       expect(out.map((p) => _resolve(p.extent!.bottom!)), orderedEquals([4.0, 6.0, 8.0]));
     });
 
     test('treats keys and predicate as an AND filter', () {
-      const style = CircleDataPointStyle(radius: Px(4.0), color: Colors.blue);
+      const style = CircleDataPointStyle(radius: Px(4.0), color: Color(0xFF2196F3));
       final pipeline = DataPointPipeline().scatterZ(
         keys: const {'selected'},
         predicate: (point) => point.x > 0.0,
@@ -618,7 +618,7 @@ void main() {
     });
 
     test('preserves existing extent when no extent interval is supplied', () {
-      const style = CircleDataPointStyle(radius: Px(4.0), color: Colors.blue);
+      const style = CircleDataPointStyle(radius: Px(4.0), color: Color(0xFF2196F3));
       const extent = ChartInsets(left: Px(4.0));
       final pipeline = DataPointPipeline().scatterZ(style: (min: style, max: style));
       final out = pipeline.build(const [
@@ -630,7 +630,7 @@ void main() {
     });
 
     test('rejects a non-finite z for a matching point', () {
-      const style = CircleDataPointStyle(radius: Px(4.0), color: Colors.blue);
+      const style = CircleDataPointStyle(radius: Px(4.0), color: Color(0xFF2196F3));
       final pipeline = DataPointPipeline().scatterZ(style: (min: style, max: style));
       final out = pipeline.build(const [DataPoint(x: 0.0, dy: 0.0, z: double.nan)]);
 

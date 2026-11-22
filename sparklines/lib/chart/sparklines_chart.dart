@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import '../interfaces/chart_insets.dart';
 import '../interfaces/layout.dart';
 import '../interfaces/sparklines_data.dart';

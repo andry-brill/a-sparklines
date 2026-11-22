@@ -1,5 +1,5 @@
+import 'dart:ui';
 import 'package:any_sparklines/any_sparklines.dart';
-import 'package:flutter/material.dart' show Colors;
 import 'package:test/test.dart';
 
 
@@ -523,7 +523,7 @@ void main() {
 
     test('applies set selector, exact keys, and predicate as AND filters', () {
       final selectedKey = SeatKey(label: '1B', row: 1, column: 2, area: 'main');
-      const style = CircleDataPointStyle(radius: Px(4.0), color: Colors.blue);
+      const style = CircleDataPointStyle(radius: Px(4.0), color: Color(0xFF2196F3));
       final selectedKeys = <SeatKey>{SeatKey(label: 'stored-id', row: 1, column: 2, area: 'main', tags: {_SeatTag.window})};
       final pipeline = DataPointPipeline().seats(
         selector: SeatSelector(labels: {'1B', '1C'}, rows: {1, 3}, areas: {'main'}, tags: {{_SeatTag.vip}, {_SeatTag.accessible}}),
@@ -551,8 +551,8 @@ void main() {
       const metadata = _FirstData('metadata');
       const oldExtent = ChartInsets(left: Px(1.0));
       const newExtent = ChartInsets(right: Px(2.0));
-      const baseStyle = CircleDataPointStyle(radius: Px(3.0), color: Colors.blue);
-      const finalStyle = CircleDataPointStyle(radius: Px(5.0), color: Colors.red);
+      const baseStyle = CircleDataPointStyle(radius: Px(3.0), color: Color(0xFF2196F3));
+      const finalStyle = CircleDataPointStyle(radius: Px(5.0), color: Color(0xFFF44336));
       final key = SeatKey(label: '1A', row: 1, column: 1);
       final pipeline = DataPointPipeline()
           .seats(style: baseStyle)
@@ -570,7 +570,7 @@ void main() {
     });
 
     test('does not depend on z and integrates repeated rows with one scatter series', () {
-      const style = CircleDataPointStyle(radius: Px(3.0), color: Colors.blue);
+      const style = CircleDataPointStyle(radius: Px(3.0), color: Color(0xFF2196F3));
       final raw = SeatsBuilder().record().seats(2).nextRow().repeat(2).build();
       final input = [raw[0].copyWith(z: double.nan), ...raw.skip(1)];
       final points = DataPointPipeline().seats(style: style).build(input);

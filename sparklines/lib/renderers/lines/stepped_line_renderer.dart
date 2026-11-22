@@ -1,6 +1,6 @@
 import 'dart:math';
+import 'dart:ui';
 
-import 'package:flutter/material.dart';
 import '../../data/data_point.dart';
 import '../../interfaces/chart_transform.dart';
 import '../../interfaces/line_type.dart';

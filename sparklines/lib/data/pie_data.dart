@@ -1,8 +1,7 @@
 import 'dart:collection';
+import 'dart:ui';
 
 import 'package:any_sparklines/interfaces/pie_offset.dart';
-import 'package:flutter/material.dart';
-import 'dart:ui' show lerpDouble;
 import '../interfaces/chart_border.dart';
 import '../interfaces/chart_flip.dart';
 import '../interfaces/chart_insets.dart';

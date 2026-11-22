@@ -1,5 +1,5 @@
 
-import 'package:flutter/material.dart';
+import 'package:flutter/painting.dart';
 import '../../data/data_point.dart';
 import '../../interfaces/chart_transform.dart';
 import '../../interfaces/line_type.dart';

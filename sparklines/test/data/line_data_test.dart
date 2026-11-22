@@ -1,5 +1,5 @@
+import 'dart:ui';
 import 'package:any_sparklines/any_sparklines.dart';
-import 'package:flutter/material.dart' show Colors;
 import 'package:test/test.dart';
 
 void main() {
@@ -44,15 +44,15 @@ void main() {
         () {
       const scatter = LineData.scatter(points: points);
       final copied = scatter.copyWith(
-        thickness: const ThicknessData(size: Px(4.0), color: Colors.red),
-        areaColor: Colors.blue,
+        thickness: const ThicknessData(size: Px(4.0), color: Color(0xFFF44336)),
+        areaColor: const Color(0xFF2196F3),
       );
 
       expect(copied.lineType, isA<ScatterLineData>());
       expect(copied.lineType.drawLine, isFalse);
       expect(copied.thickness,
-          equals(const ThicknessData(size: Px(4.0), color: Colors.red)));
-      expect(copied.areaColor, equals(Colors.blue));
+          equals(const ThicknessData(size: Px(4.0), color: Color(0xFFF44336))));
+      expect(copied.areaColor, equals(const Color(0xFF2196F3)));
     });
 
     test(

@@ -1,7 +1,7 @@
 import 'dart:collection';
+import 'dart:ui';
 
 import 'package:any_sparklines/interfaces/data_point_data.dart';
-import 'package:flutter/material.dart';
 import '../interfaces/chart_border.dart';
 import '../interfaces/chart_flip.dart';
 import '../interfaces/chart_insets.dart';

@@ -4,14 +4,16 @@ version: 0.1.0
 publish_to: none
 
 environment:
-  sdk: '>=3.0.0 <4.0.0'
-  flutter: ">=3.10.0"
+  sdk: '>=3.13.0 <4.0.0'
+  flutter: ">=3.47.0"
 
 dependencies:
   flutter:
     sdk: flutter
   any_sparklines:
     path: ../sparklines
+  material_ui: ^1.11.1
+  cupertino_icons: ^2.0.0
 
 dev_dependencies:
   flutter_test:

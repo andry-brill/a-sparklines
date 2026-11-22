@@ -1,5 +1,5 @@
+import 'dart:ui';
 import 'package:any_sparklines/data/data_point.dart';
-import 'package:flutter/material.dart';
 
 import 'chart_transform.dart';
 import 'data_point_data.dart';
