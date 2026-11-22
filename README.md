@@ -4,9 +4,9 @@
 
 Feature-rich, highly optimized sparklines for Flutter. Line, scatter, bar, pie, and between-line charts with shared layouts, animation, and flexible styling.
 
-![App Screenshot](https://raw.githubusercontent.com/andry-brill/a-sparklines/main/sparklines/example/web/example.png)
+![App Screenshot](https://raw.githubusercontent.com/andry-brill/a-sparklines/main/example/web/example.png)
 
-> You might also like my other packages: [any_timeago](https://pub.dev/packages/any_timeago), [any_borders](https://pub.dev/packages/any_borders)
+> You might also like my other packages: [any_borders](https://pub.dev/packages/any_borders), [any_compact_format](https://pub.dev/packages/any_compact_format), [any_timeago](https://pub.dev/packages/any_timeago), and [any_treemap](https://pub.dev/packages/any_treemap).
 
 ---
 

@@ -1,3 +1,7 @@
+# Pub uses this file instead of the root .gitignore.
+# Keep generated files excluded as well as the separate website project.
+/site/
+
 # Miscellaneous
 *.class
 *.log

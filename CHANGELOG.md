@@ -1,3 +1,10 @@
+## 3.0.2
+
+* Replaced broad Material imports in the core library with focused `widgets.dart`, `rendering.dart`, `painting.dart`, and `dart:ui` imports, removing the Material dependency without changing the public API.
+* Replaced Material color constants in tests with plain `Color` values and migrated both demo apps to `material_ui`.
+* Moved the package to the repository root, with `example/` for the package demo and `site/` (formerly `sparklines-examples/`) for the web showcase. Updated local dependency paths, CI, and documentation.
+* Added `.pubignore` rules to exclude `site/` and generated files from pub.dev while retaining the package example.
+
 ## 3.0.1
 
 * Added a configurable `eps` threshold to pie layout and data-bounds computations.
